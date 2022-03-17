@@ -1,0 +1,118 @@
+[[perche_git]]
+[appendix]
+= Perché git
+
+Forse la domanda giusta è "perché no?" icon:smile-o[] A parte gli scherzi, esistono <<git,decine di articoli su questo argomento>>, e lascio a te approfondire i vantaggi di usare un VCS, o meglio, gli _svantaggi di non usarlo_. Di seguito puoi trovare un esempio di vita reale con e senza un VCS.
+
+== Esempio di vita reale con e senza VCS
+
+Stiamo lavorando all’app _iStuff_: la versione 1.0 è online e funzionante.
+
+[width="100%",options="header"]
+|===
+| Senza VCS | Con VCS
+
+| Creiamo una nuova versione (1.1) *senza fare un backup* dei sorgenti della v1.0 (nella fretta ci dimentichiamo di farlo). | Salviamo la versione 1.0 nel VCS e creiamo una nuova versione/ramo di sviluppo (1.1).
+
+| Testiamo la versione 1.1 su vari dispositivi (ma non iPhone N con iOS 43.2.1). Siccome contiene importanti migliorie, pubblichiamo la v1.1 dell'app. +
+A questo punto scopriamo che la v1.1 va in crash su iPhone N con iOS 43.2.1, cosa che non succedeva con la v1.0.| Idem
+
+| Non possiamo ripristinare la 1.0 neanche temporaneamente: la nostra app in produzione è *inservibile* su iPhone N.| Salviamo le modifiche fatte finora per la v1.1; ripristiniamo la v1.0 dal VCS come nuovo ramo di sviluppo; rilasciamo nuovamente la v1.0 come patch (ad es. 1.1.2), che non è il massimo ma riporta un minimo di serenità agli utenti.
+
+| Dobbiamo lavorare anche di notte per sistemare questo problema, o le recensioni negative sull'app store diventeranno eccessive. icon:frown-o[] | L'app in produzione è *salva* e possiamo pensare a correggere la versione 1.1. icon:smile-o[]
+
+|===
+
+== Concetti base e flusso di lavoro
+
+Nella terminologia di Git, un _progetto_ o un _insieme di file_ di cui vogliamo gestire il versioning si chiama *repository*.
+Un repository generalmente corrisponde ad una directory, e i file al suo interno possono trovarsi in uno di questi stati.
+
+.Ciclo di vita di un file in un repository Git
+image::images/1.ide-git-79f00.png[]
+
+.Stati e significati
+[width="100%"]
+|===
+
+|Untracked |Il file non viene considerato.
+
+|Unmodified |Il file è uguale all'ultima versione salvata nel repository.
+
+|Modified |Il file è stato modificato, ma le modifiche non sono verranno salvate.
+
+|Staged |Il file è stato modificato, e le sue modifiche sono pronte per essere salvate.
+
+|===
+
+=== init
+
+(((Git, git init))) Qualsiasi operazione vogliamo effettuare con Git, ci servirà un _repository_ di riferimento; da shell si può crearne uno, nella directory corrente, con il comando *git init*.
+
+[source,bash]
+----
+$ git init
+Initialized empty Git repository in /Users/.../.git/
+----
+
+Man mano che procediamo nello sviluppo, potremo salvare in Git delle _fotografie_ dei nostri sorgenti, cioè registrare lo stato della nostra _codebase_ ad un particolare momento. Queste _fotografie_ nel linguaggio di Git si chiamano *commit*. +
+Dopo aver inizializzato il repository, non avremo ancora salvato niente. Per fare la prima _fotografia_ dovremo eseguire due operazioni: aggiungere (*add*) i file al _((working tree))_ e poi effettuare il *commit*.
+
+
+=== add
+
+(((Git, git add))) Un *commit* può riguardare tutta la directory del nostro progetto, o un suo sottoinsieme, o anche un solo file: per comunicare a git *che cosa* vogliamo _fotografare_, usiamo il comando *git add* seguito dal percorso del file (o dei file) da aggiungere al working tree. +
+Specificando come argomento il percorso (relativo) di una _directory_, git aggiungerà al working tree quella directory e tutto il suo contenuto. Ad esempio, per il primo commit può avere senso aggiungere tutta la directory del nostro progetto:
+
+[source,bash]
+----
+$ git add .
+----
+
+=== commit
+
+(((Git, git commit))) Quando abbiamo aggiunto tutti i file che vogliamo _fotografare_, possiamo creare il nostro primo commit con il comando:
+
+[source,bash]
+----
+$ git commit -m "Primo commit :)"
+----
+
+L'opzione `-m` permette di specificare _inline_ il messaggio legato a questo commit; infatti, ciascun commit deve essere accompagnato da un testo che descriva cosa è stato modificato. Se *non usiamo* l'opzione `-m`, git aprirà un editor di testo (Nano, Vim, ecc.) per permetterci di scrivere il messaggio di commit: in tal caso il commit verrà eseguito dopo che abbiamo salvato il messaggio e chiuso l'editor.
+
+=== branch
+
+(((Git, git branch))) Quando usiamo Git, possiamo lavorare su più rami di sviluppo della stessa _codebase_: ogni ramo ha un'esistenza separata dagli altri e può coesistere senza problemi con gli altri. I rami di sviluppo nel linguaggio di git si chiamano *branch*.
+
+@todo completare: come si crea un branch
+
+=== merge
+
+(((Git, git merge))) I *branch* di sviluppo sono indipendenti, ma all'occorrenza è possibile sincronizzare un branch con un altro, facendovi confluire tutti i commit del primo. Quest'operazione è detta *merge*.
+
+@todo completare
+
+
+=== remote
+
+(((Git, git remote))) Git permette una gestione *distribuita* dei sorgenti: ciascuno sviluppatore può mantenere sul proprio computer una copia dei sorgenti, ed è possibile specificare un repository remoto (cioè accessibile tramite https o ssh) da cui scaricare i commit e verso cui pubblicarli.
+
+
+@todo: definizione, schemino e comandi
+
+=== pull
+
+(((Git, git pull))) Quando è stato definito un _remote_, è possibile scaricare i commit del repository remoto usando il comando **git pull**.
+
+@todo completare
+
+=== push
+
+(((Git, git push))) Quando è stato definito un _remote_, è possibile fare l'upload dei commit del repository locale in remoto usando il comando **git push**. +
+La prima volta che si fa **push**, si può specificare quale branch remoto dovrà ricevere le modifiche del branch locale corrente usando l'opzione *-u* o la sua versione lunga *--set-upstream*, seguita dal percorso del branch remoto (ossia dal nome del relativo _remote_ seguito da slash e dal nome del branch remoto), ad esempio come segue.
+
+
+[source,bash]
+----
+$ git push -u origin/master
+----

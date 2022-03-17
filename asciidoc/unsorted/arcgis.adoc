@@ -1,0 +1,45 @@
+
+#### ArcGIS
+
+ArcGIS è un ... ////
+completare
+////
+
+Leggiamo attentamente questa pagina: <https://developers.arcgis.com/rest/geocode/api-reference/geocoding-free-vs-paid.htm>
+
+Il limite qui è di 1000 richieste al mese... sempre un po' pochine.
+
+Creiamo quindi un account come **sviluppatori** qui <https://developers.arcgis.com/sign-up> .
+
+* * *
+
+**Nota bene**
+
+Se non ci registriamo come sviluppatori, all'accesso verremo accolti con questo messaggio:
+
+![](/pix/arcgis-first.png)
+
+e dovremo crearne un altro usando il link **"sign up for a free ArcGIS for Developers account"**.
+
+* * *
+
+Una volta creato un account _developer_, entriamo come spiegato https://developers.arcgis.com/rest/geocode/api-reference/geocoding-authenticate-a-request.htm[qui] in <https://developers.arcgis.com/> con le nostre credenziali e creiamo una nuova App.
+
+Se tutto va bene (per inciso, sono obbligatori il titolo dell'App e _almeno un tag_) il sito ci porterà a una schermata simile:
+
+![](/pix/ArcGIS-for-Developers.png)
+
+Per geocodificare un POI, sarà sufficiente visitare l'URL:
+
+<http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode?forStorage=true&f=json&location=[LONGITUDINE],[LATITUDINE]&token=[TOKEN>
+
+dove:
+
+-   `[LONGITUDINE]` e `[LATITUDINE]` sono i corrispondenti campi dell'entity Poi che stiamo considerando;
+-   `[TOKEN]` è il valore che troviamo nel box omonimo nella pagina dell'App del sito di ArcGis.
+
+...
+
+## Il codice
+
+Nota bene: il token ha validità limitata nel tempo. Prima di lanciare questo comando dovrai rigenerare il token e copiarne il valore nel codice.

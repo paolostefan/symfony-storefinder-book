@@ -1,0 +1,200 @@
+[appendix]
+= Vagrant
+
+****
+Nel repository {sample_git_repo_web} sono già presenti i file di configurazione per Vagrant. In quest'appendice vediamo come sono stati creati.
+****
+(((Vagrant, vagrant init)))
+
+== Inizializzazione della Vagrant Box
+
+Per *inizializzare* la _Vagrant Box_ che abbiamo scelto, vanno eseguiti i seguenti passi:
+
+. creiamo una directory per il nostro progetto, chiamandola ad es. `sample_symfony`.
+. usando la shell, posizioniamoci (`cd`) nella directory che abbiamo appena creato.
+. digitiamo il comando `vagrant init`: questo comando inizializzerà l'ambiente Vagrant, creerà cioè un file di nome *Vagrantfile* e una directory (nascosta) di nome *.vagrant/* nella directory corrente.
+
+[source,bash]
+
+----
+mkdir sample_symfony
+cd sample_symfony
+vagrant init damianlewis/ubuntu-18.04-lamp
+----
+
+NOTE: La VM a questo punto non è ancora in funzione, anzi non è stata nemmeno creata: il comando `vagrant init` crea solo i file di configurazione.
+
+(((Port forwarding)))
+
+=== Port forwarding 
+
+Prima di far partire la VM, vogliamo che sia possibile accedere facilmente al suo web server. +
+Per accedere al webserver della VM bisognerebbe conoscere l'IP della VM e visitarlo usando un browser; possiamo però evitare di tenere a mente l'IP della VM, perché Vagrant permette di inoltrare (*forward*) le porte TCP/IP dal nostro Mac/PC alla macchina virtuale.
+
+
+Quando si inoltra una porta TCP/IP, le connessioni a una determinata porta (X) vengono deviate in modo trasparente ad un'altra porta (Y), eventualmente anche su un'altra macchina. +
+Pensiamo all'inoltro delle chiamate telefoniche: se sul telefono di *Mario* attiviamo l'inoltro al numero di *Alice*, tutte le chiamate dirette a Mario verranno deviate al numero di Alice. Quest'ultima non saprà se chi la chiama ha fatto il suo numero o quello di Mario: è come se le avessero telefonato direttamente.
+
+Quando attiviamo il _forward_ della porta 8080 del nostro PC sulla porta 80 della VM, tutti i pacchetti TCP che **il nostro PC** riceverà sulla porta *8080* verranno inoltrati alla **VM** sulla porta *80*. +
+Nell'esempio precedente, la porta 8080 del nostro PC è il numero di telefono di _Mario_ e la porta 80 della VM è il telefono di _Alice_. +
+Quindi, visitando http://localhost:8080/ avremo accesso al web server della VM (che è _in ascolto_ sulla porta 80), anche senza sapere l'IP della VM.
+
+Per abilitare l'inoltro, nel file *Vagrantfile* troviamo questa riga e decommentiamola (cioè, cancelliamo il *#* e lo spazio che lo segue a inizio riga):
+
+[source,diff]
+----
+-# config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
++config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
+----
+
+NOTE: _8080_ non è un numero magico! Possiamo sostituirlo con un numero a nostra scelta, facendo attenzione ad usare lo stesso numero anche più avanti.
+
+Con questa modifica otterremo quanto detto nell'esempio: cioè, le richieste alla porta *8080* dell'*host*, il nostro computer, verranno indirizzate alla porta *80* del *guest* (la VM).
+
+=== Verifichiamo le estensioni PHP
+
+(((Symfony, Estensioni PHP))) Symfony ha bisogno di alcune estensioni di PHP che non sono preinstallate nella VM che stiamo usando. Per installarle tutte è sufficiente installare `php7.2-xml`, con i comandi:
+
+[source,bash]
+----
+sudo apt update
+sudo apt install php7.2-xml
+----
+
+
+(((Git, gitignore)))
+
+=== Il file .gitignore
+
+Non vogliamo che la directory nascosta *.vagrant/* venga salvata nel repository Git, perché è legata alla macchina su cui eseguiamo Vagrant: contiene ad es. i percorsi delle cartelle sincronizzate e la _chiave privata_ che Vagrant utilizza per accedere via SSH alla VM. Dati di questo tipo (percorsi legati a una specifica macchina, password, e/o chiavi private) non dovrebbero essere salvati in git, sia per motivi di sicurezza, sia per garantire il corretto funzionamento del progetto.
+
+Git permette di specificare quali file *non vogliamo* aggiungere al repository mediante il file *.gitignore*: in questo file di testo semplice, è sufficiente specificare su ciascuna riga il _percorso esatto_ di un file, oppure un _pattern_, e i file che corrispondono verranno ignorati da Git.
+
+Per escludere la directory *.vagrant* dal repository, va aggiunta una riga al file *.gitignore*, ad es. usando il nostro IDE, oppure da shell con il comando seguente:
+
+[source,bash]
+----
+echo ".vagrant" >>.gitignore
+----
+
+WARNING: prima di dare il comando qui sopra, assicuriamoci che ci siano _due_ `>`, altrimenti *cancelleremo* tutto il contenuto del file!
+
+Ora possiamo creare il primo _commit_ del nostro repository con i comandi:
+
+[source,bash]
+----
+git add .
+git commit -m "Primo commit"
+----
+
+== Symfony servito da Apache
+
+Sarà ((Apache)), il webserver della nostra VM, a _servire_ il nostro sito Symfony: per farlo, ha bisogno di un file di configurazione che gli spieghi dove si trovano i file da servire (e altri dettagli). È possibile modificare la configurazione di Apache *solo dalla VM*, quindi riaccendiamola (se non l'abbiamo già fatto) e connettiamoci tramite SSH:
+
+[source,bash]
+----
+vagrant up
+vagrant ssh
+----
+
+Per far funzionare Symfony con Apache, è necessario il pacchetto *symfony/apache-pack*, installabile tramite _Composer_. Dalla VM digitiamo:
+
+[source,bash]
+----
+cd /vagrant
+composer require symfony/apache-pack
+----
+
+Questo comando crea il file `public/.htaccess`, utilizzato da Apache per "comprendere" i _friendly URLs_ di Symfony. Alla domanda `Do you want to execute this recipe?` rispondiamo kbd:[y] e premiamo invio.
+
+=== Il modulo rewrite
+
+I _friendly URLs_ di Symfony non funzionano correttamente a meno che non sia abilitato il modulo `rewrite` di Apache. È possibile abilitare i moduli di Apache con il comando *a2enmod*, che sta per **A**pache *2* **en**able **mod**ule.
+
+[source,bash]
+----
+sudo a2enmod rewrite
+----
+
+=== Il sito principale
+
+La directory */etc/apache2/* e le sue sottodirectory contengono i file di configurazione letti da Apache: sono file di testo con estensione *.conf*. +
+Ad es., dentro */etc/apache2/sites-available/* si trovano i file che definiscono tutti i siti configurati per Apache. Creiamo una copia del file *000-default.conf* (che definisce il sito di default), e apriamo il file copiato in un editor di testo (nano, vim, emacs...), con i comandi:
+
+[source,bash]
+----
+cd /etc/apache2/sites-available/
+sudo cp 000-default.conf 001-guybrush.conf
+sudo nano 001-guybrush.conf # oppure vim, o quello che preferisci
+----
+
+Troviamo questa riga:
+
+[source,apache]
+----
+DocumentRoot /var/www/html
+----
+
+e sostituiamola con le righe seguenti:
+
+[source,apache]
+----
+DocumentRoot /vagrant/public
+<Directory /vagrant/public>
+    Options Indexes FollowSymLinks
+    AllowOverride All
+    Require all granted
+</Directory>
+----
+
+Salviamo premendo kbd:[Ctrl+O] e poi kbd:[Y] per confermare. Quindi usciamo premendo kbd:[Ctrl+X]. Ora abilitiamo il nostro sito con il comando *a2ensite*, che sta per **A**pache *2* **en**able **site**.
+
+[source,bash]
+----
+sudo a2ensite 001-guybrush
+----
+
+Poi, disabilitiamo il vecchio sito di default che non serve più, con il comando *a2dissite* che (ormai hai capito la regola) sta per **A**pache *2* **dis**able **site**:
+
+[source,bash]
+----
+sudo a2dissite 000-default
+----
+
+=== Utente di Apache e permessi sui file
+
+Per permettere ad Apache di scrivere file, è necessaria una delle due operazioni seguenti:
+
+. impostare il *proprietario* della directory in cui vogliamo che Apache possa scrivere, all'*utente* sotto cui gira Apache;
+
+. cambiare l'*utente* sotto cui gira Apache, impostandolo al *proprietario* della directory (noi faremo questo).
+
+Cambiare *l'utente sotto cui gira Apache* permette a Symfony di creare e modificare i file di _cache_ e _log_. Per ora ci basta sapere che se Symfony *non* riesce a creare questi file, il sito semplicemente *non funzionerà*. +
+Il file */etc/apache2/envvar* contiene le variabili di ambiente (**env**ironment **var**iables) usate da Apache, tra cui l'_utente_ impersonato dal web server durante l'esecuzione. +
+Per verificare qual è ed eventualmente modificarlo, possiamo aprire il file nel nostro editor preferito (vim, nano, ecc.):
+
+[source,bash]
+----
+sudo vim /etc/apache2/envvars
+----
+
+Troviamo la riga che comincia con:
+
+[source,bash]
+----
+export APACHE_RUN_USER=...
+----
+
+Nella nostra VM il proprietario della directory contenente il progetto Symfony è `vagrant`, perciò -se non lo è già- impostiamo l'utente sotto cui gira Apache a `vagrant`:
+
+[source,bash]
+----
+export APACHE_RUN_USER=vagrant
+----
+
+Quindi, salviamo il file e usciamo dall'editor. Riavviamo _Apache_ dalla VM:
+
+[source,bash]
+----
+sudo systemctl restart apache2
+----

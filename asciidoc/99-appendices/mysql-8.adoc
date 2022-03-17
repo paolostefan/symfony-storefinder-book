@@ -1,0 +1,122 @@
+[appendix]
+= Symfony e MySQL 8
+
+Per accedere al database da Symfony, abbiamo bisogno di un utente **diverso da _root_**, che ci possa scrivere.
+
+[TIP]
+.Perché non usare l'utente root?
+====
+. L'utente root in sistemi Linux/Unix(R) ha _licenza di uccidere_: se lasciamo che Symfony usi il db come root, corriamo il rischio di intaccare **tutti** i database del server.
+
+. Usando _root_ per connetterci, esporremmo il server ad attacchi da parte di utenti malintenzionati: Symfony o Doctrine potrebbero avere un bug che permette di eseguire query arbitrarie, e questo con l'utente *root* significa poter fare _qualsiasi_ cosa con _tutti_ i database presenti nel server
+
+. Realisticamente, in ambienti web condivisi non viene quasi mai consentito l'accesso al db come _root_: solitamente ci verranno assegnate le credenziali di un utente che può accedere ad _un solo database_.
+
+Nel caso della nostra VM, il server **non** è condiviso, e noi vi accediamo come _amministratori_, ma è buona pratica imparare a limitare il raggio d'azione delle web application allo stretto indispensabile.
+====
+
+Possiamo creare un utente di database da shell, connettendoci all'istanza di MySQL in esecuzione nel container *guybrush_php8*; se non siamo connessi al container *guybrush_php8*, usiamo il buon vecchio `vagrant ssh`. +
+
+Prima di procedere, controlliamo la versione di MySQL che
+stiamo usando con il comando `mysql -V` (*V* maiuscola). Se 
+l'output comincia con `mysql  Ver 8.0.`, dovremo fare qualche 
+modifica (v. sotto). Se invece comincia con `mysql  Ver 5.7.`
+possiamo passare al <<creiamo_db_utente,paragrafo successivo>>.
+
+=== PHP e MySQL 8
+
+Nel momento in cui sto scrivendo, MySQL 8 e PHP (versioni 5.x e 7, esclusa la 7.4) non hanno ancora "fatto pace" su un punto cruciale: l'_autenticazione_.
+MySQL 8 utilizza un nuovo metodo di autenticazione, abilitato di default, con il quale PHP *non riuscirà*
+a connettersi al database. Questo problema si può risolvere sia 
+*riconfigurando* il DB server, sia creando un utente con 
+una password memorizzata usando il _vecchio_ metodo (detto
+_mysql native password_). Siccome abbiamo il controllo del server,
+noi cambieremo la configurazione (è piuttosto semplice).
+
+==== Riconfigurare il server MySQL
+
+Come utente root (usando `sudo`) modifichiamo il file di configurazione relativo al ((demone)) MySQL:
+
+[source,bash]
+----
+sudo vim /etc/mysql/mysql.conf.d/mysqld.conf
+----
+
+Aggiungiamo alla sezione `[mysqld]` (cioè dopo la riga che contiene solo
+`[mysqld]`) questa riga:
+
+[source,ini]
+----
+default_authentication_plugin = mysql_native_password
+----
+
+Infine dalla console di MySQL diamo il comando:
+
+[source,sql]
+----
+FLUSH PRIVILEGES;
+----
+
+
+[#creiamo_db_utente]
+== Creiamo DB e utente
+
+Ora siamo pronti per creare il database e l'utente MySQL che faremo usare a Symfony. +
+Nella https://app.vagrantup.com/damianlewis/boxes/lamp-php7.1/versions/1.0.0[pagina della Vagrant box] è riportata la password di root per MySQL, '*secret*': per connetterci al DB locale come utente *root* usiamo quindi il comando (dal container *guybrush_php8*):
+
+[source,bash]
+----
+mysql -u root -psecret
+----
+
+Dal prompt di MySQL, possiamo *creare un nuovo database* di nome _guybrush_ col comando:
+
+[source,sql]
+----
+CREATE DATABASE guybrush;
+----
+
+Quindi possiamo *creare un utente di database* di nome _guybrush_usr_ col comando:
+
+[source,sql]
+----
+CREATE USER 'guybrush_usr'@'localhost' IDENTIFIED BY 'password';
+----
+
+[CAUTION]
+.MySQL 8: utente con password _nativa_
+====
+Se siamo usando MySQL 8 e *non* abbiamo modificato la configurazione globalmente, possiamo comunque creare un utente con cui PHP riuscirà a connettersi, usando questa variante del comando: +
+[source,sql]
+----
+CREATE USER 'guybrush_usr'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password'
+----
+====
+
+TIP: Stiamo definendo un utente che ha una password ridicola (`password`) solo perché ci troviamo in ambiente di sviluppo.
+In qualsiasi altro contesto, usare `password` come password è *una pratica da evitare*.
+
+Infine, vogliamo che l'utente *guybrush_usr* possa fare più o meno tutto, ma limitatamente al db *guybrush*: possiamo dargli i *permessi* sufficienti col comando:
+
+[source,sql]
+----
+GRANT ALL ON guybrush.* TO 'guybrush_usr'@'localhost';
+----
+
+Ora abbiamo un db a cui far connettere Symfony; usciamo dal prompt MySQL premendo kbd:[Ctrl] + kbd:[D], oppure con il comando `quit` o `\q`.
+
+=== Diciamo a Symfony che usiamo MySQL
+
+I parametri di connessione possono essere scritti nel nel file `.env` nella directory
+principale del nostro progetto. Salvare credenziali in questo file non le espone a occhi 
+indiscreti, visto che il file è ignorato da Git. +
+Possiamo aprirlo col nostro IDE e modificare la stringa:
+
+  DATABASE_URL=mysql://db_user:db_password@127.0.0.1:3306/db_name?serverVersion=5.7
+
+inserendo i parametri di connessione corretti, ossia utente, password, nome del DB e versione del server, cioè se stiamo usando MySQL 5.7 (il default):
+
+  DATABASE_URL=mysql://guybrush_usr:password@127.0.0.1:3306/guybrush?serverVersion=5.7
+oppure se abbiamo aggiornato MySQL:
+
+  DATABASE_URL=mysql://guybrush_usr:password@127.0.0.1:3306/guybrush?serverVersion=8.0

@@ -1,0 +1,218 @@
+(((geocoding)))
+
+[#reverse-geocoding]
+= Reverse geocoding
+
+****
+.icon:github[] Con il repository {sample_git_repo_web}
+
+Per tornare a questo punto del libro potete fare checkout del ramo *import_command*. (((Git, git checkout)))
+
+[source,bash]
+----
+cd /percorso/di/guybrush        # sostituite col percorso corretto
+git checkout import_command
+----
+****
+
+[TIP]
+====
+Il processo che, a partire da un *indirizzo* (via, piazza, città, CAP, nazione), ne restituisce le *coordinate geografiche* è detto _geocodifica diretta_; il processo che a partire dalle *coordinate* di un punto ne ricava *l'indirizzo*  prende il nome di _geocodifica inversa_ (in inglese *reverse geocoding*).
+====
+
+== Un nuovo comando
+
+In questo capitolo scriveremo un comando che leggerà tutti i *((POI))* *privi di indirizzo*, e per ciascuno di essi effettuerà una chiamata ad un  _webservice_ di geocodifica inversa; se la chiamata va a buon fine e restituisce un indirizzo, il comando dovrà _salvare_ i dati del risultato nel *POI*; altrimenti, il comando _salterà_ il *Poi* corrente, oppure _uscirà_ con un messaggio di errore.
+
+
+=== Lesson learned
+
+Usiamo gli accorgimenti appresi nel capitolo scorso: creiamo il comando usando `make:command`, otteniamo (((Doctrine, Entity Manager)))l'_Entity Manager_ di Doctrine nel costruttore, prevediamo alcune opzioni per il comando (`--force`, e altre che ne modificano il comportamento), e usiamo una *ProgressBar* per mostrare a che punto siamo.
+
+NOTE: Preferisco non essere pedante: per questo mi limito a dare le indicazioni su cosa fare senza scendere troppo nel dettaglio.
+
+== POI privi di indirizzo
+
+(((Doctrine,Entity Repository))) Nel capitolo scorso abbiamo visto come leggere dal DB _tutte_ le Entity di tipo *PoiCategory* usando il metodo `findAll()` del relativo _Entity Repository_. Prima ancora, abbiamo accennato al fatto che gli _Entity Repository_ hanno alcuni <<repository_default_func,metodi predefiniti>> che restituiscono la o le Entity corrispondenti a particolari criteri di ricerca: per ottenere i *Poi* privi di indirizzo sarà quindi sufficiente usare il metodo *findBy*, come segue:
+
+[source,php]
+----
+$this->em->getRepository(Poi::class)
+->findBy(
+  ['address' => null], // <1>
+  ['updatedAt' => 'ASC'], // <2>
+  $limit // <3>
+);
+----
+
+<1> Criteri di ricerca (uno solo): l'indirizzo deve essere _null_.
+<2> Ordinamento dei risultati: per data di modifica crescente (_ascending_).
+<3> Numero massimo di risultati da restituire. Imposteremo la variabile `$limit` leggendo l'opzione `-l` del comando.
+
+// E se dovessimo eseguire una query più complessa?
+
+// Quando creiamo una Entity con il comando `bin/console make:entity`, Symfony genera _due_ classi, una in *src/Entity* e una in *src/Repository*, ad es. per la nostra Entity *Poi*:
+
+//  . src/Entity/Poi.php
+//  . src/Repository/PoiRepository.php
+
+// Quest'ultima classe contiene alcune funzioni utili per accedere alla tabella di DB corrispondente alla Entity, e *può essere estesa a piacimento*; siccome al comando servono le Entity *Poi*, il nostro uomo è il file *src/Repository/PoiRepository.php*: apriamolo nel nostro IDE e creiamo un metodo _ad hoc_ per recuperare le Entity con indirizzo _null_.
+
+// [source,php,linenums]
+// .Il metodo findNullAddress()
+// ----
+// /**
+//   * @param int $limit Numero massimo di record da restituire
+//   * @return Poi[] Poi objects
+//   */
+// public function findByNullAddress($limit = 10)
+// {
+//     $qb = $this->createQueryBuilder('p'); // <1>
+
+//     $qb
+//       ->andWhere($qb->expr()->isNull('p.address')) // <2>
+//       ->orderBy('updatedAt', 'ASC') // <3>
+//       ;
+//     if ($limit > 0) {
+//         $qb->setMaxResults($limit); // <4>
+//     }
+
+//     return $qb->getQuery()->getResult(); // <5>
+// }
+// ----
+
+// <1> Crea un'istanza di ((QueryBuilder)): una classe che permette di costruire query arbitrarie.
+// <2> Dice al QueryBuilder *cosa* prendere: le entity per le quali il campo `address` è `null`.
+// <3> Dice al QueryBuilder come *ordinare* i risultati: per data di ultima modifica crescente (_**asc**ending_ in inglese).
+// <4> Dice al QueryBuilder *quanti* risultati restituire al massimo (`$limit`).
+// <5> Esegue la query e ne restituisce il risultato.
+
+
+== Servizio di geocodifica
+
+Per effettuare la geocodifica inversa utilizzeremo l'API di *<<mapquest,((MapQuest))>>*.
+
+=== Perché MapQuest e non ...?
+
+Vista l'utilità del servizio di geocodifica (diretta e inversa) molte realtà si sono date da fare per fornirlo, tutte o quasi con formula _freemium_ cioè gratuita fino a un certo numero di richieste; spesse volte le restrizioni sono piuttosto pesanti: ad es. _((Google Maps))_ richiede un account di _fatturazione_ con una carta di credito *non prepagata*, mentre _((OpenStreetMap))_ fissa un limite di *una richiesta al secondo* e *mille richieste al mese* (decisamente poco per le nostre esigenze). +
+Ho scelto di usare MapQuest perché con un account gratuito consente di effettuare fino a *15.000* richieste al mese, è un progetto mantenuto attivamente e ha un'ottima <<mapquest_docs,documentazione>>.
+
+Se possedete già una chiave API di un altro provider, può essere un esercizio utile partire dal comando che stiamo scrivendo e modificare le chiamate al _webservice_ secondo le specifiche del vostro provider.
+
+////
+Esempio di URL di richiesta di geocodifica di openstreetmap
+<https://nominatim.openstreetmap.org/reverse?format=json&lat=38.0145392&lon=12.50897&addressdetails=1>
+////
+
+=== Creiamo un account e richiediamo una chiave API
+
+Dalla home page del sito, creiamo un account e richiediamo una chiave API cliccando sul pulsante _Get your free API key_ .
+
+image::mapquest.png[]
+
+=== Chiamate al webservice
+
+Per effettuare la geocodifica inversa dovremo fare una richiesta HTTP al webservice di MapQuest: https://developer.mapquest.com/documentation/geocoding-api/reverse/get/[questa pagina] contiene le specifiche sul formato della richiesta HTTP da inviare, e sul formato dei dati restituiti.
+
+== Opzioni
+
+=== Force
+
+Come per il comando di importazione, prevediamo l'opzione `--force` senza la quale il comando effettuerà un _dry run_ senza scrivere nulla a DB.
+
+=== Limit
+
+15000 richieste mensili possono sembrare molte, ma con diecimila POI basterebbe lanciare il comando _una volta sola_ dimenticando l'opzione `--force`, e all'esecuzione successiva avremmo esaurito il credito. Per questo motivo prevediamo un'opzione per *limitare* il numero di POI da processare (e quindi le richieste al webservice): fissiamo un valore predefinito basso, ad esempio 10, così da non bruciare inavvertitamente troppe richieste in una volta sola. Chiameremo quest'opzione `--limit`, abbreviata in `-l`.
+
+=== Info
+
+Può servirci sapere quanti *Poi* non hanno ancora un indirizzo: prevediamo all'uopo un'opzione `--info`. Se presente il comando non farà altro che leggere tutti i Poi ed uscire (senza effettuare chiamate al _webservice_).
+
+=== Stop on error
+
+Se si verifica un errore di geocodifica, forse non è il caso di proseguire con le chiamate al _webservice_: potrebbe esserci qualcosa da rivedere nel nostro codice! Prevediamo l'opzione `--stoponerror` per far uscire il comando al primo errore.
+
+== Latitudine e longitudine
+
+Nelle Entity, il tipo di dato (((Doctrine, Geography))) _geography_ (usato per
+il campo *Coords* nei POI) è composto da tre informazioni distinte: l'((SRID)),
+la ((latitudine)) e la ((longitudine)) di un punto. L'_<<PostGIS_SRID,SRID>>_
+rappresenta il modo in cui sono codificate latitudine e longitudine, e nel
+nostro caso varrà sempre *4326*. Se vogliamo leggere latitudine e longitudine
+contenute in *Coords*, dovremo convertire il valore restituito dal suo
+_((getter))_, che sarà una stringa di questo tipo:
+
+```
+SRID=4326;POINT(45.442237 9.148153)
+```
+
+Le coordinate fra parentesi sono rispettivamente *longitudine* e *latitudine*. +
+Per evitare di convertire questa stringa ogni volta, aggiungiamo alla Entity
+*Poi* alcuni metodi per recuperare rispettivamente SRID, longitudine e
+latitudine a partire dal valore restituito da *getCoords()*, ad es. come segue.
+
+[source,php]
+----
+namespace App\Entity;
+
+use App\Repository\PoiRepository;
+use Doctrine\ORM\Mapping as ORM;
+
+class Poi
+{
+  //...
+  private ?int $srid;
+  private ?float $lon;
+  private ?float $lat;
+
+  /**
+    * Popola i campi srid, lat e lon a partire dalle coordinate lette da db
+    */
+  private function parseCoords(){
+      sscanf($this->coords,"SRID=%d;POINT(%f %f)", $this->srid, $this->lon, $this->lat);
+  }
+
+  public function getLon(): float
+  {
+      $this->parseCoords();
+      return $this->lon;
+  }
+
+  public function getLat(): float
+  {
+      $this->parseCoords();
+      return $this->lat;
+  }
+
+  public function getSrid(): int
+  {
+      $this->parseCoords();
+      return $this->srid;
+  }
+}
+----
+
+== Il comando completo
+
+Io l'ho scritto così, ma sono convinto che il vostro funziona altrettanto bene,
+se non meglio.
+
+[source,php,linenums]
+----
+include::PoiEnrichCommand-noGeocode.php[]
+----
+
+Una volta scritto il comando, possiamo provarlo con i primi dieci *Poi* privi
+di indirizzo (nota: non è necessario specificare l'opzione `-l 10` prché è il
+valore di default).
+
+[source,bash]
+----
+php bin/console poi:enrich
+----
+
+Se non riceviamo messaggi di errore inattesi, possiamo procedere alla
+geocodifica di tutti i *Poi* privi di indirizzo con l'opzione `--force`; se
+vogliamo sapere quanti sono, usiamo l'opzione `-i`.
+
+<<<

@@ -1,0 +1,293 @@
+[#entity_cos_e]
+== Cos'è una Entity?
+
+Per interagire con i database Symfony si appoggia all'<<ORM>> di ((Doctrine)), che utilizza il concetto di *((Entity))* per rappresentare oggetti atomici di DB, cioè _righe_ singole di tabelle di DB. +
+Nella pratica una Entity è una *classe PHP semplice*, con _annotazioni_ che vengono usate da Doctrine per mappare:
+
+. ciascuna classe _Entity_ in una _tabella di DB_, 
+. gli opportuni _attributi_ della classe Entity nelle _colonne_ della tabella corrispondente. 
+
+== Entity Repository
+
+L'ORM di Doctrine utilizza inoltre il concetto di *Entity Repository* 
+(((Doctrine, Entity Repository))) -anch'esso una classe PHP- come tramite per effettuare query semplici (`SELECT`) e restituire Entity singole o collezioni di Entity.
+
+[#repository_default_func]
+.Metodi predefiniti dei Repository
+[cols="23,77"]
+|===
+|Nome funzione | Cosa restituisce?
+
+|`find($id)`
+|L'unica Entity (*Poi* per PoiRepository, *PoiCategory* per PoiCategoryRepository, ecc.) avente l'id specificato, o _null_ se nessuna ha quell'id.
+
+|`findAll()`
+|Collezione di _tutte_ le Entity presenti nella tabella: *usare con cautela*!
+
+|`findBy($criteria)`
+|Collezione di Entity corrispondenti ai criteri: ad es. `$criteria = ['nome'=>'Paolo', 'paese'=>'Italia']` restituirà tutte le Entity con campo `nome` **uguale** a `Paolo` e con campo `paese` **uguale** a `Italia`.
+
+|`findOneBy($criteria)`
+|Come `findBy()`, ma restituisce solo il *primo* risultato.
+|===
+
+=== Come definire una Entity
+
+Per definire una Entity è necessario:
+
+* creare una classe PHP nella directory *src/Entity/*;
+
+* aggiungere una _variabile privata_ per ciascuna _colonna_ della tabella;
+
+* per _ciascuna variabile/colonna_:
+
+** aggiungere l'annotazione opportuna, ad es.
++
+[source,php]
+----
+/**
+ * @ORM\ManyToOne(targetEntity="App\Entity\PoiCategory", inversedBy="points")
+ */
+private $category;
+----
+
+** creare due metodi (_setter_ e _getter_), rispettivamente per impostare la variabile e per leggerla;
+
+* se vogliamo personalizzare il *Repository* associato alla Entity, bisogna prima creare una classe derivata da Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository (uf!), quindi aggiungere l'annotazione opportuna alla classe Entity per indicare a Doctrine che il Repository da utilizzare è quello che abbiamo creato.
+
+Se questa trafila vi sembra macchinosa, siamo pienamente d'accordo; per fortuna Symfony ha un _console command_ per generare il sorgente di una nuova Entity: `make:entity` . Questo comando prevede un argomento opzionale (il _nome_ della Entity da creare; se omesso lo chiede interattivamente), e permette di specificare i _nomi_ e i _tipi_ di tutti i suoi campi, semplificandoci il lavoro (specie quando si devono correlare le Entity, come vedremo). (((PoiCategory)))
+
+== La nostra prima Entity
+
+La prima Entity che definiamo rappresenta le _categorie_ dei punti di interesse, come ad es.
+_ristoranti_, _stazioni di servizio_, _alberghi_, eccetera;
+per questo le diamo il nome di *PoiCategory* (abbreviazione di **P**oint **O**f **I**nterest Category).  +
+La stiamo creando prima della Entity principale (i punti 
+di interesse) per poterle collegare fra loro senza doverle
+modificare in un secondo momento.
+
+=== Campi
+
+Come minimo ogni categoria deve avere un _nome_ univoco (ad es. _"Ristoranti"_); 
+prevediamo anche altri due campi:
+
+- *active*: campo _booleano_ (vero/falso), che indica se la categoria è attiva o meno (può essere utile _disattivare_ una categoria senza bisogno di cancellarla);
+- *description*: campo testuale contenente una descrizione (facoltativa); può tornare utile se vorremo mostrare qualche informazione in più sulla categoria.
+
+[TIP]
+.Campo predefinito: _id_
+====
+Oltre ai campi che stiamo definendo, il console command ne crea 
+un altro, di nome *id*, che serve a identificare in modo univoco ciascun record. +
+In gergo SQL, questo campo costituisce la _((chiave primaria))_ della tabella: è una colonna che contiene un numero intero stabilito _automaticamente_ dal DB quando viene eseguita una query di tipo `INSERT`. Quando nel codice PHP andremo a creare nuove istanze della Entity, non ci dovremo preoccupare di valorizzarlo: ci penserà il database a impostarlo e l'ORM lo valorizzerà nell'oggetto PHP.
+====
+
+=== Comando
+
+Per creare questa Entity, dalla shell della nostra VM lanciamo il comando `make:entity PoiCategory` e diamo le seguenti risposte alle domande del _console command_.
+
+NOTE: Se ad una domanda premiamo invio senza scrivere niente, Symfony prende il valore predefinito della risposta (mostrato fra parentesi quadre).
+
+----
+$ bin/console make:entity PoiCategory
+
+ created: src/Entity/PoiCategory.php
+ created: src/Repository/PoiCategoryRepository.php
+
+ Entity generated! Now let´s add some fields!
+ You can always add more fields later manually or by re-running this command.
+
+ New property name (press <return> to stop adding fields):
+ > title
+
+ Field type (enter ? to see all types) [string]:
+ >
+
+ Field length [255]:
+ >
+
+ Can this field be null in the database (nullable) (yes/no) [no]:
+ >
+
+ updated: src/Entity/PoiCategory.php
+
+ Add another property? Enter the property name (or press <return> to stop adding fields):
+ > active
+
+ Field type (enter ? to see all types) [string]:
+ > boolean
+
+ Can this field be null in the database (nullable) (yes/no) [no]:
+ >
+
+ updated: src/Entity/PoiCategory.php
+
+ Add another property? Enter the property name (or press <return> to stop adding fields):
+ > description
+
+ Field type (enter ? to see all types) [string]:
+ >
+
+ Field length [255]:
+ >
+
+ Can this field be null in the database (nullable) (yes/no) [no]:
+ > yes
+
+ updated: src/Entity/PoiCategory.php
+
+ Add another property? Enter the property name (or press <return> to stop adding fields):
+ >
+
+
+  Success!
+
+
+ Next: When you´re ready, create a migration with make:migration
+----
+
+Manca solo un particolare: non vogliamo che esistano due *PoiCategory* con lo stesso nome. Per far sì che questo accada, nel Database la colonna relativa al titolo deve essere associata a un indice di tipo _unique_ footnote:doctrine[Per approfondire l'argomento _indici_, v. la <<db_indexes,sezione omonima>> nell'appendice dedicata a Doctrine.]. Possiamo _dirlo_ a Doctrine cambiando l'annotazione del campo *$title* come segue.
+
+[source,diff,linenums]
+./src/Entity/PoiCategory.php
+----
+  /**
+-   * @ORM\Column(type="string", length=255)
++   * @ORM\Column(type="string", length=255, unique=true)
+   */
+  private $title;
+----
+
+Salviamo il file, e alla prossima *migration*, Doctrine aggiungerà un indice di tipo _unique_ alla tabella *poi_category*.
+
+
+== La seconda Entity: POI (Point Of Interest)
+
+(((POI,Point of interest))) Questa ((Entity)) rappresenta i *punti di interesse* che verranno visualizzati sulla mappa geografica come segnalini (_marker_); per essa prevediamo i campi seguenti:
+
+- _Nome_ o _titolo_ del punto di interesse;
+- _Coordinate_: _Longitudine_ (x) e _Latitudine_ (y) del punto sulla carta geografica;
+- Un _testo descrittivo_ (opzionale);
+- _Città_;
+- _Indirizzo_ (via e numero);
+- _Codice postale_;
+- _Provincia_;
+- _Regione_ (o Stato se si trova in USA o Canada);
+- _Nazione_ (codice ISO a 3 cifre, ad es. *ITA* per l'Italia).
+- _Categoria_: un *POI* può appartenere a una categoria, nel qual caso questo campo conterrà il valore del campo ID della Entity _PoiCategory_ corrispondente. Useremo per questo scopo quella che in gergo si chiama _Foreign Key_ e che nel console command si chiama *relation*.
+
+Per *creare* questa Entity, dalla shell del container guybrush/* diamo il comando `make:entity Poi` e aggiungiamo i seguenti campi/tipi:
+
+[cols="2,2,1,1"]
+|===
+|Nome campo |Tipo |Dimensione |_nullable_
+
+
+|title |string |255 |No
+
+|description |text |- |Sì
+
+|coords |geography |- |No
+
+|city |string |255 |Sì
+|address |string |255 |Sì
+|zip |string |12 |Sì
+|province |string |64 |Sì
+|region |string |64 |Sì
+|country |string |3 |Sì
+
+|category |relation |- |Sì
+
+|===
+
+*category* è un campo particolare, perché collega due Entity fra loro; selezionando _relation_ come tipo di campo, il comando chiede:
+
+. qual è il *tipo di relazione* che lega le due Entity (una fra "molte-a-una", 
+"una-a-molte", "molte-a-molte", "una-a-una"): nel nostro caso è di tipo 
+"*molte-a-una*", perché *molti* POI potranno appartenere ad *una sola* 
+categoria, mentre non sarà possibile il contrario (cioè ogni _POI_
+avrà una categoria al massimo, non potrà averne due o più). *Nota*: avremmo potuto associare più categorie a ciascun _POI_ con una relazione di tipo "*molte-a-molte*", ma questo avrebbe reso un po' più complicato il tutto.
+
+. se il campo dev'essere _nullable_ (ossia, in questo caso, se un POI può non avere una categoria associata);
+
+. se aggiungere un campo all'Entity collegata per recuperare tutti i POI che appartengono a quella categoria.
+
+----
+ New property name (press <return> to stop adding fields):
+ > category
+
+ Field type (enter ? to see all types) [string]:
+ > relation
+
+ What class should this entity be related to?:
+ > PoiCategory
+
+What type of relationship is this?
+ ------------ -----------------------------------------------------------------
+  Type         Description
+ ------------ -----------------------------------------------------------------
+  ManyToOne    Each Poi relates to (has) one PoiCategory.
+               Each PoiCategory can relate/has to (have) many Poi objects
+
+  OneToMany    Each Poi relates can relate to (have) many PoiCategory objects.
+               Each PoiCategory relates to (has) one Poi
+
+  ManyToMany   Each Poi relates can relate to (have) many PoiCategory objects.
+               Each PoiCategory can also relate to (have) many Poi objects
+
+  OneToOne     Each Poi relates to (has) exactly one PoiCategory.
+               Each PoiCategory also relates to (has) exactly one Poi.
+ ------------ -----------------------------------------------------------------
+
+ Relation type? [ManyToOne, OneToMany, ManyToMany, OneToOne]:
+ > ManyToOne
+
+ Is the Poi.category property allowed to be null (nullable)? (yes/no) [yes]:
+ >
+
+ Do you want to add a new property to PoiCategory so that you can access/update Poi objects from it - e.g. $poiCategory->getPois()? (yes/no) [yes]:
+ >
+
+ A new property will also be added to the PoiCategory class so that you can access the related Poi objects from it.
+
+ New field name inside PoiCategory [pois]:
+ > points
+
+ updated: src/Entity/Poi.php
+ updated: src/Entity/PoiCategory.php
+----
+
+****
+[IMPORTANT]
+.Campo di tipo _geography_
+====
+Il campo *coords* della Entity che abbiamo appena creato è di tipo 
+_geography_: questo tipo non fa parte dei <<doctrine_mapping_types,tipi predefiniti di Doctrine>>, 
+è presente grazie all'<<doctrine_postgis, estensione PostGIS per Doctrine>> che è installata di default nel container _guybrush_php8_. Se avessimo usato un'altro tipo di database (MySQL ad es.), o lo stesso Postgres ma senza le estensioni geospaziali (PostGIS), avremmo dovuto usare due campi distinti per memorizzare latitudine e longitudine.
+
+[cols="1,1,2,1"]
+|===
+|Nome campo |Tipo |Dimensione |_nullable_
+
+|lat |decimal |Precision: *10*, Scale: *7* |No
+|lng |decimal |Precision: *10*, Scale: *7* |No
+
+|===
+
+====
+****
+
+****
+[TIP]
+.Curiosità: ((latitudine)) e ((longitudine))
+====
+Nel piano cartesiano, quando diciamo che un punto ha coordinate (1,2), intendiamo che l'ascissa, cioè la coordinata **x**, orizzontale, del punto, è *1*, mentre l'ordinata, cioè la coordinata **y**, verticale, del punto, è *2*: quindi le coordinate del piano sono espresse come *(x,y)*.
+
+Le coordinate _geografiche_ generalmente sono riportate come (*latitudine*, *longitudine*): la latitudine è l'angolo formato dal punto col *piano equatoriale*, mentre la longitudine è l'angolo formato dal punto con il *meridiano di Greenwich*.
+
+Se appiattiamo la sfera su una mappa, con le convenzioni degli ultimi secoli, la _latitudine_ è la coordinata y (verticale) e la _longitudine_ la x (orizzontale), espresse in gradi.
+
+Quindi *(latitudine, longitudine)* = *(y,x)*.
+====
+****
+<<<

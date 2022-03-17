@@ -1,0 +1,25 @@
+include::99-appendices/10-symfony-prerequisites.adoc[]
+
+include::99-appendices/inviare-email.adoc[]
+
+include::99-appendices/20-doctrine.adoc[]
+
+include::99-appendices/30-console-messages.adoc[]
+
+include::99-appendices/40-fosuserbundle.adoc[]
+
+include::99-appendices/symfony-windows.adoc[]
+
+// include::99-appendices/logging.adoc[]
+
+// Vagrant stuff
+ifeval::["{virtual}" == "Vagrant"]
+include::99-appendices/vagrant.adoc[]
+
+include::99-appendices/mysql-8.adoc[]
+
+include::99-appendices/virtual-server.adoc[]
+
+endif::[]
+
+// include::99-appendices/b.git.adoc[]

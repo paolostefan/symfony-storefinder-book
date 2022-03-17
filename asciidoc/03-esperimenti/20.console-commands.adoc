@@ -1,0 +1,36 @@
+[#console-di-symfony]
+== La console di Symfony
+
+(((console command))) A un certo punto della lezione <<prima-pagina>> abbiamo digitato il comando:
+
+[source,bash]
+----
+php bin/console make:controller
+----
+
+_make:controller_ è il nome di un *console command* di Symfony. +
+Lo script `bin/console`, invocato da ((CLI)) seguito da uno o più argomenti, usa il primo argomento come indice per istanziare una classe PHP ed utilizzarla per eseguire un compito specifico.
+
+TIP: Symfony ha svariati comandi predefiniti; per elencarli, basta chiamare `bin/console` senza argomenti.
+
+Oltre ai comandi predefiniti, Symfony permette di scriverne di nuovi.
+
+=== Perché scrivere un _console command_?
+
+Un _console command_ ha alcune differenze, o se vogliamo _vantaggi_, rispetto a una pagina web:
+
+. Sicurezza: lo può lanciare solo un utente che abbia accesso alla *shell* del server;
+. Affidabilità: non è vincolato ai timeout del browser, alla stabilità della rete e al timeout di PHP (tipicamente 30 secondi);
+. _Scriptabilità_: può essere invocato da `cron`, o qualsiasi altro script eseguito dalla shell;
+. è possibile investigare le cause di errori usando le opzioni -v (verbose), -vv (more verbose) e -vvv (debug) in modo da vedere tutto quello che avviene "dietro le quinte", anche in produzione;
+. l'output di un comando è verificabile in tempo reale, mentre una pagina web generalmente mostra tutto *alla fine* del caricamento.
+
+È preferibile usare un comando (rispetto a una pagina web) ad es. quando c'è bisogno di:
+
+* importare quantità massicce di dati nel database: il comando non ha il timeout delle pagine web;
+* effettuare operazioni di _pulizia_ (di cartelle, tabelle di db, ecc.) ad orari o giorni prestabiliti;
+* eseguire compiti amministrativi o delicati, che preferiamo impedire da browser.
+
+=== Per saperne di più
+
+Due lezioni del corso sono dedicate alla creazione di comandi personalizzati: <<importazione-massiva>> e <<reverse-geocoding>>.

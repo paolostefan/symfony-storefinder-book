@@ -1,0 +1,517 @@
+[#importazione-massiva]
+= Importazione massiva di POI
+
+****
+.icon:github[] Con il repository {sample_git_repo_web}
+
+Per tornare a questo punto del libro potete fare _checkout_ del tag #NON ESISTE ANCORA#. (((Git, git checkout)))
+
+[source,bash]
+----
+cd /percorso/di/guybrush        # sostituite col percorso corretto
+git checkout ...
+----
+****
+
+A questo punto del corso, nel DB sono presenti due tabelle vuote che 
+rappresentano _Punti di interesse_ e _Categorie_: è il momento di popolarle
+con un po' di dati. +
+Potremmo creare uno ad uno i punti di interesse, ma bisognerebbe prima trovare
+gli indirizzi che vogliamo inserire, poi ottenerne le _coordinate geografiche_,
+e infine digitarle, assieme ad un titolo, in un form o in una query SQL. Già
+inserirne una sola decina sarebbe noioso, e sprecheremmo tempo in un'attività
+che possiamo automatizzare.
+
+Ci serve una soluzione scalabile (e possibilmente _istruttiva_): ad esempio,
+potremmo importare i punti di interesse da un file con un _console command_ di
+Symfony scritto da noi.
+
+== Come creare un comando
+
+Per creare un nuovo comando, si può usare il comando (non è un gioco di parole icon:smile-o[]) `make:command`.
+È possibile specificare come argomento l'_alias_ che vogliamo associare al nuovo comando, 
+cioè una stringa di caratteri alfanumerici (preferibilmente, solo lettere minuscole) ed eventualmente il carattere `:`
+da usare come separatore per i ((namespace)). +
+Questo _alias_ sarà quello che dovremo specificare dopo `bin/console` quando vorremo invocare il nostro comando.
+
+Per creare il comando di importazione dei POI, dalla shell _del container_ *guybrush_php8* scriviamo:
+
+[source,bash]
+----
+php bin/console make:command poi:import
+----
+
+Se non si verifica nessun errore, `make:command` crea il file *src/Command/ImportPoiCommand.php*, che è la dichiarazione di una classe PHP che:
+
+. appartiene al namespace *App\Command*;
+. estende la classe *Symfony\Component\Console\Command\Command*;
+. implementa i metodi *configure()* ed *execute()*.
+
+Per verificare che il comando sia stato creato, diamo il comando `php bin/console` e nell'elenco degli _Available commands_ vedremo queste righe:
+
+    poi
+     poi:import                              Add a short description for your command
+
+`poi:import`, il nome del comando che abbiamo appena creato, è presente in elenco, seguito da un testo esplicativo che troveremo nel sorgente creato da `make:command`, riportato per esteso qui di seguito.
+
+[source,php,linenums]
+.Scheletro del comando
+----
+include::CommandSkeleton.php[]
+----
+
+<1> *configure()* serve a catalogare il comando e a dichiararne gli argomenti e le opzioni.
+
+<2> *execute()* è il corpo del comando, e per adesso si limita a scrivere alcuni messaggi nella console. Questo metodo restituisce un intero che costituirà il valore di ritorno del nostro comando nella shell (0: OK, <>0: si è verificato un errore).
+
+== Argomenti
+
+Come tutti i comandi che lanciamo da shell, i comandi di console di Symfony possono richiedere argomenti, opzionali od obbligatori. +
+Gli argomenti del comando vanno dichiarati nel metodo `configure()`, chiamando `$this->addArgument()` per ciascuno degli argomenti che il comando riconoscerà.
+
+////
+completare: argomenti di addArgument-come impostare argomenti opzionali
+////
+
+== Opzioni o flag
+
+Nella linea comando con cui invochiamo il nostro console command,
+tutte le parole che iniziano con uno o due segni `-` (ad es. `-b` oppure `--force`) sono considerate _opzioni_. Le opzioni devono avere un formato lungo (quello corrispondente ai due segni `-`) e possono specificare un formato breve, ossia con un solo segno meno seguito da *una sola lettera o un numero*. +
+Anche le opzioni del comando vanno dichiarate nel metodo `configure()`, chiamando stavolta il metodo `$this->addOption()` per ciascuna opzione supportata dal comando.
+
+////
+completare: come si definiscono le opzioni?
+completare: come si definiscono i formati brevi delle opzioni?
+////
+
+== Hands on
+
+È ora di personalizzare il nostro comando: per prima cosa cambiamone la descrizione (*riga 19*):
+
+[source,diff]
+----
+-    ->setDescription('Add a short description for your command')
++    ->setDescription('Import a list of POIs from a CSV file.')
+----
+
+Quindi impostiamo come argomento, *obbligatorio* anziché opzionale, il *percorso del file CSV* da leggere (*riga 20*). 
+
+[source,diff]
+----
+-    ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
++    ->addArgument('file', InputArgument::REQUIRED, 'Path of the CSV file to import')
+----
+
+È buona pratica cautelarsi per evitare scritture e/o cancellazioni indesiderate a database: per questo dichiariamo l'opzione `--force`, in assenza della quale il comando *non scriverà niente* a DB. In tal modo, se l'utente dà il comando senza sapere bene cosa sta facendo, non effettuerà inavvertitamente un update massivo del DB. +
+Cambiamo quindi quella che nel sorgente iniziale era la *riga 21*:
+
+[source,diff]
+----
+-    ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
++    ->addOption('force', 'f', InputOption::VALUE_NONE, 'Actually write data to DB')
+----
+
+Ora facciamo in modo che il comando apra il file CSV specificato 
+come argomento, e cancelliamo il resto del codice di *execute()*.
+
+[source,diff]
+----
+-        $arg1 = $input->getArgument('arg1');
+
+-        if ($arg1) {
+-            $io->note(sprintf('You passed an argument: %s', $arg1));
+-        }
++        $filename = $input->getArgument('file');
++        $file = fopen($filename, 'r');
++        $io->note('File ok');
+
+-        if ($input->getOption('option1')) {
+-            // ...
+-        }
+-        $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
+----
+
+[NOTE]
+====
+Non stiamo controllando il valore restituito da http://php.net/manual/en/function.fopen.php[fopen()], ma in caso di errore (ad es. _file non trovato_) Symfony farà terminare il comando con un messaggio simile:
+
+----
+In AppImportPoiCommand.php line 29:
+
+  Warning: fopen(...): failed to open stream: No such file or directory
+----
+====
+
+Proviamo a lanciare il comando dalla shell del container *guybrush_php8*:
+
+[source,bash]
+----
+php bin/console poi:import
+----
+
+Non dovrebbe funzionare perché manca un argomento obbligatorio (*filename*). +
+Ritentiamo allora specificando un file qualunque come argomento, ad es. `composer.json`:
+
+[source,bash]
+----
+php bin/console poi:import composer.json
+----
+
+Il comando dovrebbe semplicemente dirci:
+
+     ! [NOTE] File ok 
+
+Funziona? Ok, allora modifichiamolo! icon:smile-o[]
+
+== Cosa deve fare il comando
+
+Il comando che stiamo scrivendo ci servirà per importare a database i dati presenti in un file ((CSV)) (_Comma Separated Values_, cioè un file di testo in cui i dati sono separati da virgole); nella fattispecie il comando dovrà:
+
+. leggere il file CSV specificato dall'utente;
+. chiedere all'utente di selezionare una categoria di punti di interesse _fra quelle esistenti_, oppure _crearne una di nuova_;
+. per ciascuna riga del file CSV:
+.. leggere _longitudine_, _latitudine_ e _titolo_ del punto di interesse;
+.. salvare questi dati in una nuova Entity *Poi*.
+. _Persistere_ le Entity create, ossia *salvarle* nel DB.
+
+[#comandi_e_db]
+== Comandi e database
+
+Il comando ha bisogno di interagire con il DB, cioè *inserire* record nella tabella _Poi_, e *leggere/scrivere* i record nella tabella _PoiCategory_: per farlo useremo *((Doctrine))*, che abbiamo conosciuto nel capitolo precedente. +
+Precisamente, il metodo *execute()* deve accedere ad una istanza inizializzata di *\Doctrine\ORM\EntityManager* per poter leggere/scrivere record nel database. (((Doctrine, Entity Manager))) +
+Possiamo ottenerne una sfruttando la procedura che Symfony chiama _((Autowiring))_ footnote:autowiring[L'_Autowiring_ è descritto approfonditamente nella documentazione ufficiale di Symfony: https://symfony.com/doc/current/service_container/autowiring.html]: senza entrare nei dettagli, per ora ci basta sapere che se aggiungiamo un *costruttore* alla classe PoiImportCommand, e nella sua firma dichiariamo un argomento di tipo *\Doctrine\ORM\EntityManager* footnote:type-hint[In PHP non è obbligatorio specificare il tipo degli argomenti di funzioni e metodi. Quando lo si fa, bisogna anteporre al nome dell'argomento il suo tipo: questa operazione è detta _type-hinting_.], Symfony si occuperà di _istanziare_ l'Entity Manager di Doctrine e _passarlo_ al nostro costruttore come argomento. +
+Comodo, no?
+
+A dire il vero, facendo alla lettera quel che c'è scritto qui sopra, nel caso specifico dell'_Entity Manager_ causeremo un errore; ma facciamolo lo stesso, così impareremo qualcosa in più. +
+Nel file *src/Command/PoiImportCommand.php* aggiungiamo un costruttore vuoto come segue:
+
+[source,php]
+.Aggiunta di un costruttore con argomento "type-hinted" (((type-hint)))
+----
+class PoiImportCommand extends Command
+{
+  public function __construct(\Doctrine\ORM\EntityManager $em){
+
+  }
+
+  // ...
+}
+----
+
+Salviamo il file, diamo il comando `bin/console poi:import`, e 
+il comando uscirà con questo messaggio di errore:
+
+image::typehint.png[]
+
+Fortunamente il messaggio di errore suggerisce cosa fare:
+
+    Try changing the type-hint to "Doctrine\ORM\EntityManagerInterface" 
+
+Abbiamo usato *\Doctrine\ORM\EntityManager* come <<type-hint,_type hint_>>, mentre va usato *\Doctrine\ORM\EntityManagerInterface*: correggiamo il file e ritentiamo. +
+
+image::constructor.png[]
+
+Perlomeno l'errore è cambiato. Siccome la classe *PoiImportCommand* è derivata da _Command_, e quest'ultima nel suo costruttore effettua alcune operazioni di inizializzazione, il costruttore della nostra classe deve chiamare il metodo *$$__construct()$$* della classe genitrice, come segue:
+
+[source,diff,linenums]
+.I costruttori dei comandi devono chiamare il costruttore del genitore
+----
+class PoiImportCommand extends Command
+{
+    protected static $defaultName = 'poi:import';
+
+-    public function __construct(\Doctrine\ORM\EntityManager $em){
++    public function __construct(\Doctrine\ORM\EntityManagerInterface $em){
++        parent::__construct();
+    }
+
+----
+
+Ritentiamo, stavolta specificando il percorso di un file qualsiasi (purché esista). +
+
+image::file-ok.png[]
+
+[TIP]
+.Shortcut per comandi solitari (((Shortcut, per comandi)))
+====
+Forse avete notato che negli screenshot il comando non è `poi:import` ma `poi:`. + 
+Quando un _namespace_ (nel nostro caso, `poi`) contiene 
+*un solo comando*, è possibile invocare il comando usando il solo nome del namespace seguito dai due punti.
+====
+
+Torniamo al motivo per cui abbiamo aggiunto il metodo *$$__construct()$$*: 
+ci serve un'istanza dell'_entity manager_ di Doctrine. +
+Il costruttore riceve come argomento l'_Entity manager_, ed altri metodi 
+della classe dovranno usarlo: la scelta obbligata è quindi salvare 
+l'_Entity manager_ in una *variabile* della classe, ad es. come segue:
+
+[source,diff]
+----
+ class PoiImportCommand extends Command
+ {
+     protected static $defaultName = 'poi:import';
++    private $em;
+
+     public function __construct(\Doctrine\ORM\EntityManagerInterface $em) {
+         parent::__construct();
++        $this->em = $em;
+----
+
+=== Seleziona o crea una categoria
+
+Facciamo in modo che il comando chieda interattivamente in quale
+_categoria_ salvare i POI che sta importando; per farlo dovremo:
+
+. importare (_use_) la classe *PoiCategory*;
+. leggere dal DB *tutte le categorie esistenti*;
+. chiedere all'utente di *selezionare* una categoria, o permettergli di 
+*crearne una nuova*: in questo secondo caso, chiedergli il _nome_ della
+nuova categoria.
+
+(((Entity Repository, findAll()))) Per ottenere l'array delle *categorie esistenti* si può usare il metodo *findAll()* dell'_Entity Repository_ delle categorie, *PoiCategoryRepository*; 
+quest'ultimo lo possiamo istanziare chiamando il metodo *getRepository()* dell'((Entity Manager)). +
+In una riga sola:
+
+[source,php]
+----
+$categories = $this->em->getRepository(PoiCategory::class)->findAll();
+----
+
+Per chiedere all'utente di selezionare una voce da un elenco, esisi può usare invece il metodo `choice($domanda, $scelte)` di *SymfonyStyle*: esso richiede come _primo_ argomento la domanda da scrivere in console
+(una stringa), e come _secondo_ argomento le possibili scelte (un array di stringhe). Il valore di ritorno sarà la _stringa_ scelta dall'utente.
+
+Faremo in modo che l'utente possa scegliere una categoria *tra quelle esistenti*,
+oppure possa *crearne una nuova*; in assenza di categorie, il comando chiederà il
+nome della categoria da creare, usando il metodo `ask()` di *SymfonyStyle*.
+
+Infine, nel caso l'utente voglia creare una nuova categoria, il comando chiederà
+conferma prima di procedere alla scrittura a database, usando il metodo 
+`confirm()` di *SymfonyStyle*. Ricordiamoci che le scritture a DB devono avvenire solo in presenza dell'opzione `--force`.
+
+=== Persistenza, Unit of Work e Flush
+
+(((Doctrine, Unit of Work))) Per salvare un *nuovo* oggetto a database con Doctrine, è necessario chiamare due metodi dell'_Entity Manager_, `persist()` e `flush()` (in quest'ordine). +
+`persist($entity)` aggiunge l'oggetto alla <<doctrine_unitofwork,Unit of work>> corrente, cioè dice a Doctrine che c'è un nuovo oggetto che vogliamo salvare; `flush()` esegue la _Unit of work_ corrente, cioè scrive tutte le modifiche pendenti a database.
+
+// @todo spiegare meglio
+
+L'ORM è strutturato in questo modo per consentire di effettuare le query di inserimento/update in blocchi; questo consente di migliorare le performance perché riduce l'overhead.
+
+Nel caso invece volessimo fare l'_update_ di un'Entity che esisteva già a database, sarebbe stato sufficiente
+modificarne i campi (chiamando uno o più metodi _setter_) e quindi chiamare solamente `flush()`.
+
+<<<
+
+Il codice che legge le categorie, chiede di selezionarne una ed eventualmente ne salva una nuova, è riportato di seguito.
+
+[source,php]
+.Richiesta di selezione o creazione di una PoiCategory
+----
+$categories = $this->em->getRepository(PoiCategory::class)->findAll();
+
+/** @var PoiCategory $chosenCategory */
+$chosenCategory = NULL;
+if (!count($categories)) {
+  $io->warning("No categories found, I need at least one to proceed");
+} else {
+
+  $catChoices = ['(Create a new category)'];
+  foreach ($categories as $cat) {
+    $catChoices[] = $cat->getTitle();
+  }
+  $catTitle = $io->choice("Please choose a category", $catChoices);
+  if ($catTitle !== '(Create a new category)') {
+    $chosenCategory = $this->em
+      ->getRepository(PoiCategory::class)
+      ->findOneBy(['title' => $catTitle]);
+  }
+}
+
+if (!$chosenCategory) {
+  $catTitle = $io->ask("Please enter the new category name");
+  $chosenCategory = new PoiCategory();
+  $chosenCategory
+    ->setTitle($catTitle)
+    ->setActive(TRUE);
+
+  if ($input->getOption('force')) {
+    if (!$io->confirm(sprintf("Ok to create category '%s'?", $catTitle), FALSE)) {
+      $io->writeln('Bye bye');
+      return Command::FAILURE;
+    }
+
+    $this->em->persist($chosenCategory);
+    $this->em->flush();
+  }
+}
+----
+<<<
+
+== Otteniamo i dati
+
+Per poter proseguire, abbiamo bisogno di un file che contenga qualche centinaio (o migliaio) di punti di interesse: *dove li troviamo*?
+
+// Diversi siti hanno database pubblici di dati geospaziali; spesso però i dati hanno carattere _idrogeologico_, mentre quel che ci serve è un database geospaziale di attività commerciali.
+
+Il sito http://poi-osm.ekibox.net[poi-osm.ekibox.net] mette a disposizione 
+liberamente i dati sui punti di interesse contenuti in
+https://www.openstreetmap.org[((OpenStreetMap))]. Un applauso va sia a chi
+ha contribuito a OpenStreetMap, sia agli <<ekibox_net,autori>> di questo sito.
+
+NOTE: I dati scaricabili non sono recentissimi (ad es. i dati sui bar in Italia sono aggiornati ad agosto 2014), ma questo non ha importanza ai fini del corso.
+
+Usando la semplice interfaccia del sito, possiamo selezionare:
+
+. un *Paese* (ad es. _Italia_);
+. uno o più *tipi di POI* che ci interessano (ad es. _ristoranti_, _bar_, _cinema_);
+. il *formato* in cui esportare il file. +
++
+[IMPORTANT]
+.Nota bene
+====
+Il resto della lezione è basato sul formato *_Garmin (csv)_*. Se ne scegliete un altro, dovrete adattare il codice per leggere il formato scelto.
+====
+
+Una volta effettuata la selezione, il sito ci permetterà di
+scaricare il file contenente i punti di interesse che abbiamo selezionato.
+
+
+== Creiamo i POI
+
+Ora che abbiamo i punti di interesse in un file CSV, è il momento di farli leggere al nostro comando. 
+
+=== Progress bar
+
+Vogliamo che il nostro comando non si limiti a fare il suo dovere, ma che lo faccia con stile: aggiungiamo una _progress bar_ che mostri l'avanzamento dell'importazione. +
+Per farlo, ci serve sapere quante *righe* ha il file - il che è semplice, basta leggerle una ad una:
+
+[source,php]
+----
+$file = fopen($filename, 'r');
+
+$rows = 0;
+while (fgets($file)) {
+  $rows++;
+}
+// Riportiamo il puntatore del file all'inizio
+fseek($file, 0, SEEK_SET);
+----
+
+Una volta che sappiamo il numero totale di righe presenti nel file (*$rows*), possiamo creare una _progress bar_ per la quale il 100% corrisponderà a *$rows*. Per farlo seguiamo la https://symfony.com/doc/current/components/console/helpers/progressbar.html[documentazione ufficiale del componente ProgressBar]:
+
+. aggiungiamo la seguente direttiva `use` all'inizio del nostro sorgente:
++
+[source,php]
+----
+// ...
+use Symfony\Component\Console\Helper\ProgressBar;
+----
+
+. creiamo la *ProgressBar* e mostriamola:
++
+[source,php]
+----
+// ...
+$pbar = new ProgressBar($output, $rows);
+$pbar->start();
+----
+
+Ora siamo pronti per scrivere il loop che popolerà la tabella di DB con i POI presenti nel file CSV.
+Questo loop dovrà:
+
+. leggere la riga corrente del file CSV;
+. creare una ((Entity)) di tipo *Poi*;
+. impostarne i campi con i valori letti dal file CSV;
+. impostarne la _categoria_ (quella scelta dall'utente in precedenza);
+. se è presente l'opzione `--force`, **persist()**ere la Entity a DB;
+. far avanzare la _progress bar_.
+
+In teoria, dopo questo loop dovremmo chiamare la funzione *flush()* 
+dell'((Entity Manager)) per scrivere le modifiche nel DB: se però lo 
+chiamassimo solo alla fine, Doctrine si troverebbe ad eseguire qualche 
+migliaio di query in una sola volta; la progress bar avanzerebbe molto
+velocemente fino alla fine, e il comando rimarrebbe _freezato_ per un po'
+in attesa di completare la transazione. Non è quello che vogliamo, per cui 
+
+[NOTE]
+.Promemoria: formato del file scaricato
+====
+Come anticipato nel paragrafo precedente, se il file CSV che importiamo
+è stato scaricato da <http://poi-osm.ekibox.net/> nel formato _Garmin_, 
+le colonne presenti nel file saranno - in quest'ordine:
+
+- Longitudine (((longitudine)))
+- Latitudine (((latitudine)))
+- Nome del POI
+
+Il file è un CSV (un file di testo) non compresso, che è leggibile riga per
+riga mediante la funzione https://www.php.net/manual/en/function.fgetcsv.php[fgetcsv()] di PHP.
+
+Se volete importare file in formati non testuali, o con colonne in numero e/o in ordine diversi, il codice del loop dovrà tenerne conto, impostando i campi della Entity in modo coerente.
+====
+
+Un esempio di loop è riportato di seguito.
+
+[source,php]
+.Loop principale del comando
+----
+while (!feof($file)) {
+  $csvrow = fgetcsv($file);
+  // Colonne nel CSV: (longitidine, latitudine, titolo)
+  // Ad es.: (12.50897,38.0145392,"Bar Gelateria Gino")
+  list($lat, $lon, $title) = $csvRow;
+  $poi = new Poi();
+  $poi
+    ->setCoords(sprintf('POINT(%f %f)', floatval($lon), floatval($lat)))
+    ->setTitle($title)
+    ->setCategory($chosenCategory);
+
+  if ($input->getOption('force')) {
+    $this->em->persist($poi);
+    // Ogni 100 righe, scrivi i dati nel DB
+    if (!($row % 100)) {
+        $this->em->flush();
+    }
+  }
+
+  $pbar->advance();
+}
+----
+
+=== Chiusura
+
+All'uscita dal loop, il comando ha quasi terminato il suo compito. +
+Per completare la scrittura a DB dei *POI* pendenti, bisogna chiamare un'ultima volta il metodo `flush()`; inoltre è buona norma liberare le risorse allocate, quindi chiudiamo il file CSV con `fclose()`; terminiamo la `ProgressBar` col metodo `finish()`; stampiamo infine due _newline_, perché la _ProgressBar_ non va a capo da sè e per dare respiro al testo.
+
+[source,php]
+----
+if ($input->getOption('force')) {
+  $this->em->flush();
+}
+
+fclose($file);
+
+$pbar->finish();
+$io->newLine(2);
+----
+
+== Comando completo
+
+Il sorgente completo del comando è disponibile nel https://github.com/paolostefan/sample_symfony/blob/import_command/guybrush/src/Command/PoiImportCommand.php[repository su Github].
+
+=== Proviamo il comando con un file
+
+Il file CSV va ora "dato in pasto" al comando, per cui la nostra VM deve potervi arrivare in qualche modo: se non l'abbiamo fatto al momento del download, spostiamo il file nella directory *sample_symfony/guybrush* o in una sua sottodirectory. Quindi dal container *guybrush_php8* diamo il comando:
+
+[source, bash]
+----
+php bin/console poi:import --force -vvv percorso-del-file.csv
+----
+
+TIP: Usando l'opzione `-vvv` (tre volte _verbose_), se qualcosa non va per il verso giusto avremo informazioni dettagliate su dove e perché è avvenuto un errore.
+
+=== E adesso?
+
+Abbiamo ora qualche centinaio di punti di interesse a DB, ma ne conosciamo *solo* le coordinate geografiche: non sappiamo cioè l'indirizzo, la città e nemmeno la *regione* in cui si trovano!
+
+Questi dati vanno _arricchiti_, e lo faremo con un altro _console command_ nella prossima lezione.

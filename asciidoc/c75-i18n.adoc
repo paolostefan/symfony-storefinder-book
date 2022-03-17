@@ -1,0 +1,8 @@
+[#c80-traduzioni]
+= Symfony e le traduzioni
+
+****
+Symfony permette di rendere _traducibile_ il nostro sito. In questo capitolo vedremo come fare nella pratica.
+****
+
+include::75-i18n/10.adoc[]

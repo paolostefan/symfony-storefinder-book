@@ -1,0 +1,65 @@
+:sectnums!:
+[bibliography]
+[#c98-riferimenti]
+= Riferimenti
+
+- [[[AJAX]]] https://it.wikipedia.org/wiki/AJAX
+- [[[Autowiring]]] Autowiring nella documentazione ufficiale di Symfony: https://symfony.com/doc/current/service_container/autowiring.html
+- [[[doctrine_annotations_reference]]] Doctrine, elenco delle annotazioni: https://www.doctrine-project.org/projects/doctrine-orm/en/current/reference/annotations-reference.html
+- [[[doctrine_associations]]] Doctrine, relazioni fra Entity: https://www.doctrine-project.org/projects/doctrine-orm/en/current/reference/working-with-associations.html
+- [[[doctrine_basic_mapping]]] Doctrine, mappare i campi di una classe sulle colonne di una tabella: http://docs.doctrine-project.org/projects/doctrine-orm/en/current/reference/basic-mapping.html#property-mapping
+- [[[doctrine_extension_fix]]] Fix temporaneo per installare le _Doctrine Extensions_ con Symfony 5.1: <https://github.com/antishov/StofDoctrineExtensionsBundle/issues/23#issuecomment-685991439>
+- [[[doctrine_mapping_types]]] Doctrine, tipi di mapping: https://www.doctrine-project.org/projects/doctrine-orm/en/current/reference/basic-mapping.html#doctrine-mapping-types
+- [[[doctrine_postgis]]] Doctrine, estensione PostGIS: https://github.com/jsor/doctrine-postgis
+- [[[doctrine_unitofwork]]] Doctrine, Unit of work: https://www.doctrine-project.org/projects/doctrine-orm/en/current/reference/working-with-objects.html
+- [[[ekibox_net]]] Il sito http://poi-osm.ekibox.net/ è stato realizzato da due utenti di OpenStreetMap,  https://www.openstreetmap.org/user/rullzer[rullzer] e https://www.openstreetmap.org/user/Rubke[Rubke] .
+- [[[gedmo_timestampable]]] Documentazione dell'estensione _timestampable_ https://github.com/Atlantic18/DoctrineExtensions/blob/master/doc/timestampable.md
+- [[[git]]] Su *Git* esiste una vastissima quantità di documentazione e materiale. +
+  Il sito di _Git-SCM_ ospita https://git-scm.com/book/en/v2[Pro Git], un ebook gratuito, che spiega in dettaglio tutti gli aspetti di Git, anche i più esotici. +
+  Per una panoramica dei vantaggi di Git v.: https://www.git-tower.com/learn/git/ebook/en/command-line/appendix/why-git , https://www.atlassian.com/git/tutorials/why-git .
+- [[[git_install]]] Istruzioni per installare Git su diverse piattaforme: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git .
+- [[[git_linux]]] Come installare Git in ambienti Linux: https://git-scm.com/download/linux
+- [[[javascript_closure]]] Le _closure_ in Javascript: https://www.w3schools.com/js/js_function_closures.asp
+- [[[jqDatatables]]] https://www.datatables.net/
+- [[[jqDatatables_server_side]]] I parametri passati dalla Datatable allo script chiamato via AJAX sono documentati qui: https://datatables.net/manual/server-side +
+ I parametri di configurazione della Datatable Server-Side sono documentati qui: https://datatables.net/examples/server_side/object_data.html +
+ Questa sezione spiega come formattare i dati: https://datatables.net/reference/option/columns.render
+- [[[jqDatatables_null_datasource]]] Questo esempio mostra come formattare una colonna della Datatable inserendovi markup custom:  https://datatables.net/examples/ajax/null_data_source.html
+
+- [[[leaflet_marker]]] Come creare un Marker in Leaflet: https://leafletjs.com/reference.html#marker
+
+- [[[leaflet_layergroup]]] LayerGroup in Leaflet: https://leafletjs.com/reference.html#layergroup
+
+- [[[mariadb]]] MariaDB è scaricabile da <https://downloads.mariadb.org/> .
+
+- [[[mapquest]]] MapQuest è un provider di servizi di tipo geografico (al pari di _Google Maps_). Per il pubblico il sito di riferimento è <https://www.mapquest.com/>, mentre per l'API il sito di riferimento è <https://developer.mapquest.com>
+
+
+- [[[mapquest_docs]]] La documentazione di MapQuest è disponibile all'URL <https://developer.mapquest.com/documentation/>. Per le istruzioni sulla chiamata all'API di geocodifica inversa v. <https://developer.mapquest.com/documentation/geocoding-api/reverse/get/> .
+
+- [[[nfs]]] NFS è un filesystem distribuito utilizzato in ambiente Linux/Unix. V. https://en.wikipedia.org/wiki/Network_File_System[la pagina di NFS su Wikipedia].
+
+- [[[ORM]]] Acronimo di Object-Relational Mapping (https://it.wikipedia.org/wiki/Object-relational_mapping[definizione su Wikipedia])
+
+- [[[php_windows]]] PHP per Windows(TM) è disponibile all'URL https://windows.php.net/download/ .
+
+- [[[PostGIS_SRID]]] Definizione di SRID (Spatial Reference Identifier) https://en.wikipedia.org/wiki/Spatial_reference_system#Identifier
+
+- [[[regexp]]] Espressioni regolari: diversi siti le spiegano nel dettaglio, ad es. https://www.rexegg.com/; altri siti servono per verificarne il funzionamento interattivamente, ad es. https://regex101.com/ .
+
+- [[[symfony]]] La homepage della documentazione ufficiale di Symfony (in inglese) si trova all'URL http://symfony.com/doc/current/ .
+
+- [[[symfony_bootstrap]]] New in Symfony 3.4: Bootstrap 4 form theme https://symfony.com/blog/new-in-symfony-3-4-bootstrap-4-form-theme
+- [[[symfony_country_form_field]]] Documentazione del campo di tipo Country https://symfony.com/doc/current/reference/forms/types/country.html
+
+- [[[symfony_form_customization]]] How to Customize Form Rendering https://symfony.com/doc/current/form/form_customization.html
+- [[[symfony_form_method]]] Changing the Action and HTTP Method https://symfony.com/doc/current/forms.html#changing-the-action-and-http-method
+- [[[symfony_entity_type]]] Utilizzo del campo EntityType in un form Symfony: https://symfony.com/doc/current/reference/forms/types/entity.html#basic-usage
+- [[[symfony_routing]]] https://symfony.com/doc/current/routing.html
+- [[[symfony_service_containers]]] Documentazione ufficiale sui Service container: https://symfony.com/doc/current/service_container.html
+- [[[symfony_template_docs]]] https://symfony.com/doc/current/templating.html#tags-and-helpers
+- [[[symfony_twig]]] https://symfony.com/doc/current/reference/twig_reference.html
+- [[[symfony_twig_path]]] https://symfony.com/doc/current/reference/twig_reference.html#path
+
+- [[[twig_reference]]] Documentazione di Twig: https://twig.symfony.com/doc/2.x/
+- [[[type-hint]]] Per i type-hint di PHP v. la documentazione nel sito ufficiale: https://secure.php.net/manual/en/functions.arguments.php#functions.arguments.type-declaration

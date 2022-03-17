@@ -1,0 +1,93 @@
+[preface]
+
+[#c01-introduzione]
+= Introduzione
+
+In questo corso costruiremo insieme uno _store finder_, cioè un sito web che permette di gestire, visualizzare e
+ricercare *punti di interesse* su una *mappa geografica*. +
+Un sito del genere può tornare utile ad esempio -ma non solo- in questi casi:
+
+- *Vendita di prodotti* +
+  Se il nostro cliente ha uno o più negozi di *beni materiali* come scarpe, gioielli o gadget elettronici, gli sarà
+  utile mostrare su di una mappa i _punti vendita_ in cui è possibile acquistare i suoi prodotti.
+
+- *Organizzazione di eventi* +
+  Se il nostro cliente organizza *eventi* in giro per il mondo, sarà interessato a mostrare i luoghi in cui si
+  svolgeranno i prossimi eventi.
+
+- *Diario di viaggi* +
+  Se il nostro cliente è un avventuriero, potrà mostrare i luoghi che ha visitato usando un mappamondo con un
+  segnalino per ciascun posto in cui è stato.
+
+== Cosa imparerò?
+
+Gli obiettivi di questo corso sono:
+
+* imparare ad usare il framework Symfony per realizzare web app e siti web;
+* imparare ad usare Git per la gestione delle versioni del tuo codice;
+* realizzare un progetto web dalla A alla Z, usando diversi linguaggi di programmazione (soprattutto PHP e Javascript).
+
+
+== Questo corso fa davvero per me?
+
+Se sei uno sviluppatore, uno studente di informatica, un appassionato di tecnologie per il web, o vuoi creare un sito web dinamico, sì, questo corso fa per te.
+
+
+== Quali conoscenze mi servono?
+
+Per seguire il corso è necessaria una conoscenza di base di:
+
+* concetti di server web e database
+* PHP
+* HTML
+* Javascript
+
+== Strumenti necessari
+
+Per seguire questo corso serviranno:
+
+. Un *computer* icon:smile-o[] con cui scrivere il codice; _non basta uno smartphone o un tablet_. Puoi usare indifferentemente un Mac, o un PC con Windows o Linux.
+
+. Accesso a Internet per il download dei software: se stai usando un PC pubblico, o sei in una rete protetta da un firewall particolarmente restrittivo, il download potrebbe non essere consentito.
+
+. Un programma che permetta di scrivere codice PHP, HTML, CSS e Javascript.
+
+. Accesso alla *shell*: tipicamente, su Mac è l'applicazione _Terminale_, su Linux è *bash*, ma si tratta sempre di una *finestra da cui digiteremo comandi*. Se usi Windows, leggi la nota qui sotto. +
+
+****
+[NOTE]
+.Shell su Windows(TM) icon:windows[]
+====
+Symfony può funzionare con Microsoft(R) _Windows_(TM) ed è possibile interagirvi con PowerShell; però, lo scopo di questo corso non è imparare a usare Symfony su Windows, bensì realizzare un progetto con Symfony.
+
+Se segui questo corso usando Windows, sconsiglio di utilizzare il prompt dei comandi (*cmd.exe*) o PowerShell; piuttosto, consiglio di utilizzare WSL2 (puoi usare la distro che preferisci) oppure https://git-scm.com/downloads[Git per Windows], che  comprende una *shell* alternativa con la quale potrai seguire alla lettera le indicazioni del corso. +
+Se usi la shell di *Git for Windows* tieni presente che:
+
+. i percorsi dei file vanno scritti come su Linux/MacOS, cioè usando come separatore delle directory questo slash `/` anziché quello predefinito di Windows (`\`)
+. i percorsi dei dischi non sono *C:\*, *D:\*, ecc. ma */c/*, */d/*, ecc.: se ad esempio il percorso di una directory in _Esplora risorse_ è `C:\percorso\della\directory\`, nella shell di *Git for Windows* andrà scritto così:
+
+    `/c/percorso/della/directory/`
+====
+****
+<<<
+
+
+=== Perché Symfony
+
+* Per evitare di _reinventare la ruota_: Symfony risolve una serie di annosi problemi in maniera efficace, _in primis_ la gestione dei template e le interazioni con il database.
+* Per creare una soluzione scalabile e gestibile nel tempo.
+* Per abituarsi a progettare e programmare in maniera strutturata.
+
+== Icone utilizzate in questo libro
+
+[cols="1,9"]
+|===
+|Icona |Significato
+
+|icon:rocket[]
+|È possibile saltare ad un paragrafo o capitolo successivo.
+
+|icon:github[]
+|È possibile scaricare il codice di questa lezione dal repository Git.
+
+|===

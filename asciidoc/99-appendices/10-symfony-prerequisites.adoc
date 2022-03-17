@@ -1,0 +1,39 @@
+[appendix]
+= Prerequisiti per Symfony
+
+[#installare_composer]
+== Composer
+
+Per *installare Composer* possiamo seguire le istruzioni presenti https://getcomposer.org/download/[nel sito ufficiale], oppure copiare lo script sottostante e lanciarlo da Shell come indicato in https://getcomposer.org/doc/faqs/how-to-install-composer-programmatically.md[un'altra pagina] del sito ufficiale:
+
+[source,bash,linenums]
+.Script di installazione di Composer
+----
+#!/bin/sh
+
+EXPECTED_SIGNATURE="$(wget -q -O - https://composer.github.io/installer.sig)"
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+ACTUAL_SIGNATURE="$(php -r "echo hash_file('SHA384', 'composer-setup.php');")"
+
+if [ "$EXPECTED_SIGNATURE" != "$ACTUAL_SIGNATURE" ]
+then
+    >&2 echo 'ERROR: Invalid installer signature'
+    rm composer-setup.php
+    exit 1
+fi
+
+php composer-setup.php --quiet
+RESULT=$?
+rm composer-setup.php
+exit $RESULT
+----
+
+=== Rendere `composer` accessibile globalmente
+
+Lo script qui sopra crea un file eseguibile di nome *composer.phar* nella directory corrente; questo significa che il comando *composer* non sarà disponibile _globalmente_, ma sarà possibile lanciarlo solo dalla directory corrente digitando `./composer.phar`. +
+Per raggiungerlo digitando semplicemente `composer` da _qualunque directory del container *guybrush_php8*_, il file *composer.phar* deve essere copiato in una directory nel _PATH_ del container *guybrush_php8* (ad es. */usr/local/bin*):
+
+[source,bash]
+----
+sudo cp composer.phar /usr/local/bin/composer
+----

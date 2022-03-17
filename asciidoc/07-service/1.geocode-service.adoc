@@ -1,0 +1,174 @@
+Il comando che abbiamo scritto nel capitolo scorso, perlomeno come l'ho scritto
+io, fa il suo dovere ma ha un problema: la chiave API di ((MapQuest)) è 
+*scritta nel codice della classe*, e questa è una delle cose per le quali _il Dio della programmazione non mi farebbe entrare in paradiso_ (https://aforismi.meglio.it/frase-film.htm?id=1693d[cit].). Come ovviare a questo problema? Possiamo intervenire in due modi che non si escludono l'un l'altro. + 
+Il primo intervento possibile è _spostare_ la chiave in un file escluso dai commit, e poi farla leggere alla classe del comando. Il miglior candidato è un nuovo file di nome *.env.local*; infatti, nel commento presente all'inizio del file *.env* troviamo questa riga:
+
+```
+#  * .env.local          uncommitted file with local overrides
+```
+
+La parola chiave di questa riga è _uncommitted_: se aggiungiamo un file con questo nome, git non lo considererà nei _((commit))_ futuri. Creiamo perciò il file *.env.local* e memorizziamo lì la nostra chiave API, che in questo modo non entrerà più in nessun commit.
+
+[source,bash]
+..env.local
+----
+MAPQUEST_API_KEY=la_vostra_chiave_API
+----
+
+Il secondo intervento possibile è separare la logica del comando da quella della geocodifica, rendendo quest'ultima un _servizio_ e usando quel che nel gergo di Symfony si chiama _((service container))_. +
+Quando abbiamo scritto il comando di <<comandi_e_db,importazione massiva>> di *Poi* abbiamo accennato al fatto che è possibile accedere ad istanze inizializzate di alcune classi (come l'_Entity Manager_ (((Doctrine, Entity Manager))) di Doctrine) senza doverne chiamare il costruttore: queste classi sono chiamate _service_ e gli ambienti da cui possono essere invocate sono detti _container_: ad esempio, la classe derivata da *Command*, oppure i *((Controller))*, sono _container_ da cui è possibile utilizzare i _service_, ossia _<<symfony_service_containers,service containers>>_.
+
+## Come creare un _service_
+
+Grazie all'_((Autowiring))_ di Symfony, ci basterà creare una classe PHP in una directory qualsiasi (dentro *src/*), e questa classe sarà disponibile in qualsiasi _container_, nel modo che abbiamo visto nel capitolo <<importazione-massiva>>. Per vedere questo meccanismo in azione, creiamo una classe _vuota_ di nome *Geocode* nella directory *src/Service*.
+
+[source,php]
+.src/Service/Geocode.php
+----
+<?php
+
+namespace App\Service;
+
+class Geocode
+{
+}
+----
+
+Ora controlliamo che l'_autowiring_ stia funzionando correttamente: dalla shell del container *guybrush_php8* diamo il comando seguente.
+
+[source,bash]
+----
+php bin/console debug:autowiring --all | grep 'App'
+----
+
+Con `grep` facciamo in modo di scremare l'output del comando `debug:autowiring` (che è un po' prolisso), visualizzando solo le classi _autowired_ del namespace *App*. Il risultato dovrebbe essere questo:
+
+----
+ App\Command\PoiEnrichCommand
+ App\Command\PoiImportCommand
+ App\Controller\HomeController
+ App\Controller\SuperController
+ App\Kernel (kernel)
+ App\Repository\PoiCategoryRepository
+ App\Repository\PoiRepository
+ App\Service\Geocode
+----
+
+Possiamo dunque sfruttare l'_autowiring_: aggiungiamo un argomento di tipo *App\Service\Geocode* al costruttore della classe *PoiEnrichCommand*, come segue.
+
+[source,diff]
+----
+class PoiEnrichCommand extends Command
+{
+  // ...
+-  public function __construct(EntityManagerInterface $em string $name = null)
++  public function __construct(EntityManagerInterface $em, App\Service\Geocode $geocode $geocode, string $name = null)    
+  // ...
+}
+----
+
+Se proviamo a rilanciare il comando adesso, l'aggiunta dell'argomento al costruttore non genererà errori; anzi, avremo a disposizione un'istanza inizializzata della classe Geocode.
+
+## Argomenti del costruttore del service
+
+Fin qui non abbiamo fatto nulla di particolarmente interessante: avremmo 
+potuto tranquillamente istanziare la classe usando *new()*. +
+Il discorso cambia se al costruttore di *Geocode* aggiungiamo un paio di argomenti, ad esempio la chiave API e il template di URL da usare nelle chiamate al _webservice_.
+
+[source,php]
+.src/Service/Geocode.php
+----
+class Geocode
+{
+  private string $apiKey;
+  private string $urlTemplate;
+
+  public function __construct(string $apiKey, string $urlTemplate)
+  {
+    $this->apiKey = $apiKey;
+    $this->urlTemplate = $urlTemplate;
+  }
+}
+----
+
+Se usassimo *new()*, ora dovremmo passarle la chiave API e l'URL
+che -al momento- sono costanti della classe *PoiEnrichCommand*. Invece, con i
+service container, questi due parametri possono essere specificati 
+nel file di configurazione *config/services.yaml*, in modo tale che quando
+Symfony istanzierà la classe Geocode, prenderà i valori che gli abbiamo detto
+di usare, e il codice chiamante non se ne dovrà preoccupare (anzi, non saprà
+nemmeno che esistono). +
+Quest'ultima considerazione costituisce un bel vantaggio nel momento in cui per qualche motivo dovessimo rifattorizzare il codice, ad esempio se volessimo usare un altro provider per la ((geocodifica)): siccome il _service_ viene passato già inizializzato al _container_, il codice del container non avrà bisogno di modifiche: sarà sufficiente cambiare il codice della classe Geocode. Anche nel caso in cui fossero necessari più parametri per il costruttore, il codice nel _container_ non avrà bisogno di essere riscritto. +
+Per fare in modo che Symfony istanzi la classe Geocode con i parametri corretti, aggiungiamo a *config/services.yaml* la configurazione del nostro _service_.
+
+[source,yaml]
+.config/services.yaml
+----
+services:
+    # ...
+    App\Service\Geocode:
+        public: true
+        arguments:
+            $apiKey: 'la_vostra_api_key'
+            $urlTemplate: 'http://www.mapquestapi.com/geocoding/v1/reverse?key=%s&location=%f,%f'
+----
+
+Non è _il modo giusto_ di farlo, ma se adesso riproviamo a lanciare il comando, questo istanzierà Geocode con i valori corretti (ossia: non farà nulla di diverso perché ancora Geocode non fa niente, ma non ci saranno messaggi di errore). Come controprova, basta commentare o cancellare queste righe da *config/services.yaml* e rilanciare il comando per avere la conferma che sono necessarie.
+
+[NOTE]
+.Spoiler alert :-)
+====
+Se commentiamo la riga `App\Service\Geocode` e le successive 4 righe, si verificherà l'errore seguente:
+
+_Cannot autowire service "App\Service\Geocode": argument "$apiKey" of method "__construct()" is type-hinted "string", you should configure its value explicitly._
+====
+
+Perché questo non è ancora _il modo giusto_ di implementare un servizio che usa una chiave? Ma ovviamente perché la chiave è ancora _hardcoded_ nel codice! Ha solo cambiato posto. +
+Possiamo ovviare brillantemente al problema: infatti, invece di un _letterale_ (come nel listato qui sopra) possiamo dire a Symfony di prendere il valore di un _parametro_ presente in *.env*, o *.env.local* ecc. . Per memorizzare la chiave, ci basterà creare un parametro in *.env* e quindi usare l'espressione `'%env(PARAMETRO)%'` nel file yaml (sostituiremo `PARAMETRO` col *nome* del parametro che abbiamo creato); la configurazione _pulita_ potrebbe somigliare a questa:
+
+[source,yaml]
+.config/services.yaml
+----
+services:
+    # ...
+    App\Service\Geocode:
+        public: true
+        arguments:
+            $apiKey: '%env(MAPQUEST_API_KEY)%'
+            $urlTemplate: 'http://www.mapquestapi.com/geocoding/v1/reverse?key=%s&location=%f,%f'
+----
+
+## Codice del _service_
+
+Con i parametri a posto, ci resta la parte divertente: far fare qualcosa al servizio! +
+Possiamo trasferire il metodo *mapQuestGeocode()* dal comando al _service_, magari dargli un nome più generico come  *callWebservice()*, e per separare completamente la logica del comando da quella del _service_, inglobare le istruzioni seguenti in *Geocode*:
+
+[source,php]
+----
+  $result = $output['results'][0]['locations'][0];
+  $p
+    ->setAddress($result['street'])
+    ->setCity($result['adminArea5'])
+    ->setCountry($result['adminArea1'])
+    ->setProvince($result['adminArea3'] ?? '-')
+    ->setRegion($result['adminArea3'] ?? '-')
+    ->setZip($result['postalCode']);
+----
+
+## Sorgenti completi
+
+### Service
+
+[source,php]
+.src/Service/Geocode.php
+----
+include::Geocode.php[]
+----
+
+### Comando
+
+[source,php]
+.src/Command/PoiEnrichCommand.php
+----
+include::PoiEnrichCommand-withGeocode.php[]
+----

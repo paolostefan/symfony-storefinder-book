@@ -1,0 +1,63 @@
+[appendix]
+[#inviare_email]
+= Inviare email con Symfony
+
+Dalla versione 4.3, il framework di Symfony comprende il componente *Mailer* che serve a gestire l'invio di messaggi email. In precedenza veniva usato il pacchetto Swiftmailer, che da novembre 2021 non è più supportato.
+
+Il file di configurazione utilizzato dal componente Mailer è *config/packages/mailer.yaml*, che per default contiene una sola voce:
+
+[source, yaml]
+----
+framework:
+    mailer:
+        dsn: '%env(MAILER_DSN)%'
+----
+
+Questo significa che *Mailer* cercherà la variabile di ambiente MAILER_DSN (in uno dei file `.env` utilizzati da Symfony o nelle variabili d'ambiente riconosciute da PHP). Se questa variabile non è impostata riceveremo un errore di questo tipo:
+
+image::images/mailer_dsn-not-found.png[]
+
+
+== MAILER_DSN
+
+Affinché il componente *Mailer* possa inviare mail, la variabile MAILER_DSN deve essere impostata, ad esempio nel file `.env` oppure `.env.local`. Suggerisco di usare quest'ultimo (ignorato da Git), perché in MAILER_DSN vanno inserite le credenziali dell'account di posta che vogliamo utilizzare.
+
+Il formato da usare per specificare le credenziali è il seguente:
+
+[source, env]
+----
+# .env
+MAILER_DSN=smtp://user:pass@smtp.example.com:port
+----
+
+A meno che non abbiamo un _mail server_ nella nostra infrastruttura Docker, possiamo sfruttare un server SMTP di terze parti per inviare email.
+
+NOTE: L'elenco completo dei provider supportati è presentato nella pagina https://symfony.com/doc/current/mailer.html#using-a-3rd-party-transport .
+
+=== GMail
+
+Se avete un indirizzo email su GMail, potete utilizzare i server SMTP di Google per inviare email (fino ad un massimo di 2000 al giorno). Per facilitare il compito esiste un pacchetto dedicato, installabile con il comando footnote:ignoreplatformreqs[Il parametro `--ignore-platform-reqs` è necessario solo perché l'infrastruttura Docker usata nel libro utilizza PHP 8, che non è pienamente supportato da Doctrine 2.8.]:
+
+[source, bash]
+----
+composer require symfony/google-mailer --ignore-platform-reqs
+----
+
+Una volta installato il pacchetto, bisogna specificare le proprie credenziali nel file *.env.local* nel formato seguente.
+
+
+[source, env]
+..env.local
+----
+MAILER_DSN=gmail://iltuoindirizzo@gmail.com:password@default
+----
+
+IMPORTANT: La password da inserire qui non è necessariamente la quella del vostro account Google. Se state usando l'autenticazione a due fattori, è necessario creare una _App password_ all'URL https://myaccount.google.com/apppasswords e utilizzare quella.
+
+
+Se siete arrivati a questa appendice dal capitolo <<registrazione>>, potete tornare al punto corretto usando <<registrazione_mail_config_ok,questo link>>.
+
+== Inviare un messaggio di prova
+
+NOTE: Documentazione ufficiale: https://symfony.com/doc/current/mailer.html#creating-sending-messages
+

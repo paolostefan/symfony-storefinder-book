@@ -1,0 +1,82 @@
+[appendix]
+= Console input/output nei comandi
+
+Nei _console command_, la variabile *$io* creata di default nel metodo *execute()* rappresenta la nostra _finestra sul mondo_: può servire sia per _scrivere_ messaggi nella console, sia per _fare domande_ all'utente e leggerne le risposte. 
+
+== Scrivere
+
+Per scrivere un messaggio nella console si può usare il metodo *writeln()*:
+
+[source,php]
+----
+$io->writeln("Questo è un messaggio");
+----
+
+*writeln()* aggiunge un carattere _a capo_ alla fine del messaggio; se vogliamo scrivere un messaggio _senza andare a capo_, possiamo usare il metodo *write()*:
+
+[source,php]
+.Scrivere più messaggi sulla stessa riga
+----
+$io->write("Questo è ");
+// Altre istruzioni ...
+$io->write("un messaggio");
+----
+
+Per andare a capo e/o scrivere una o più righe vuote, c'è il metodo *newLine()*:
+
+[source,php]
+----
+$io->newLine();  // Va a capo
+$io->newLine(5); // Va a capo cinque volte
+----
+
+Se passiamo un solo argomento a *write()* o *writeln()*, il messaggio verrà stampato indipendentemente dal livello di _verbosity_: se cioè invochiamo il comando con o senza opzione `-v`, `-vv` o `-vvv`, il messaggio verrà comunque stampato. +
+Potremmo volere invece che alcuni messaggi comparissero solo se il comando viene invocato in modalità _verbose_: in tal caso possiamo usare il *secondo argomento* (come specificato nella https://symfony.com/doc/current/console/verbosity.html[documentazione]):
+
+[source,php]
+----
+$output->writeln("Siamo perlomeno VERBOSE",             
+                 OutputInterface::VERBOSITY_VERBOSE);
+----
+
+In questo caso, il messaggio verrà stampato solo se il livello di verbosity è _maggiore o uguale_ a *OutputInterface::VERBOSITY_VERBOSE*, cioè se il comando è stato  invocato con opzioni `-v`, `-vv` o `-vvv` (che corrispondono rispettivamente ai valori delle costanti
+*VERBOSITY_VERBOSE*, *VERBOSITY_VERY_VERBOSE* e *VERBOSITY_DEBUG* di *OutputInterface*).
+
+== Colori e stili
+
+Per colorare porzioni dei messaggi di *write()* e *writeln()* si possono usare i seguenti tag nella stringa:
+
+-   `<info>Testo</info>`: verde
+-   `<comment>Testo</comment>`: giallo
+-   `<question>Testo</question>`: nero su fondo azzurro
+-   `<error>Testo</error>`: bianco su fondo rosso
+
+Per evidenziare l'*intero messaggio* possiamo usare i seguenti metodi della classe SymfonyStyle.
+
+.Metodi di SymfonyStyle
+[cols='3,7']
+|===
+|Nome funzione | Cosa fa
+
+|`note($msg)`
+|Scrive $msg in giallo, preceduto da `! [NOTE]`.
+
+|`success($msg)`
+|Scrive $msg in bianco su una *mattonella verde* molto evidente.
+
+|`error($msg)` +
+`warning($msg)` +
+`caution($msg)`
+|Scrivono $msg in bianco su una mattonella *rossa*.
+
+|`section($msg)`
+|Scrive $msg in giallo _sottolineato_ usando il carattere `-`.
+
+|`title($msg)`
+|Scrive $msg in giallo _sottolineato_ usando il carattere `=`.
+
+|`comment($msg)`
+|Scrive $msg preceduto da due slash (`// Messaggio`).
+
+|===
+

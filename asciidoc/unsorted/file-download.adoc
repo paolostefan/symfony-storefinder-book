@@ -1,0 +1,20 @@
+## BinaryFileResponse
+
+Di default restituisce un file:
+
+ - Che il browser chiederà di scaricare
+ - Con un nome "casuale" (o uguale all'ultimo segmento dell'URL)
+
+Per dare un nome al download:
+
+[source,php]
+====
+return new BinaryFileResponse($filename, 200, ['Content-Disposition'=> 'attachment; filename="'.basename($filename).'"']);
+====
+
+per mostrarlo inline (se il browsr lo permette):
+
+[source,php]
+====
+return new BinaryFileResponse($filename, 200, ['Content-Disposition'=> 'inline; filename="'.basename($filename).'"']);
+====

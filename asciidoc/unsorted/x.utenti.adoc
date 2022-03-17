@@ -1,0 +1,203 @@
+# Gestione degli utenti
+
+Ora seguiremo pedissequamente le istruzioni presenti a http://symfony.com/doc/master/bundles/FOSUserBundle/index.html[questa pagina].
+
+## FOSUserBundle
+
+### 1. Installazione del pacchetto tramite composer
+
+Dalla shell del container *guybrush_php8* digitiamo:
+
+    composer require friendsofsymfony/user-bundle "~2.0"
+
+
+### 2. Abilitazione del Bundle
+
+Nella nostra IDE apriamo il file app/AppKernel e aggiungiamo la riga:
+
+[source,php]
+====
+  new FOS\UserBundle\FOSUserBundle(),
+====
+
+all'array $bundles della funzione registerBundles() (@todo migliorare ////
+completare
+////)
+
+
+### 3. Creazione della Entity user
+
+Creiamo il file src/AppBundle/Entity/User.php e scriviamoci dentro:
+
+[source,php]
+====
+<?php
+// src/AppBundle/Entity/User.php
+
+namespace AppBundle\Entity;
+
+use FOS\UserBundle\Model\User as BaseUser;
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * @ORM\Entity
+ * @ORM\Table(name="fos_user")
+ */
+class User extends BaseUser
+{
+    /**
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    protected $id;
+
+    public function __construct()
+    {
+        parent::__construct();
+        // your own logic
+    }
+}
+?>
+====
+
+### 4. Impostazione del firewall di Symfony
+
+Modifichiamo app/config/security.yml come segue.
+
+* Sotto `security:` aggiungiamo le voci
+
+[source,yaml]
+====
+    encoders:
+        FOS\UserBundle\Model\UserInterface: bcrypt
+
+    role_hierarchy:
+        ROLE_ADMIN:       ROLE_USER
+        ROLE_SUPER_ADMIN: ROLE_ADMIN
+====
+
+* Sotto `providers:` aggiungiamo la voce
+
+[source,yaml]
+====
+        fos_userbundle:
+            id: fos_user.user_provider.username
+====
+
+* Sotto `firewalls: main` va aggiunto  
+
+[source,yaml]
+====
+            pattern: ^/
+====
+va disabilitato `anonymous:` e abilitato form_login coem segue:
+[source,yaml]
+====
+            form_login:
+                provider: fos_userbundle
+                csrf_token_generator: security.csrf.token_manager
+====
+
+* Infine va aggiunta la sezione access_control (sempre sotto security)
+
+[source,yaml]
+====
+    access_control:
+        - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/admin/, role: ROLE_ADMIN }
+
+====
+
+* Alla fine il file security.yml dovrebbe contenere:
+
+
+[source,yaml]
+====
+# To get started with security, check out the documentation:
+# https://symfony.com/doc/current/security.html
+security:
+
+    encoders:
+        FOS\UserBundle\Model\UserInterface: bcrypt
+
+    role_hierarchy:
+        ROLE_ADMIN: ROLE_USER
+        ROLE_SUPER_ADMIN: ROLE_ADMIN
+
+    # https://symfony.com/doc/current/security.html#b-configuring-how-users-are-loaded
+    providers:
+
+        fos_userbundle:
+            id: fos_user.user_provider.username
+
+        in_memory:
+            memory: ~
+
+    firewalls:
+        # disables authentication for assets and the profiler, adapt it according to your needs
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        main:
+            pattern: ^/
+
+            # anonymous: ~
+            # activate different ways to authenticate
+
+            # https://symfony.com/doc/current/security.html#a-configuring-how-your-users-will-authenticate
+            #http_basic: ~
+
+            # https://symfony.com/doc/current/security/form_login_setup.html
+            form_login:
+                provider: fos_userbundle
+                csrf_token_generator: security.csrf.token_manager
+
+            logout: true
+            anonymous: true
+
+    access_control:
+        - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/admin/, role: ROLE_ADMIN }
+====
+
+
+### 5. Configurazione
+
+In app/config/config.yml aggiungiamo le righe seguenti:
+
+[source,yaml]
+====
+fos_user:
+    db_driver: orm
+    firewall_name: main
+    user_class: AppBundle\Entity\User
+    from_email:
+        address: "%mailer_user%"
+        sender_name: "%mailer_user%"
+====
+
+### 6. Routing
+
+In app/config/routing.yml aggiungiamo le righe seguenti:
+
+[source,yaml]
+====
+fos_user:
+    resource: "@FOSUserBundle/Resources/config/routing/all.xml"
+====
+
+Prima di procedere, verifichiamo di aver salvato tutti i file php e yml
+coinvolti.
+
+### 7. Aggiornamento del database
+
+Per creare la tabella fos_user (o il valore che abbiamo inserito in ORM\Table)
+dalla shell del container *guybrush_php8* diamo il comando:
+
+    php bin/console doctrine:schema:update --force --dump-sql

@@ -1,0 +1,21 @@
+La funzione `mail()` di PHP, in ambienti Linux come la nostra VM, PHP si appoggia al comando `sendmail`.
+
+Questo comando funziona se il web server è anche un server SMTP (cioè un server di posta), ma non è il nostro caso.
+
+## Installare un mail server
+
+Installiamo prima di tutto un client di posta che funzioni da linea comando, ad es. heirloom-mailx:
+
+<http://www.binarytides.com/linux-mail-with-smtp/>
+
+Poi aggiungiamo le seguenti righe a /etc/nail.rc (`sudo nano /etc/nail.rc`):
+
+    set smtp=mail.yourdomain.com (example)
+    ...smtp-auth-user
+    ...smtp-auth-password
+
+## Facciamo una prova di invio
+
+Per utilizzare un comando alternativo, modifichiamo `php.ini`:
+
+    sendmail_path = /usr/bin/mailx -t

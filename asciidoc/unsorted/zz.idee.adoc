@@ -1,0 +1,18 @@
+# Gerarchia (tree):
+
+- Robot e loro derivati (ad es. prototipo, versione 1,2 3, 2a, 2b)
+- Nodi di contenuti
+
+# Teoria
+
+Un sito web funziona come un *ristorante*: quando visiti un sito, è come se il tuo browser fosse il cliente del ristorante, e il server web fosse il cameriere.
+
+Il cliente chiede al cameriere una pietanza presente nel menu; il cameriere la recupera e la *serve* al cliente.
+
+Un sito web **statico** è paragonabile a un distributore automatico che serve **solo cibi preconfezionati**: il servizio è rapidissimo, ma è molto poco personalizzabile.
+
+Un sito web **dinamico** è come un ristorante con una cucina, e il cuoco è il nostro *application server*. Puoi chiedere di personalizzare ogni pietanza, ma ovviamente il servizio sarà leggermente più lento.
+
+# Altri appunti
+
+Si può https://mariadb.com/kb/en/library/mysql_install_dbexe/[installare manualmente MariaDB come servizio Windows]

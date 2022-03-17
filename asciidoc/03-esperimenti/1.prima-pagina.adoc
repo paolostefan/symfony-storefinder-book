@@ -1,0 +1,254 @@
+[#prima-pagina]
+== La nostra prima pagina
+
+=== Prima di iniziare
+
+Prima di iniziare assicuriamoci che i container siano accesi, altrimenti all' http://localhost:8080/[URL del sito] comparirà una pagina di errore. Apriamo quindi una shell nel container, come segue.
+
+[source,bash]
+----
+docker exec -it guybrush_php8 bash   # apre la shell
+su developer                   # usa un utente non privilegiato
+cd /var/www/html/guybrush      # entra nella dir del progetto
+----
+
+=== Iniziamo!
+
+Per _creare una pagina_ in un sito Symfony bisogna aggiungere un *metodo* ad una classe PHP detta _((Controller))_, e associare al metodo *l'URL della pagina* (Symfony lo chiama _((route))_). Questo metodo dovrà restituire un oggetto di tipo _Response_. Non preoccupiamoci più di tanto della terminologia, per ora: stiamo prendendo confidenza con Symfony, nella prossima lezione faremo più chiarezza. +
+La classe _Controller_ dovrà trovarsi nella directory *src/Controller*, che è ancora vuota. Abbiamo quindi due possibilità:
+
+. creare ex-novo una classe PHP in questa directory, specificando le opportune direttive `use` e `extends`;
+. far creare un nuovo Controller a Symfony con l'apposito _console command_.
+
+Per questa volta usiamo il *secondo metodo*, più facile, visto che stiamo imparando.
+Dalla shell del container *guybrush_php8* diamo il comando: +
+
+[#make_controller]
+[source, bash]
+----
+php bin/console make:controller
+----
+
+Opzionalmente, possiamo passare il _nome_ del controller come argomento del comando (dopo `make:controller`); se non lo specifichiamo, ci verrà chiesto di inserirlo interattivamente. Qualsiasi nome va bene, purché finisca con *Controller* (io ho scelto `SuperController`). +
+Terminata l'esecuzione del comando, possiamo notare che nella directory *src/Controller* è comparso un file PHP che ha il nome che abbiamo specificato (*SuperController.php*): esso contiene la dichiarazione della classe PHP omonima, nella quale è presente il solo metodo  *index()*. +
+Infatti, il comando ((`make:controller`)) effettua le seguenti operazioni:
+
+. crea *la classe PHP* corrispondente al nuovo Controller;
+. aggiunge alla classe un metodo (_azione_) di nome *index()* associato alla _route_ corrispondente al nome del Controller in minuscolo, senza il suffisso _Controller_ - nel nostro caso, questa route sarà http://localhost:8080/super[/super] ;
+. crea un file template, di cui ci occuperemo in <<c04-template,una delle prossime lezioni>>.
+
+[IMPORTANT]
+.In caso di errore
+====
+(((Errore,There are no commands defined in the "make" namespace))) Se il comando `make:controller` restituisce il messaggio di errore *There are no commands defined in the "make" namespace*, proviamo a controllare i punti seguenti:
+
+. Siamo in ambiente di *produzione*? +
+Se nel file */.env* o */.env.local* è presente la riga `APP_ENV=prod`, questa va cambiata in `APP_ENV=dev`. Infatti, i comandi del namespace *make* funzionano solo in ambiente *_dev_*. #@todo link a capitolo sugli env#
+
+. Manca il bundle *maker* o *symfony/maker-bundle*? +
+Proviamo a dare il comando `composer require symfony/maker-bundle`. Se siamo già in ambiente di sviluppo questo dovrebbe risolvere il problema.
+
+====
+
+Per vedere la pagina che Symfony ha creato, visitiamo l'URL <http://localhost:8080/super>. Se abbiamo scelto un nome diverso per il controller, l'URL da visitare sarà il nome del controller in minuscolo, ad es. se abbiamo scelto come nome *HelloWorldAnyoneController*, l'URL sarà <http://localhost:8080/helloworldanyone> . Dovrebbe essere qualcosa di simile:
+
+image::super-ombra.png[pdfwidth=90%]
+
+=== La debug toolbar
+
+Cos'è quella barra nera in fondo alla pagina?
+
+#@todo immagine#
+
+#@todo Profiler, doctrine tab, routing tab#
+
+(((bin/console,debug:router)))
+
+== debug:router
+
+Possiamo visualizzare un elenco completo delle _route_ 
+definite usando il comando seguente dalla shell del container *guybrush_php8*:
+
+[source,bash]
+----
+php bin/console debug:router
+----
+
+In questo momento dovrebbe dare un output simile:
+
+image::debug-router.png[pdfwidth=90%]
+
+== La nostra seconda pagina: la via più lunga
+
+Nell'esempio precedente abbiamo creato una pagina lasciando fare tutto a Symfony; ora vedremo come scrivere un Controller da zero e aggiungervi i metodi opportuni. +
+Poniamo ad es. di voler creare l'homepage del sito, e di farle scrivere un semplice messaggio di benvenuto (in testo semplice, non in HTML): cioè vogliamo che la pagina all'URL <http://localhost:8080/> mostri la scritta "Benvenuto da Guybrush!". +
+Per farlo, con il nostro IDE creiamo un nuovo file PHP dentro *src/Controller/*, chiamandolo ad es. *HomeController.php*. Al suo interno scriviamo quanto segue:
+
+[source,php]
+.src/Controller/HomeController.php
+----
+<?php
+
+namespace App\Controller;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Annotation\Route;
+
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
+
+class HomeController extends AbstractController
+{
+    /**
+     * @Route("/") <1>
+     */
+    public function index(Request $request)
+    {
+        return new Response('Benvenuto da Guybrush!');
+    }
+}
+----
+
+<1> Attenzione *Usa i doppi apici* (", non ') per evitare errori di interpretazione.
+
+[TIP]
+.Annotazioni in PHP
+====
+Il _commento_ che precede la dichiarazione del metodo *index()* è una cosiddetta *annotazione*, cioè un metadato inserito in un commento formattato in maniera particolare. Le annotazioni vengono lette e interpretate al volo da PHP e possono essere utilizzate per gli scopi più svariati, come vedremo nei prossimi capitoli. Fino a PHP 7 le annotazioni dovevano avere questo formato:
+
+[source, php]
+----
+/**
+ * @Route("/login", name="login")
+ */
+----
+
+Da PHP 8 in poi, oltre a questo formato è possibile utilizzarne un altro più compatto, che occupa una sola riga.
+
+[source, php]
+----
+#[Route("/login", name:"login")]
+----
+
+*Nota bene*: nelle rotte di PHP 8, i nomi dei parametri non devono essere seguiti dal'uguale `=` ma dai due punti `:` . L'annotazione inoltre deve essere racchiusa entro parentesi quadre.
+====
+
+(((annotazione,@Route)))
+
+== L'annotazione @Route
+
+L'annotazione *@Route* serve ad associare un metodo *pubblico* di un Controller ad una _pagina_ (i metodi pubblici di un controller non debbono essere associati per forza ad una pagina). +
+*@Route* richiede un argomento obbligatorio di tipo stringa, che rappresenta l'URL della rotta: esso può essere sia un percorso esatto, come nel caso visto sopra, sia un _pattern_ contenente parti variabili da specificare tra parentesi graffe, come ad es.:
+
+[source,php]
+----
+  /**
+   * @Route("/archive/{year}/{month}/{topic}/")
+   */
+----
+
+In presenza di parti variabili, la firma del metodo deve prevedere un argomento per ciascuna di esse: nell'esempio qui sopra dovrebbe quindi prevedere tre argomenti (*$year*, *$month*, *$topic*), come segue.
+
+[source,php]
+----
+  /**
+   * @Route("/archive/{year}/{month}/{topic}/")
+   */
+  public function index($year, $month, $topic) {
+    // ...
+  }
+----
+
+Il componente Router di Symfony si arrangerà a valorizzare gli argomenti opportunamente: nel caso visitassimo ad es. l'URL */archive/2015/10/technology/*, il router chiamerebbe il metodo assegnando i seguenti valori agli argomenti:
+
+. `$year = "2015"`
+. `$month = "10"`
+. `$topic = "technology"`
+
+NOTE: Siccome gli argomenti del metodo hanno lo stesso nome che hanno nel pattern della _Route_, essi possono comparire in qualsiasi ordine nella firma del metodo, senza dover modificare il pattern.
+
+Ogni rotta deve avere un *nome univoco*, e l'annotazione *@Route* permette opzionalmente di specificarne uno mediante l'argomento *name*; ad esempio:
+
+[source,php]
+----
+/**
+ * @Route("/", name="home")
+ */
+----
+
+[TIP]
+====
+In assenza dell'argomento **name="..."**, Symfony assegnerà alla rotta il nome di default *app_[controller]\_[azione]*, dove _[controller]_ è il nome del Controller in minuscolo (senza il suffisso _Controller_), e _[azione]_ è il nome del metodo in minuscolo, senza l'eventuale suffisso _Action_. +
+*Ad esempio*: se nel nostro *HomeController* definiamo il metodo *SuperWowAction()* e vi associamo un'annotazione _@Route_, il nome di default della corrispondente rotta sarà **app_home_superwow**.
+
+====
+
+Ora che abbiamo definito il metodo *HomeController::index()*, all'URL <http://localhost:8080/> dovrebbe comparire la scritta "Benvenuto da Guybrush!", in font Times nero su fondo bianco (uno stile molto *_Web 1.0_* icon:smile-o[]).
+
+****
+
+[WARNING]
+====
+
+[.lead]
+Troubleshooting
+
+Se avevamo già visitato questo URL, può darsi che Symfony e/o il browser stiano usando la versione di questa pagina salvata in cache (si tratta di due cache diverse), e potremmo, a seconda dei casi, vedere la vecchia versione della pagina oppure una pagina di errore 404 o 500.
+
+. Cache *del browser*: per bypassarla, proviamo a ricaricare la pagina.
+. Cache *di Symfony*: per cancellarla, dobbiamo connetterci al container/VM e dare il comando:
+
+[source,bash]
+----
+php bin/console cache:clear
+----
+
+icon:comment-o[] *Quindi… ogni volta che modifichiamo una virgola dobbiamo fare questo giro?*
+
+No, non è necessario, a meno che Symfony non sia in modalità _produzione_ (vedremo come farlo alla fine del corso).
+
+====
+
+****
+
+== La stessa pagina con route *Yaml*
+
+Le _((route))_ possono essere dichiarate nei controller tramite annotazioni 
+PHP (come abbiamo visto), oppure in un file di configurazione in formato 
+*((Yaml))* oppure *((XML))*: il file principale da cui vengono caricate 
+le _route_ è *config/route.yaml*, che può richiamare altri file. +
+Le rotte in formato Yaml sono un hash (array associativo) in cui le chiavi
+sono i _nomi_ delle route e i valori sono hash con due chiavi obbligatorie,
+_path_ e _controller_: la prima è l'_URL relativo_ della rotta, e la seconda 
+il _nome del metodo_ che corrisponde alla rotta (nel formato `classe::metodo`). 
+
+Per provare a usare questa modalità di dichiarazione delle _route_, apriamo
+il file *config/route.yaml* nel nostro IDE e aggiungiamo le righe seguenti.
+
+[source,yaml]
+.config/route.yaml
+----
+index:
+   path: /
+   controller: App\Controller\HomeController::index
+----
+
+Dopodiché, per non confondere le idee a Symfony, nel file *HomeController.php*
+_eliminiamo_ l'((annotazione)) che precede il metodo *index()* e cambiamo la stringa di benvenuto:
+
+[source,diff]
+.src/Controller/HomeController.php senza annotazione
+----
+    /**
+-     * @Route("/", name="home")
+     */
+    public function index(Request $request)
+    {
+-        return new Response('Benvenuto da Guybrush!');
++        return new Response('Benvenuto nuovamente da Guybrush!');
+    }
+----
+
+Ricarichiamo la pagina http://localhost:8080/: dovrebbe mostrare il _nuovo_ messaggio di benvenuto.
+
+<<<

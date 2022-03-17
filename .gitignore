@@ -1,0 +1,7 @@
+*.pyc
+*.code-workspace
+.idea/
+build/
+.DS_Store
+**/.asciidoctor
+old/

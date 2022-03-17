@@ -1,0 +1,23 @@
+### Annullare le modifiche a un file
+
+    git checkout -- path/to/file
+
+### Creare un nuovo branch e spostarcisi in un comando
+
+    git checkout -b <new_branch>
+
+### error: cannot lock ref 'refs/remotes/origin/master': is at <...> but expected <...>
+
+**Soluzione**: Elimina i *remote* ed aggiungili nuovamente.
+Sarà necessario impostare nuovamente gli upstream ad es. con:
+
+    git branch -u origin/master master
+
+Ref: https://stackoverflow.com/a/36268476/719247[Stackoverflow]
+
+
+### Checkout di alcuni file da un branch diverso da quello corrente
+
+    git checkout -p source_branch -- <paths>...
+
+Ref: https://stackoverflow.com/a/1355990/719247[Stackoverflow]

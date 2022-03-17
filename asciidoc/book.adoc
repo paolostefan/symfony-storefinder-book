@@ -1,0 +1,99 @@
+// Custom vars that need to be here
+:build: 1
+:version: 1.0.0
+// Valori permessi: Docker, Vagrant
+:virtual: Docker 
+// END Custom vars that need to be here
+= Uno store finder con Symfony e {virtual}
+Paolo Stefan <info@paolostefan.it>
+v{version} build {build} ({localdatetime})
+:doctype: book
+:experimental:
+:icons: font
+:imagesdir: ./pix/
+:front-cover-image: image:Cover2.png[Front Cover,1050,1600]
+:hide-uri-scheme:
+:lang: it
+// Elenco stili di rouge: https://github.com/rouge-ruby/rouge/tree/master/lib/rouge/themes
+// scuri belli: molokai, gruvbox
+// chiari belli: monokai_sublime, pastie
+:source-highlighter: rouge
+:rouge-style: molokai
+// NOTA: Pygments è legato a Python2 e non funziona con l'immagine Docker
+// :source-highlighter: pygments
+// :pygments-style: perldoc
+// :pygments-linenums-mode: inline
+:sectnums:
+:toc:
+:toc-title: Indice
+:toclevels: 2
+:chapter-label: Capitolo
+:figure-caption: Figura
+:listing-caption: Listato
+:table-caption: Tabella
+:appendix-caption: Appendice
+// Custom vars
+:sample_git_repo: git@github.com:paolostefan/sample_symfony.git
+:sample_git_repo_web: https://github.com/paolostefan/sample_symfony
+:template_name: AdminBSBMaterialDesign
+:template_git_repo_web: https://github.com/gurayyarar/AdminBSBMaterialDesign
+// END Custom vars
+
+
+ifndef::ebook-format[]
+:leveloffset: 1
+endif::[]
+
+include::c01-introduzione.adoc[]
+
+:imagesdir: ./02-ambiente/images/
+include::c02-ambiente.adoc[]
+
+:imagesdir: ./03-esperimenti/images/
+include::c03-esperimenti.adoc[]
+
+:imagesdir: ./04-template/images/
+include::c04-template.adoc[]
+
+include::c05-database.adoc[]
+
+:imagesdir: ./06-comandi/images/
+include::c06-comandi.adoc[]
+
+include::c07-service.adoc[]
+
+:imagesdir: ./08-mappa/
+include::c08-mappa.adoc[]
+
+:imagesdir: ./09-form/
+include::c09-form.adoc[]
+
+:imagesdir: ./10-utenti/
+include::c10-utenti.adoc[]
+
+:imagesdir: ./75-i18n/
+include::c75-i18n.adoc[]
+
+include::c80-deploy.adoc[]
+
+[#c90-bonus]
+:imagesdir: ./99-appendices/
+include::c90-appendix.adoc[]
+
+include::c98-riferimenti.adoc[]
+
+ifdef::backend-pdf[]
+[index]
+[#c99-indice]
+= Indice analitico
+endif::[]
+
+ifdef::ebook-format[]
+[index]
+[#c99-indice]
+= Indice analitico
+endif::[]
+
+ifndef::ebook-format[]
+:leveloffset: -1
+endif::[]

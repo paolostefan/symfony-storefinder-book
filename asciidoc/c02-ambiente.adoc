@@ -1,0 +1,40 @@
+= L'ambiente di sviluppo
+
+****
+Per scrivere codice serve un semplice editor di testo, oppure un programma che permetta qualche operazione in più, cioè un _IDE_. Inoltre serviranno un sistema di controllo delle versioni, e un ambiente di _runtime_ che permetta di eseguire il codice che scriveremo.
+****
+
+include::02-ambiente/10.ide-git.adoc[]
+
+[#runtime]
+== Runtime
+
+Durante questo corso scriveremo e faremo _girare_ sul nostro computer una _web application_ che avrà bisogno di *tre* software server:
+
+- un webserver, cioè un server *HTTP* (ad es. Nginx o Apache);
+- un *application* server (PHP);
+- un *database* server (PostgreSQL).
+
+Abbiamo diverse scelte per far girare questi tre server sul nostro computer, ad esempio:
+
+. installarli e configurarli nel nostro PC/Mac;
+. installare e configurare nel nostro PC/Mac solo _application server_ (PHP) e _database server_, e usare PHP come _webserver_ in modalità _builtin_ (incorporata), senza bisogno di un server HTTP;
+. creare una macchina virtuale nel nostro PC/Mac e installarvi i tre server;
+. creare tre ((container)) con ((Docker)) ed eseguirli nel nostro PC/Mac usando _((docker-compose))_ o _((Kubernetes))_.
+
+ifeval::["{virtual}" == "Docker"]
+In questo corso useremo l'ultima soluzione: vedremo cioè come usare
+_docker-compose_ per orchestrare i container che faranno da web, app e database server.
+
+include::02-ambiente/20.docker.adoc[]
+
+endif::[]
+
+// Vagrant stuff
+ifeval::["{virtual}" == "Vagrant"]
+In questo corso useremo la soluzione n. 3: vedremo cioè come usare Vagrant per creare una macchina virtuale in cui faremo 
+girare tutti i software server necessari.
+
+include::02-ambiente/21.vb-vagrant.adoc[]
+
+endif::[]

@@ -1,0 +1,16 @@
+[#c07-service]
+= Service container
+
+****
+.icon:github[] Con il repository {sample_git_repo_web}
+
+Per tornare a questo punto del libro potete fare checkout del ramo *enrich_command*. (((Git, git checkout)))
+
+[source,bash]
+----
+cd /percorso/di/guybrush        # sostituite col percorso corretto
+git checkout enrich_command
+----
+****
+
+include::07-service/1.geocode-service.adoc[]

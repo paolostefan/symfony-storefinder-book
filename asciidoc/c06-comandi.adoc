@@ -1,0 +1,3 @@
+include::06-comandi/10.importazione-massiva.adoc[]
+
+include::06-comandi/20.reverse.adoc[]

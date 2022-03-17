@@ -1,0 +1,42 @@
+
+@todo ////
+completare
+//// mettere in bella
+
+* Crea una Google Maps API key visitando l'URL https://developers.google.com/maps/documentation/javascript/get-api-key[developers.google.com/maps/documentation/javascript/get-api-key]
+
+  Per me è AIzaSyBOVVZJVsTLAeOkyXnJJD0TuEut-wT-i9w
+
+* Crea un file twig vuoto: /app/Resources/views/default/map.html.twig
+* Scrivi nel file vuoto:
+  [source,twig]
+====
+  {% extends 'base.html.twig' %}
+
+  {% block content %}
+  {% endblock %}
+  ====
+
+* Crea il controller che restituisce questo file in `/src/Controller/DefaultController.php`:
+  [source,php]
+====
+  <?php
+  // /src/Controller/DefaultController.php
+
+  // ...
+   /**
+    * @Route("/map", name="mapPage")
+    */
+   public function mapAction(Request $request) {
+     return $this->render('default/map.html.twig', []);
+   }
+
+  ====
+
+* Apri il file {template_name}/pages/maps/google.html
+* Copia quello che c'è tra i commenti `<!-## Markers -->` (linea 832) e `<!-## #END# Markers -->` (linea 859)
+* Incollalo nel template map.html.twig fra {% block content %} ed {% endblock %}
+* Crea una nuova directory `public/guybrush/js`
+* Copiaci il file `public/js/pages/maps/google.js` col nome `map.js`
+* Apri il file
+* Cancella le righe dalla 38 alla 97 e dalla 2 alla 7, salva e carica

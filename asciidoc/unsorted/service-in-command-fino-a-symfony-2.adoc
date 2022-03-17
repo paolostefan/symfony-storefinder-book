@@ -1,0 +1,71 @@
+Per permettergli di accedere agevolmente al database, anziché estendere `Symfony\Component\Console\Command\Command` è necessario estendere `Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand`.
+
+Rispetto al precedente, questa classe ha il metodo `get()` che può essere usato per ottenere un'istanza del service container che ci serve.
+
+Sostituiamo il precedente:
+
+[source,php]
+====
+<?php
+
+namespace App\Command;
+
+use Symfony\Component\Console\Command\Command;
+// ...
+
+class ImportPoiCommand extends Command {
+====
+
+con:
+
+[source,php]
+====
+<?php
+
+namespace App\Command;
+
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+// ...
+
+class ImportPoiCommand extends ContainerAwareCommand {
+====
+
+Ora, è possibile ottenere un servizio come segue:
+
+[source,php]
+====
+<?php
+  $service = $this->getContainer()->get('<alias del servizio>');
+====
+
+Magari ti stai chiedendo come fare per sapere quali servizi puoi richiedere, o quale sia l'alias che ti serve.
+
+> In realtà mi sto anche chiedendo cosa sia un servizio.
+
+Con il comando Symfony `debug:container` ottieni l'elenco completo:
+
+
+====
+php bin/console debug:container
+====
+
+L'EntityManager di Doctrine ad es. ha alias `doctrine.orm.entity_manager`, quindi lo ottieni così:
+
+[source,php]
+====
+<?php
+$em = $this->getContainer()->get('doctrine.orm.entity_manager');
+====
+
+[source,php]
+====
+<?php
+    protected function execute(InputInterface $input, OutputInterface $output) {
+        $doctrine = $this->getContainer()->get('doctrine');
+        /* @var $doctrine \Doctrine\Bundle\DoctrineBundle\Registry */
+        $repo = $doctrine->getManager()->getRepository('AppBundle:Poi');
+        $output->writeln(get_class($repo));
+    }
+====
+
+aggiungi var PoiRepo e CatRepo

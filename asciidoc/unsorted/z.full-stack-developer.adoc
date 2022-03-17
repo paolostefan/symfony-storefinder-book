@@ -1,0 +1,34 @@
+Essere sviluppatori **full-stack** significa saper realizzare un *progetto* interamente da sè, senza bisogno di ricorrere ad altri sviluppatori. Uso la parola *progetto*, cioè un termine generico, perché non si tratta solo di scrivere un programma, una libreria o uno script: il lavoro da svolgere potrà essere ad es.:
+
+ * creare un sito web e allestire il relativo server;
+ * realizzare un'app per smartphone che interagisce con una API;
+ * progettare un prototipo hardware;
+
+
+ &hellip; e chi più ne ha più ne metta.
+
+Lo **stack** (letteralmente, *catasta*) a cui si riferisce il termine *full-stack developer* è l'*insieme* delle tecnologie che servono nel corso della creazione del nostro progetto.
+
+Per chi ama gli elenchi, uno sviluppatore web full-stack raccoglie le competenze di queste figure professionali:
+
+  * Sistemista
+  * Sviluppatore PHP
+  * Database administrator
+  * Grafico
+  * Project manager
+
+Oppure, tecnicamente è in grado di *masticare*:
+
+  * Bash
+  * PHP
+  * MySQL
+  * HTML
+  * Javascript/Typescript
+  * CSS
+  * Photoshop
+
+Non è detto che uno sviluppatore full-stack debba lavorare sempre da solo: le sue competenze gli permettono sia di farlo, sia di conoscere con esattezza tutti gli aspetti del progetto che sta seguendo.
+
+@todo ////
+completare
+//// un po' di romanticismo hacker 

@@ -1,0 +1,180 @@
+****
+icon:rocket[] Se avete già installato Docker sul vostro computer, potete saltare al capitolo <<ambiente_symfony>>.
+****
+
+[#docker]
+== Docker
+
+I vantaggi più evidenti di Docker sono la _portabilità_ della configurazione (la stessa funziona in qualsiasi contesto), e la _velocità_ con cui i container possono esere avviati e fermati. +
+Rispetto ad una VM, un container (((Docker,container))) ha alcune differenze e limitazioni:
+
+- è associato ad un _entrypoint_, ossia ad uno specifico *comando*: il container si accende all'inizio dell'esecuzione del comando, ed esce invariabilmente quando questo comando termina;
+- se si tratta di un container che esegue un kernel Linux, *non* ha il processo `init`;
+- non ha uno storage persistente, a meno che non venga opportunamente configurato: questo fa sì che alcune operazioni, come la consultazione dei log o la modifica di file di configurazione, avvengano in maniera diversa rispetto ad una VM.
+
+NOTE: Un container o un insieme di container possono non rappresentare fedelmente l'ambiente di produzione in cui verrà deployata la nostra applicazione; infatti, se il deploy viene effettuato su una VM, alcuni problemi -tipicamente legati a configurazione e/o permessi sul filesystem- potrebbero emergere solo a deploy effettuato. Questo corso ha lo scopo di far apprendere il *funzionamento di Symfony* e non come allestire un server, per cui non ci occuperemo di gestire questi potenziali problemi.
+
+=== Installare Docker
+
+
+
+.icon:apple[] Su Mac 
+****
+
+Docker Desktop Community Edition è scaricabile dal sito ufficiale: +
+https://hub.docker.com/editions/community/docker-ce-desktop-mac/
+****
+
+.icon:windows[] Su Windows 
+****
+
+Docker Desktop Community Edition è scaricabile dal sito ufficiale: +
+https://hub.docker.com/editions/community/docker-ce-desktop-windows/
+
+****
+
+.icon:linux[] Su Linux
+****
+
+Se la distro che avete usa `apt` come _package manager_ (((Debian)), ((Ubuntu)), ((Linux Mint)), ...) ed è recente (dal 2019 in poi circa), è sufficiente installare i pacchetti `docker.io` e `docker-compose`:
+
+[source,bash]
+----
+sudo apt update
+sudo apt install -y docker.io docker-compose
+----
+
+Se utilizzate una distro differente, potete provare ad installare i due pacchetti indicati sopra con il vostro _package manager_, oppure potete seguire le indicazioni presenti nel sito ufficiale (ad es. per ((Fedora)): https://docs.docker.com/engine/install/fedora/ ).
+
+****
+
+<<<
+
+=== L'ambiente Docker che useremo
+
+L'infrastruttura Docker utilizzata in questo corso è composta da *quattro* container (due _web_ server, un _application_ server e un _database_). Come webserver useremo _((nginx))_, come application server la variante ((FastCGI)) di PHP (_php-fpm_), e come DB la variante di _((Postgres))_ che comprende le estensioni geospaziali, ossia _((PostGIS))_.
+
+[TIP]
+====
+I file di configurazione per Docker si trovano nella directory icon:far-folder[] `docker/` del repository {sample_git_repo_web}.
+====
+
+.Come interagire con Docker?
+
+Esistono diversi modi per interagire con Docker (per effettuare build, far partire e fermare i container, e connettersi ad essi); di seguito ne vedremo tre.
+
+---
+
+=== Docker da PhpStorm
+
+In ((PhpStorm)) è possibile configurare l'ambiente _Docker compose_ dal menu *Run -> Edit Configurations...*. Nella finestra _Run/Debug Configurations_ è sufficiente premere il pulsante *+* e selezionare *Docker -> Docker Compose*, come nell'immagine seguente.
+
+image::phpstorm-docker-compose.png[pdfwidth="90%"]
+
+Quindi dovremo selezionare il _Compose file_ da utilizzare (`./docker/docker-compose.yml`), e potremo dare un nome a questa configurazione per ritrovarla con facilità in seguito. Nell'immagine qui sotto la configurazione si chiama *Guybrush Docker-compose*.
+
+image::phpstorm-docker-compose-detail.png[pdfwidth="90%"]
+
+[#docker_compose_phpstorm]
+==== Come avviare i container Docker
+
+Una volta completata la configurazione, per avviare l'infrastruttura Docker è sufficiente selezionare il nome della configurazione nel menu a tendina in alto a destra, e premere il pulsante _Play_ o _Debug_; lo stesso risultato si può ottenere selezionando il menu *Run* -> *Run 'Guybrush Docker-compose'* oppure *Run* -> *Run ...* e poi selezionando la configurazione *Guybrush Docker-compose* appena salvata.
+
+image::phpstorm-run-toolbar.png[pdfwidth="90%"]
+
+---
+
+[#docker_compose_vscode]
+=== Docker da VSCode
+
+image::vscode-docker-icon.png["",47,100,float=right,pdfwidth="8%"]
+
+Se usate ((Visual Studio Code)) o ((VSCodium)), consiglio di installare l'estensione di nome *Docker* (non inclusa in VSCode), che permette di eseguire le operazioni di routine usando la GUI. Una volta installata, l'estensione aggiungerà nella barra laterale di VSCode il pannello _Docker_, che permette di effettuare diverse operazioni. (((Come fare per...,Avviare i container Docker da VSCode)))
+
+==== Come avviare i container
+
+Per far partire l'infrastruttura Docker è sufficiente, nel pannello *Explorer*, cliccare col pulsante destro del mouse sul file `docker-compose.yml` e selezionare *Compose Up*: l'estensione si arrangerà ad effettuare il build dei container e lanciarli subito dopo. +
+Alternativamente, è possibile aprire il file `docker-compose.yml`, e cliccando col pulsante destro in un punto qualsiasi dell'editor selezionare la stessa voce di menu.
+
+==== Come fermare/riavviare i container
+
+Il procedimento per fermare e riavviare l'infrastruttura Docker è esattamente lo stesso usato per farla partire: basterà selezionare *Compose Down* oppure *Compose Restart* dal menu contestuale.
+
+==== Come aprire una shell sui container
+
+image::attach-shell.png["",302,294,align="right",pdfwidth="20%"]
+
+Per aprire una shell su uno dei container basta selezionare il pannello *Docker*, aprire l'elenco dei container -dove dovrebbero essere visibili tutti i container sia avviati che stoppati-, cliccare col pulsante destro del mouse sul nome del container a cui vogliamo connetterci e selezionare _Attach Shell_. 
+
+
+---
+
+=== Docker da shell
+
+Questo è il metodo più _da smanettoni_, è un po' più difficile ma permette di capire qualcosa in più. (((Come fare per...,Avviare i container Docker da shell)))
+
+[#docker_compose_shell]
+==== Come avviare i container Docker
+
+Prima di avviare i container per la prima volta, è necessario effettuarne il build (_una tantum_): lo si può fare da shell fare con il comando seguente. (((docker-compose,build)))
+
+[source,bash]
+----
+cd docker/
+docker-compose build
+----
+
+NOTE: In questo libro il comando `docker-compose` viene lanciato sempre dalla directory in cui si trova il file *docker-compose.yml*: in questo modo evitiamo di specificare il percorso del file `docker-compose.yaml`. +
+La sintassi generica del comando è +
+`docker-compose -f [percorso del file yaml] [comando]` +
+cioè ad es. +
+`docker-compose -f docker/docker-compose.yaml build`
+
+Una volta che il processo di build è terminato senza errori, è possibile avviare l'infrastruttura Docker con il comando `docker-compose up`. (((docker-compose,up)))
+
+[source,bash]
+----
+cd docker/
+docker-compose up -d
+----
+
+
+TIP: L'opzione `-d` (_detach_) serve per far eseguire i container in un processo separato: in questo modo, i log dei container *non* verranno stampati nella nostra shell. Se non specifichiamo l'opzione `-d`, i container verranno avviati in modo sincrono nella shell che stiamo utilizzando, e se premiamo kbd:[CTRL]-kbd:[C] verranno fermati tutti. +
+Se qualcosa va storto, possiamo quindi *lanciare il comando senza l'opzione -d*: i log dei container verranno stampati nello ((STDOUT)) della nostra shell, e ci potrebbero aiutare a capire eventuali problemi di configurazione dei container.
+
+(((Come fare per...,Aprire una shell su un container)))
+
+==== Come aprire una shell su un container
+
+Per aprire una shell su un _container_ dalla shell _del nostro computer_, possiamo usare un comando simile al seguente.
+
+[source, bash]
+----
+docker exec -it ${CONTAINER} bash
+----
+
+*${CONTAINER}* può essere sia il _nome_ del container a cui desideriamo connetterci, sia il suo _hash_ (tutto o la parte iniziale). 
+
+[TIP]
+.Nomi dei container che useremo
+====
+In questo progetto useremo quattro container (configurati nel file `docker-compose.yml`):
+
+- *guybrush_php8* è l'application server;
+- *guybrush_pgsql* il database server;
+- *guybrush_nginx* è il web server principale;
+- *guybrush_nginx_template* è un webserver che serve solo per visualizzare il template HTML che useremo (non è strettamente necessario al funzionamento dell'applicazione).
+====
+
+
+.`docker exec`
+****
+Il comando `docker exec` che usiamo per connetterci al container serve più in generale per eseguire un *comando* all'interno di un container. La sintassi completa è
+
+`docker exec [flags] CONTAINER COMANDO [ARGOMENTI]`
+
+Se specifichiamo i flag `-i` (o `--interactive`) e `-t` (o `--tty`), il comando userà lo ((STDIN)) della nostra shell, e allocherà un terminale sul container: questi due elementi combinati avranno l'effetto di _aprire un terminale di linea comando_ sul container, a patto che il comando che stiamo lanciando sia una _shell_ di qualsiasi tipo (quindi non solo *bash* ma anche un client ftp, il comando *php* con l'opzione `-a`, ecc.).
+****
+
+<<<
+

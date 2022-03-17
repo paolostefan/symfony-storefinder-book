@@ -1,0 +1,96 @@
+## La modalità di sviluppo (dev)
+
+Symfony è strutturato in modo da utilizzare diversi _ambienti_ ("environment"), intesi come "modalità di funzionamento": ogni _ambiente_ ha un nome univoco e può avere file di configurazione distinti, e quindi comportamenti diversi.
+
+I tre ambienti predefiniti di Symfony si chiamano **dev** (da _development_), **prod** (da _production_) e **test** (quest'ultimo per ora non ci interessa).
+
+### Disambiguazione
+
+Questi _ambienti_ sono _modalità di funzionamento della web application_ gestite interamente da Symfony: non hanno niente a che vedere con l'ambiente di sviluppo/produzione in cui viene installata la web application (trattato nel capitolo 0). Per evitare fraintendimenti, quando in questo corso parlerò di _ambiente_, specificherò se si tratta di una macchina o dell'ambiente di Symfony.
+
+// TODO: riscrivere per la v4
+
+> Ok, ma non ci hai ancora detto cos'è app_dev.php.
+
+La pagina `web/app_dev.php` carica l'ambiente Symfony **dev**, a differenza della pagina `web/app.php`,  utilizzata di default, che carica l'ambiente Symfony **prod**.
+
+L'ambiente Symfony `dev` differisce da `prod` perché:
+
+1.  i messaggi di errore sono abilitati e super-eloquenti;
+2.  non è necessario pulire la cache ogniqualvolta si cambia il codice e/o si aggiunge una pagina;
+3.  alle pagine HTML viene aggiunta _gratis_ una barra contenente un sacco di informazioni utili durante la scrittura della web application (ad es. memoria occupata, richieste AJAX, nome del controller ecc.). Da questa barra inoltre è possibile accedere al _profiler_, che mostra le stesse informazioni con un livello di dettaglio entusiasmante.
+
+Per evitare "ispezioni" indesiderate,  app_dev.php di default non è accessibile a meno che non vi si acceda dalla stessa macchina che fa da server, che _non è_ il nostro caso (in quanto il server è la nostra macchina virtuale e il browser si trova nella nostra macchina _reale_).
+return new Response('Benvenuto nuovamente da Guybrush!');
+Per avere conferma di ciò, basta aprire la pagina http://localhost:8080/app_dev.php[app_dev.php] che ci accoglierà simpaticamente con:
+
+> You are not allowed to access this file. Check app_dev.php for more information.
+
+No, non ce l'ha con te; tra qualche riga sarà diventata tua amica.
+
+### Abilitare app_dev.php (in Vagrant)
+
+Come ho detto, `app_dev.php` di default impedisce l'accesso se l'indirizzo IP da cui arrivi non è quello del server locale (`localhost`), ossia `127.0.0.1` o `::1`.
+
+Se avessimo installato Apache e PHP direttamente sul nostro Mac/PC, questo sarebbe il nostro caso; ma siccome usiamo una macchina virtuale, per "arrivare" da _localhost_ dovremmo aprire un browser sul desktop della macchina virtuale... peccato che la macchina virtuale non abbia un desktop!
+Infatti, i server in generale (e la nostra macchina Vagrant in particolare) non hanno un ambiente grafico, e se anche ce l'avessero sarebbe uno spreco di risorse.
+
+Perciò, per evitare giri innaturali, "allenteremo" il controllo degli IP effettuato da app_dev.php, aggiungendo agli IP consentiti quello da cui arriviamo.
+
+> Ah, semplice in teoria … ma come faccio a sapere da quale IP arriviamo?
+
+PHP ha una variabile pronta _all'uopo_: `$_SERVER['REMOTE_ADDR']`.
+
+> Bene. Ma se spengo e riaccendo Vagrant, questo IP può cambiare?
+
+Fortunatamente no: in VirtualBox la macchina "host", cioè il nostro Mac/PC, ha sempre lo stesso IP.
+
+Se sei curioso https://www.virtualbox.org/manual/ch09.html#changenat[questa sezione] della documentazione di VirtualBox spiega perché (**nota**: Vagrant di default usa VirtualBox con la rete in modalità NAT).
+
+> E se disabilitassimo del tutto il controllo degli IP?
+
+Nulla vieta di farlo. Se però pubblicassi -per errore o dimenticanza- questo file (app_dev.php) sul tuo server di produzione, potrebbe essere un problema di sicurezza.
+
+Apri `web/app_dev.php` e trova la linea:
+
+[source,php]
+====
+exit('You are not allowed to access this file. Check '.basename(__FILE__).' for more information.');
+====
+
+Prima di questa linea aggiungi:
+
+[source,php]
+====
+echo $_SERVER['REMOTE_ADDR']."<br />";
+====
+
+Salva il file e ricarica la pagina http://localhost:8080/app_dev.php[app_dev.php]: comparirà lo stesso messaggio inospitale, preceduto da un quartetto di numeri, ad es.:
+
+> **10.0.2.2**<br> You are not allowed to access this file. Check app_dev.php for more information.
+
+_Yeah!_ Ora puoi copiare il quartetto di numeri nella prima riga (è l'indirizzo IP con cui "arriviamo" alla nostra macchina virtuale), e aggiungerlo agli IP consentiti. Per farlo trova le righe seguenti in `web/app_dev.php`:
+
+[source,php]
+====
+if (isset($_SERVER['HTTP_CLIENT_IP'])
+    || isset($_SERVER['HTTP_X_FORWARDED_FOR'])
+    || !(in_array(@$_SERVER['REMOTE_ADDR'], ['127.0.0.1', '::1']) || php_sapi_name() === 'cli-server')
+) {
+====
+
+Ora modificale come segue (supponendo che sia 10.0.2.2 come sopra):
+
+[source,php]
+====
+if (isset($_SERVER['HTTP_CLIENT_IP'])
+    || isset($_SERVER['HTTP_X_FORWARDED_FOR'])
+    || !(in_array(@$_SERVER['REMOTE_ADDR'], ['127.0.0.1', '::1', '10.0.2.2']) || php_sapi_name() === 'cli-server')
+) {
+====
+
+Salva il file e ricarica la pagina nel browser.
+
+Funziona?
+
+Se sì, noti niente di diverso? Guarda in fondo alla pagina...

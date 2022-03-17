@@ -1,0 +1,101 @@
+****
+icon:rocket[] Se avete già un IDE e Git, potete saltare al capitolo <<repo>>.
+****
+
+== IDE (((IDE)))
+
+TIP: *IDE* è l'acronimo di **I**ntegrated **D**evelopment **E**nvironment, cioè "ambiente di sviluppo integrato": è un programma che include, oltre ad un editor di testo, una serie di altri strumenti che permettono di interagire ad es. con compilatori, interpreti, client FTP (per il deploy) e strumenti per il controllo delle versioni.
+
+Non esiste *_la_* scelta migliore in assoluto: va benissimo l'editor/IDE che (probabilmente) avete già installato. +
+Se dovete ancora decidere, quelli che preferisco sono https://www.jetbrains.com/phpstorm/[((PhpStorm)) ®] (a pagamento dopo 30 giorni di prova gratuita) e https://code.visualstudio.com/[((Visual Studio Code))]. Fra le tante alternative gratuite troviamo https://netbeans.org/downloads/[NetBeans] ed https://www.eclipse.org/downloads/[Eclipse], mentre https://atom.io/[Atom] e https://www.sublimetext.com/[Sublime Text] pur non essendo veri e propri IDE, sono prodotti molto validi ed estensibili grazie a una miriade di plugin.
+
+
+== Controllo delle versioni: Git
+
+*((Git))* è un programma nato per gestire il _versioning_ dei sorgenti, che permette di collaborare alla stesura di un programma, memorizzare *_tutte_* le modifiche (rilevanti) apportate al nostro codice nel corso del tempo e far coesistere *più versioni del nostro codice*. +
+Grazie a Git, ad esempio, se durante lo sviluppo ci troviamo ad un punto morto in cui il codice non funziona più e non capiamo perché, possiamo ripristinare l'ultima versione funzionante del nostro codice o _di un particolare file_; oppure, possiamo controllare se funzionava meglio la versione precedente, il tutto senza dover gestire alcun backup, e senza perdere una virgola del codice più recente.
+
+TIP: I programmi come Git sono detti *((VCS))* oppure *((SCM))*. *VCS* è l'acronimo di **V**ersion **C**ontrol **S**ystem, sistema di controllo delle versioni; *SCM* sta per **S**ource **C**ode **M**anager, gestore dei sorgenti.
+
+
+=== Installare Git su Linux icon:linux[]
+
+Tipicamente va dato il comando `[package-manager] install git`.
+
+==== Debian, Ubuntu, Mint e derivate (apt)
+
+[source,bash]
+----
+sudo apt-get install git
+----
+
+==== Fedora, CentOS, RedHat e derivate (dnf, yum)
+
+[source,bash]
+.Fedora dalla versione 22 in poi
+----
+dnf install git
+----
+
+[source,bash]
+.Fedora fino alla versione 21
+----
+yum install git
+----
+
+==== Altre distribuzioni
+
+Per altre distribuzioni, è possibile consultare le istruzioni nel <<git_linux,sito di Git-scm>>.
+
+=== Installare Git su MacOS icon:apple[]
+
+Su MacOS è possibile installare Git in diversi modi; il più semplice forse è installare gli _Xcode Command Line Tools_. +
+Da MacOS Mavericks (10.9) in poi, per installarli basta lanciare git da Terminale.
+
+[source,bash]
+----
+git --version
+----
+
+Se *Git* non è installato, MacOS chiederà se vogliamo installare gli _Xcode Command Line Tools_: rispondiamo di sì e
+l'installazione proseguirà in automatico.
+
+
+=== Installare Git su Windows icon:windows[]
+
+Le istruzioni per l'installazione sono presenti <<git_install,nel sito di Git-scm>>.
+
+<<<
+
+[#repo]
+== Repository Git
+
+Il codice che scriveremo in questo libro è disponibile in un repository Git pubblico: +
+{sample_git_repo_web}
+
+Questo repo contiene i file di configurazione necessari per creare l'ambiente
+di _runtime_ (v. capitolo successivo), e tutto il codice che scriveremo
+durante il corso. +
+Quando nel testo troverete questa icona icon:github[], ci saranno anche le
+indicazioni su come scaricare la relativa porzione di codice dal repository. +
+Scrivere codice in autonomia è il modo migliore per imparare;
+vi suggerisco però di clonare il repo (cioè scaricarlo sul vostro computer)
+per due motivi: potrete allestire il _runtime_ più rapidamente, e sarà più
+semplice ripartire nel caso vi capiti di _piantarvi_ (succede a
+chiunque scriva codice). Nulla vieta ad es. di tenere il repository clonato in
+*una directory*, e i sorgenti che state scrivendo in *un'altra*: in tal modo
+potrete implementare a modo vostro il progetto senza perdere troppo tempo su
+questioni meno divertenti. (((Git, git clone)))
+
+****
+icon:github[] Per _clonare_ il repository, potete digitare il comando:
+
+[source,bash,subs=attributes+]
+----
+git clone --recurse-submodules {sample_git_repo}
+----
+
+Questo comando effettuerà il download del repo creando una subdirectory di nome
+*sample_symfony* nella directory corrente.
+
+****

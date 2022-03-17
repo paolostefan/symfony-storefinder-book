@@ -1,0 +1,13 @@
+[#c04-template]
+= I template
+
+****
+Finora abbiamo visto come un'_azione_ di un ((Controller)) possa restituire un testo semplice oppure fare uso di un ((template)), ma non abbiamo ancora chiarito come Symfony gestisca i template; in questa lezione impareremo a servirci dei _template_ per creare pagine HTML dinamiche.
+****
+
+include::04-template/1.template.adoc[]
+
+include::04-template/3.html-twig.adoc[]
+
+// Per adesso è una sola pagina, non serve a una minchia
+// include::04-template/4.mockup.adoc[]

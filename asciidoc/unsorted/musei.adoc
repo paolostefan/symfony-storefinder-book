@@ -1,0 +1,53 @@
+Lo scopo di questo comando è *popolare il nostro database* con i punti di interesse che mostreremo sulla mappa.
+
+Per farlo, ci serve un elenco: per fortuna ne esistono di gratuiti, ad es. nella pagina: https://datahub.io/dataset?tags=museum[https://datahub.io/dataset?tags=museum] il link **"Italian Museums"** porta alla pagina di download del file che si trova in
+
+    sample_symfony/guybrush/app/Resources/misc/dump.linkedopendata.it-musei.rdf
+
+L'URL del file è http://dump.linkedopendata.it/musei[http://dump.linkedopendata.it/musei] .
+
+## Leggere un file Xml
+
+Il file in questione è in formato XML: lo faremo leggere a Symfony e copieremo i contenuti che ci servono nel nostro database.
+
+Per leggere file xml installiamo `domcrawler` come spiegato qui: http://symfony.com/doc/current/components/dom_crawler.html :
+
+    composer update
+    composer require symfony/dom-crawler
+
+
+### Struttura del file
+
+Nodi di questo tipo contengono le coordinate geografiche di una punto di interesse.
+
+[source,xml]
+====
+<rdf:Description rdf:nodeID="node15lbkbrbvx3">
+	<rdf:type rdf:resource="http://www.w3.org/2006/vcard/ns#Location"/>
+	<vcard:latitude>38.2884876</vcard:latitude>
+	<vcard:longitude>15.8081818</vcard:longitude>
+</rdf:Description>
+====
+
+E la *location* a cui si riferiscono è identificata dall'attributo `rdf:nodeID`.
+In questo modo:
+
+[source,xml]
+====
+<rdf:Description rdf:about="http://data.linkedopendata.it/musei/resource/A._Versace-Bagnara_Calabra">
+	<vcard:geo rdf:nodeID="node15lbkbrbvx3"/>
+	<rdfs:label>A. Versace</rdfs:label>
+	<skos:subject rdf:resource="http://dbpedia.org/resource/Category:Art_museums_and_galleries"/>
+</rdf:Description>
+====
+
+Quindi il comando dovrà:
+
+ 1. cercare tutti i nodi `rdf:Description` che contengano un nodo `vcard:geo` (A)
+ 2. per ciascuno dei nodi (A), memorizzare l'attributo `nodeID` del nodo `vcard:geo`
+ 3. memorizzare l'etichetta, cioè il sotto-nodo `rdfs:label` di (A)
+ 4. trovare i nodi `rdf:Description` *che contengono un nodo `vcard:latitude`* (B)
+ 5. collegare i nodi (A) con i nodi (B) usando `rdf:nodeID`
+ 6. salvare a database i dati trovati.
+
+In XPath, per cercare ecc. ecc.

@@ -1,0 +1,114 @@
+[TIP]
+.Abbreviazione
+====
+*VM* sta per **V**irtual **M**achine, cioè macchina virtuale. D'ora in avanti la sigla VM indicherà la macchina virtuale che stiamo usando.
+====
+
+[TIP]
+.Approfondimento
+====
+Per approfondire il tema VM, puoi vedere l'appendice <<server_virtuale,'Server virtuale: cos'è?'>>.
+====
+
+[#vagrant]
+== VM: Vagrant
+
+Per allestire una VM sono necessari molti dei passi che eseguiremmo per configurare una macchina _reale_:
+
+* scegliere alcune caratteristiche hardware: CPU, RAM, spazio disco e numero di dischi;
+* configurare la rete;
+* scaricare e installare il sistema operativo;
+* installare e configurare i software necessari.
+
+Sono tutte operazioni facili in sè, ma portano via tempo prezioso. +
+(((Vagrant,Vagrant box)))
+https://www.vagrantup.com/[*Vagrant*] è un programma che permette di saltare questi passi, utilizzando macchine preconfigurate dette _Vagrant box_: anziché configurare da zero l'hardware e il software della VM, è sufficiente scegliere la _Vagrant box_ che fa al caso nostro (e aspettare che il download sia completato).
+
+TIP: L'elenco di _Vagrant box_ pubbliche è presente qui: https://app.vagrantup.com/boxes/search 
+
+Vagrant è scaricabile dal https://www.vagrantup.com/downloads.html[suo sito ufficiale].
+
+Per creare e gestire le VM, Vagrant si deve appoggiare a un programma di virtualizzazione: in questo corso vedremo come usare Vagrant con *((VirtualBox))*, scaricabile dal https://www.virtualbox.org/[sito ufficiale].
+
+NOTE: Vagrant funziona anche con *((VMWare))*, ma solo nella _versione a pagamento_.
+
+=== La VM che useremo
+
+La VM che useremo rispecchia la configurazione di molti server web: ha sistema operativo *Ubuntu* (Linux) con _Apache_, _PHP 7_ e _MySQL_; usare una macchina simile a quella che avremo in produzione, ci eviterà brutte sorprese al momento del ((deploy)). +
+La _Vagrant box_ che useremo si chiama https://app.vagrantup.com/damianlewis/boxes/ubuntu-18.04-lamp[damianlewis/ubuntu-18.04-lamp], e ha queste caratteristiche:
+
+
+* SO ((Ubuntu)) 18, versione stabile usata da diversi provider
+* ((PHP)) 7.2 (Symfony 4 richiede almeno PHP 7.1)
+* ((Apache)) 2.4
+* ((MySQL)) 8.0
+
+TIP: *LAMP* è l'acronimo di Linux/Apache/MySQL/PHP.
+
+=== Vagrant UP (((Vagrant, vagrant up)))
+
+Ora possiamo far partire la nostra VM con il comando `vagrant up`.
+
+[WARNING]
+.Download della Vagrant Box
+====
+La prima volta che eseguiamo `vagrant up`, Vagrant scarica da Internet l'immagine della _Vagrant Box_ che pesa qualche centinaio di megabyte, e quindi ci metterà un po' di tempo. Però lo farà solo questa volta.
+====
+
+Al termine del comando non sarà successo niente di _visibile_ (a parte l'output in console); _dietro le quinte_ però, nel tuo computer sarà in esecuzione una VM. Puoi verificarlo ad esempio:
+
+- visitando http://localhost:8080/ con un browser, comparirà la pagina "Apache2 Ubuntu Default Page", la pagina di default del web server Apache;
+- digitando il comando `vagrant ssh`, che aprirà una shell remota sulla macchina virtuale.
+
+(((Vagrant, vagrant ssh)))
+Connettiamoci alla VM digitando il comando:
+
+[source,bash]
+----
+vagrant ssh
+----
+
+Il prompt diventerà `vagrant@vagrant:~$`, ad indicare che la Shell con cui stiamo interagendo è quella della VM.
+
+(((Come fare per...,Verificare se la VM è accesa)))
+
+=== Come verificare se la VM è accesa?
+
+Se abbiamo aperto una shell sulla VM, sicuramente è accesa. icon:smile-o-wink[] Altrimenti, dalla shell del _nostro computer_, posizioniamoci nella directory del progetto e digitiamo `vagrant status`.(((Vagrant,vagrant status))) La VM *è accesa* se l'output del comando comincia con:
+
+----
+Current machine states:
+
+default                   running (virtualbox)
+----
+
+Se *è spenta*, otterremo un messaggio simile:
+
+----
+Current machine states:
+
+default                   poweroff (virtualbox)
+
+The VM is powered off. To restart the VM, simply run `vagrant up`
+----
+
+Come suggerito, con il comando `vagrant up` potremo avviare la VM. +
+Se invece *ci troviamo nella directory sbagliata*, otterremo un messaggio che inizia con:
+
+----
+Current machine states:
+
+default                   not created (virtualbox)
+----
+
+In questo caso dovremo verificare di trovarci nella directory corretta: su Linux e MacOS,
+per conoscere il percorso della directory corrente si usa il comando (((Comandi, pwd)))`pwd`,
+acronimo di _**p**rint **w**orking **d**irectory_.
+
+(((Come fare per...,Aprire una shell sulla VM)))
+
+=== Come connetterci alla VM
+
+Quando la VM sta girando, dalla shell del _nostro computer_ digitiamo `vagrant ssh`. (((Vagrant,vagrant ssh)))
+
+<<<

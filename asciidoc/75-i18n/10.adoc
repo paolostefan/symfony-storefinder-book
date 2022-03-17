@@ -1,0 +1,102 @@
+== Lingua predefinita e fallback
+
+Per prima cosa vanno impostate, nei file di configurazione, una *lingua predefinita* e una o più *lingue di fallback*. +
+La lingua *predefinita* viene usata da Symfony in mancanza di informazioni su "quale lingua usare". +
+La/le lingue *di fallback* vengono usate quando la traduzione nella lingua desiderata non viene trovata. In presenza di più lingue di fallback, verranno tentate tutte finché non viene trovata una traduzione. +
+Specifichiamo queste lingue nel file *config/packages/translation.yaml*.
+
+[source,yaml]
+.config/packages/translation.yaml
+----
+framework:
+    default_locale: 'it'
+    translator:
+        fallbacks: ['en']
+
+----
+
+Nell'esempio qui sopra, stiamo dicendo a Symfony di usare come lingua predefinita l'*italiano*, e che quando manca una traduzione vogliamo usare l'*inglese* (e solo l'inglese) come lingua di _fallback_.
+
+== Il catalogo
+
+Il secondo passo consiste nel definire e popolare un _catalogo_ di traduzioni, cioè un contenitore per le stringhe traducibili. Un catalogo può essere definito in diversi modi (file, database, memoria, ecc.), ma quello predefinito è usare un file di testo in formato *xlf* oppure il buon vecchio *yaml* (che preferisco). +
+Se creiamo ad es. il file `translations/messages.en.yaml` Symfony vi cercherà le stringhe in lingua inglese. Questo perché:
+
+- la directory `translations/` è quella in cui Symfony cerca i cataloghi;
+- `messages` è il _namespace_ predefinito per i testi traducibili, ossia -se usiamo i file come cataloghi- il *prefisso* di default che devono avere i file catalogo. Possiamo definire altri __namespace__,
+
+
+=== Aggiungiamo qualche traduzione
+
+****
+Nei cataloghi, le stringhe traducibili possono essere specificate sia _letteralmente_ (ad es. *"Ciao a tutti"*) che come _token_ (ad es. *HELLO_WORLD*). +
+Usare i token è preferibile, è più elegante e svincola i template da una lingua specifica; se però stiamo rendendo traducibile un sito  realizzato in una lingua specifica, potremmo riciclare i template (limitando le modifiche necessarie) se utilizziamo le stringhe letterali.
+****
+
+Una volta creato il file catalogo, possiamo inserirvi le stringhe traducibili sotto forma di hash, in cui il _token_ è la *chiave* e la stringa tradotta è il *valore*, come nell'esempio qui sotto.
+
+[source,yaml]
+.translations/messages.en.yaml
+----
+site_name: "Store locator"
+menu:
+    map: Map
+    home: Homepage
+----
+
+Parimenti, possiamo definire le stringhe in italiano nel file corrispondente:
+
+[source,yaml]
+.translations/messages.it.yaml
+----
+menu:
+    map: Mappa
+    home: Pagina iniziale
+----
+
+NOTE: Siccome in quest'ultimo file abbiamo omesso la voce *site_name*, in italiano verrà utilizzata (come fallback) la corrispondente voce in inglese, ossia *Store locator*.
+
+=== Rinfreschiamo la memoria
+
+Le traduzioni aggiornate non saranno visibili finché la cache di Symfony non verrà cancellata.
+
+[source,bash]
+----
+$ bin/console cache:clear --env=prod
+$ bin/console cache:clear --env=dev
+----
+
+== Rendiamo traducibili le stringhe
+
+Il modo per dire a Symfony di tradurre una stringa è diverso a seconda del contesto.
+
+=== Nei template Twig
+
+Per tradurre una stringa in un template Twig, è sufficiente usare il filtro `trans` se stiamo usando un'espressione fra doppie parentesi graffe, oppure il tag  `{% trans %} ... {% endtrans %}` se vogliamo tradurre un testo su più righe. Solitamente la prima delle due sintassi è preferibile perché è più compatta. + Se ad esempio vogliamo inserire la stringa tradotta identificata dal _token_ "**menu.home**" possiamo scrivere indifferentemente:
+
+[source,twig]
+----
+{{ 'menu.home' | trans }}
+----
+
+[source,twig]
+----
+{% trans %}
+menu.home
+{% endtrans }
+----
+
+==== Tradurre stringhe con argomenti
+
+@todo
+
+
+=== Nei controller
+
+@todo
+
+=== Nelle classi custom
+
+Va usata la classe #@todo#
+
+<<<

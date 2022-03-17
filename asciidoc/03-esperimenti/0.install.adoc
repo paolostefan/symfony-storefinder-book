@@ -1,0 +1,120 @@
+[#ambiente_symfony]
+== Iniziamo!
+
+In questo capitolo creeremo un progetto Symfony dal container *guybrush_php8*, e (come vedremo tra poco) in una directory del nostro computer compariranno i file dello scheletro della web application. Se siete impazienti, potete saltare questo approfondimento e andare direttamente a <<creiamo_progetto_symfony>>.
+
+****
+.La magica directory condivisa
+
+Per poter sviluppare sul nostro computer e far leggere i sorgenti al container *guybrush_php8* in tempo reale, useremo una directory condivisa. Nel file *docker-compose.yml* ci sono le seguenti righe: (((docker-compose.yml, Direttiva `volumes`)))
+
+[source, yaml]
+----
+    # ...
+    container_name: guybrush_php8
+    volumes:
+      - ../guybrush:/var/www/html/guybrush
+----
+
+La riga contenente `volumes:` è l'inizio della dichiarazione dei volumi (dischi) da montare sul container. Uno dei formati possibili per le dichiarazioni dei volumi è `PERCORSO_LOCALE:PERCORSO_REMOTO`, che dice a Docker di _montare_ una directory o un file del nostro PC a uno specifico percorso nel container. `PERCORSO_LOCALE` rappresenta un percorso nel filesystem del nostro PC, assoluto o relativo; in quest'ultimo caso il percorso verrà considerato relativo alla directory in cui si trova il file *docker-compose.yml*.
+
+La riga `../guybrush:/var/www/html/guybrush` dice quindi a ((docker-compose)) che desideriamo condividere la directory del nostro PC a _sinistra_ del separatore (*../guybrush*, cioè la cartella *guybrush* del repository), montandola nel container al percorso specificato _dopo_ i due punti, cioè */var/www/html/guybrush*. 
+
+// ifeval::["{virtual}" == "Vagrant"]
+
+// La directory */vagrant* del container *guybrush_php8* è _condivisa_ fra 
+// macchina host (il vostro computer) e macchina guest (il container 
+// *guybrush_php8*): è cioè visibile sia dal container che dalla vostra macchina
+// di sviluppo. +
+// Tecnicamente, questa directory del vostro PC/Mac è uno share <<nfs,((NFS))>>
+// montato nel container *guybrush_php8*.
+
+// endif::[]
+
+==== Come ci può essere utile?
+
+Al di là dei dettagli tecnici, il concetto importante è: sia l'*host* (il nostro computer) che il *container* possono leggere e scrivere file nella directory condivisa, e quando *uno dei due* vi crea, modifica o cancella un file, *l'altro* vede le modifiche in tempo reale. +
+Per verificare se le cose stanno proprio così, facciamo una prova: dopo aver fatto partire l'infrastruttura Docker (con uno dei modi visti nei paragrafi Come avviare i container Docker footnote:compose[Per avviare l'infrastruttura Docker da VSCode/VSCodium v. <<docker_compose_vscode>>; per avviarla da shell v. <<docker_compose_shell>>; per avviarla da PhpStorm v. <<docker_compose_phpstorm>>.]), apriamo la directory *guybrush* del repository usando Windows Explorer, il Finder, o il suo equivalente in Linux. +
+Apriamo quindi una shell sul container *guybrush_php8*, _cambiamo utente_ e diamo il comando `touch` per creare un file vuoto, come segue:
+
+[source,bash]
+----
+docker exec -it guybrush_php8 bash   # apre la shell
+su developer                         # usa un utente non privilegiato
+touch /var/www/html/prova.txt        # crea un file vuoto
+----
+
+TIP: Per default l'utente con cui ci connettiamo ai container è `root`. Il cambio di utente (`su developer`) serve per rendere il file scrivibile non solo dal container, ma anche dal PC.
+
+// ifeval::["{virtual}" == "Vagrant"]
+
+// Apriamo una shell sul container *guybrush_php8*, e diamo il comando `touch` come segue:
+
+// [source,bash]
+// ----
+// vagrant ssh                    # apre la shell
+// touch /vagrant/prova.txt       # crea un file vuoto
+// ----
+
+// endif::[]
+
+Nella finestra di Windows Explorer (o del gestore di file che usiamo) vedremo comparire l'icona di un nuovo file di nome *prova.txt*- quello che abbiamo appena creato col comando _touch_. Possiamo vedere che il file è vuoto aprendolo con un doppio click. +
+Per avere la prova che il file che vede il  container *guybrush_php8* è proprio lo stesso, modifichiamolo dal nostro computer ad es. scrivendoci dentro "Ciao a tutti", quindi _salviamolo_, e dalla shell del container *guybrush_php8* digitiamo:
+
+[source,bash]
+----
+cat prova.txt
+----
+
+Vedremo che il file contiene esattamente quello che vi abbiamo appena scritto.
+
+****
+
+[#creiamo_progetto_symfony]
+=== Creiamo il progetto Symfony
+
+Ogni progetto Symfony ha bisogno di un nome: per questo corso ho scelto il nome *_Guybrush_* ispirandomi al protagonista di _Monkey Island_, un videogioco degli anni '90. Per creare un progetto Symfony si usa un comando della shell, quindi dovremo prima connetterci al container *guybrush_php8* (ora è finalmente chiaro perché questo container si chiama così icon:smile-o[]). +
+Per creare un nuovo progetto Symfony di nome `guybrush` nella directory corrente, dalla shell del container *guybrush_php8* vanno dati i seguenti comandi.
+
+==== Usando symfony-cli
+
+[source,bash]
+----
+su developer # usa un utente non privilegiato
+symfony new guybrush --webapp
+----
+
+==== Usando composer
+
+Questo metodo è alternativo al precedente: non usatelo se il metodo precedente ha funzionato.
+
+[TIP]
+.((Composer))
+====
+Per installare Symfony e altri pacchetti PHP è necessario un programma di nome https://getcomposer.org/[Composer]; è già installato nel container *guybrush_php8* che usiamo in questo corso, ma se state usando una VM o un container diverso da quello contenuto in {sample_git_repo_web}, Composer potrebbe non essere installato; per verificarlo, basta digitare il comando *composer* dalla shell _del container guybrush_php8_:
+
+  $ composer
+  -bash: composer: command not found
+
+Se la shell risponde -come qui sopra- che non trova il comando, v. l'appendice <<installare_composer>>.
+
+====
+
+[source,bash]
+----
+su developer # usa un utente non privilegiato
+composer create-project symfony/skeleton guybrush
+----
+
+
+
+Quest'ultimo comando scarica da internet Symfony e i pacchetti PHP dipendenti da Symfony. Pazientiamo un po', e se l'output del comando contiene qualcosa di simile, è andato tutto bene.
+
+image::symfony-shell.png[pdfwidth=90%]
+
+=== Controlliamo se funziona
+
+Ora che abbiamo lo scheletro dell'app Symfony, possiamo verificare che effettivamente _qualcosa_ sta funzionando: visitiamo <http://localhost:8080/> con un browser e dovrebbe comparire l'homepage predefinita di Symfony (qualcosa di simile all'immagine qui sotto). 
+
+image::home-default.png[pdfwidth=90%]
+

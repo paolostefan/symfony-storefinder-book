@@ -1,0 +1,324 @@
+# Allestire un server LAMP #
+
+# L: Linux #
+
+Le agenzie di hosting danno la possibilità di installare una distribuzione di Linux sul tuo server. Il sistema operativo che troverai sulla macchina solitamente è "pulito", cioè non ha nessuna caratteristica particolare, in modo da poter usare il server come preferisci (e non solo come web server).
+
+Come distribuzione seleziona Ubuntu o Debian, altrimenti i comandi (apt-get e simili) potrebbero non funzionare.
+
+## A: Apache ##
+
+Installare il webserver Apache è immediato:
+
+
+====
+sudo apt-get -y install apache2
+====
+
+Al termine di questo comando, Apache sarà installato e in esecuzione come servizio.
+
+## M: MySQL ##
+
+Installare il server MySQL è altrettanto rapido:
+
+
+====
+sudo apt-get -y install mysql-server
+====
+
+Durante l'installazione ti verrà chiesto di specificare una password per l'utente *root*.
+
+Inventane una di decente (cioè non `12345`, `qwerty` o simili), e soprattutto **scrivila da qualche parte**, altrimenti rischi di doverla resettare usando le istruzioni scritte qui:
+
+https://www.howtoforge.com/reset-forgotten-mysql-root-password[Come resettare la password di root di MySQL]
+
+Al termine dell'installazione, anche MySQL sarà in esecuzione come servizio.
+
+
+## P: PHP ##
+
+A seconda della versione di Ubuntu/Linux che hai sul tuo server, potresti trovare la versione 5 o 7.
+
+> TODO: completare
+
+
+### Opzionale: PhpMyAdmin ###
+
+Se vuoi installare PhpMyAdmin, è sufficiente un solo comando (niente da configurare); prima però fermati un secondo e considera che PhpMyAdmin può rappresentare un problema di sicurezza.
+
+> TODO: spiegare: url, pw root debole, ipotesi di restrizione degli accessi o di non installarlo del tutto
+
+Per evitare che PhpMyAdmin si lamenti, attiviamo l'estensione `mcrypt` di PHP (versione 5) con i comandi:
+
+
+====
+sudo apt-get -y install php5-mcrypt
+sudo php5enmod mcrypt
+sudo service apache2 reload
+====
+
+Che nell'ordine:
+
+  1. installa l'estensione
+  2. attiva l'estensione
+  3. fa ricaricare la configurazione ad Apache
+
+
+
+# Configurare un sito #
+
+A sconda dei casi, può servirti un *virtual host*, cioè un sito comune, oppure un *sottosito*, cioè un sito del tutto autonomo ma che, per motivi pratici, deve essere posizionato in una sottodirectory di un altro sito.
+
+Ad esempio:
+
+ * vuoi creare un nuovo sito www.guybrush.cloud : **serve un *virtual host***;
+ * hai già un sito statico www.super-robot.cloud ma vuoi aggiungere una sezione autonoma all'URL www.super-robot.cloud/shop : **serve un *sottosito***.
+
+> È proprio necessario configurare un sottosito? Non basterebbe copiare tutto via FTP in una sottodirectory, e morta là?
+
+> Risposta breve: no.
+
+> Risposta completa: vedi l'esempio seguente.
+
+## Esempio
+
+@TODO
+
+
+## Virtual host
+Apache 2.4 su Ubuntu 14 di default ha la *document root* in `/var/www/html`.
+
+Un *virtual host* può quindi essere posizionato in `/var/www` a fianco di `html`.
+
+## Sottosito
+
+Alla fine delle istruzioni l’utente *mysite* potrà:
+
+1.	Accedere via FTP al server, senza poter modificare niente in cartelle non sue
+2.	Depositare file nella document root del suo sito oppure in una sottodirectory
+Requisiti
+Il webserver deve avere:
+1.	Un sistema operativo Unix-like (queste istruzioni sono state scritte per Ubuntu)
+2.	Apache 2.2 o 2.4
+
+### Creiamo un utente non privilegiato
+
+Crea un utente (mysite) con gruppo di default `www-data` o meglio, il gruppo sotto cui gira Apache: solitamente si trova nel file `/etc/apache2/envvars`.
+
+
+
+====
+adduser --home /var/www/mysite --ingroup www-data mysite
+====
+
+questo comando richiederà alcune informazioni: l’unica degna di nota è la password (ricorda di salvarla e/o scriverla da qualche parte).
+
+L'output dovrebbe somigliare a questo:
+
+    Adding user 'mysite' ...
+    sent invalidate(passwd) request, exiting
+    sent invalidate(group) request, exiting
+    Adding new user `mysite' (1006) with group `www-data' ...
+    sent invalidate(passwd) request, exiting
+    sent invalidate(group) request, exiting
+    sent invalidate(passwd) request, exiting
+    sent invalidate(group) request, exiting
+    sent invalidate(passwd) request, exiting
+    sent invalidate(group) request, exiting
+    Creating home directory '/var/www/mysite' ...
+    Copying files from '/etc/skel' ...
+    Enter new UNIX password:
+    Retype new UNIX password:
+    passwd: password updated successfully
+    Changing the user information for mysite
+    Enter the new value, or press ENTER for the default
+            Full Name []:
+            Room Number []:
+            Work Phone []:
+            Home Phone []:
+            Other []:
+    sent invalidate(passwd) request, exiting
+    sent invalidate(group) request, exiting
+    sent invalidate(passwd) request, exiting
+    Is the information correct? [Y/n] y
+
+
+### Configurare Apache
+
+Come utente root puoi "metterti nei panni" dell’utente `mysite`; dopodiché creeremo due cartelle: `web` e `private`. La prima sarà la *document root* e la seconda servirà a depositare file, via ftp e/o usando il web server.
+Entrambe le cartelle dovranno essere scrivibili da parte dell’utente www-data (per farlo, abilitiamo il gruppo omonimo).
+
+
+====
+su – mysite
+cd
+mkdir web private
+chmod g+w web private
+====
+
+Sempre come utente `root`, modifica il file di configurazione del sito/*virtual host* in cui dovrà comparire questa directory. Se il server è “mono-host”, il file sarà
+
+`/etc/apache2/sites-available/default`
+
+se usi Apache 2.2, oppure
+
+`/etc/apache2/sites-available/default.conf`
+
+Il nome preciso può variare, sia in contesti "host singolo" che -soprattutto- in contesti in cui hai più *virtual host* sulla stessa macchina.
+
+L’importante è che il file di configurazione:
+
+*	sia quello giusto (ovviamente)
+*	sia relativo ad un sito **abilitato**: ossia, che esista il link a questo file in  `/etc/apache2/sites-enabled`. **Verifica due volte questo punto prima di proseguire.**
+
+1. Se usi Apache 2.2:
+
+  > come faccio a saperlo?
+
+  [source,apache]
+====
+  Alias /mysite "/var/www/mysite/web/"
+  <Directory "/var/www/mysite/web/">
+    AllowOverride All
+    Order allow,deny
+    Allow from all
+  </Directory>
+  ====
+
+2. per Apache 2.4:
+
+  [source,apache]
+====
+  Alias /mysite "/var/www/mysite/web/"
+  <Directory "/var/www/mysite/web/">
+    AllowOverride All
+    Require all granted
+  </Directory>
+  ====
+
+Ricarica la configurazione di Apache:
+
+
+====
+service apache2 reload
+====
+
+Ora prova ad accedere al sotto-sito che hai appena abilitato:
+
+http://www.nomesito.com/mysite[http://www.nomesito.com/mysite]
+
+### FTP
+
+Per poter accedere al server via FTP, è necessario:
+
+  1. abilitare un servizio FTP
+  2. aggiungere l'utente `mysite` all'elenco degli utenti che possono accedere.
+
+#### Abilitazione servizio
+
+Per verificare se il servizio FTP è attivo, il modo più semplice è provare a connettersi :)
+Lo puoi fare da linea comando con:
+
+
+====
+ftp localhost
+====
+
+Se il comando risponde `Connected to localhost.`, puoi passare all'abilitazione dell'utente.
+Se invece risponde `ftp: connect: Connection refused`, va installato e/o attivato.
+
+Proviamo a vedere se il servizio è già installato:
+
+
+====
+sudo service vsftpd start
+====
+
+Se risponde con un messaggio di errore, `vsftp` non è installato. Per installarlo digita:
+
+
+====
+sudo apt-get install vsftpd
+====
+
+A questo punto il servizio sarà in esecuzione. Apriamo il file di configurazione principale, cioè `/etc/vsftpd.conf` e impostiamo le seguenti voci di configurazione:
+
+    write_enable=YES
+    local_umask=022
+    chroot_local_user=YES
+    pam_service_name=ftp
+    userlist_enable=YES
+    userlist_deny=NO
+    userlist_file=/etc/vsftpd.user_list
+
+
+#### Abilitazione utente
+
+Aggiungiamo una riga con il nome dell’utente al file
+
+`/etc/vsftpd.allowed_users` .
+
+Verifica se l’utente riesce ad accedere:
+
+
+====
+ftp mysite@localhost
+====
+
+
+### (Opzionale) MySQL
+
+Se il sito è statico, MySQL non è necessario. Se usi Symfony, Wordpress, o per
+qualsiasi altro motivo ti serve un DB MySQL, puoi creare un db seguendo le
+istruzioni qui sotto.
+
+
+ 1. Connessione a MySQL
+
+  Per connettersi come utente `root` dalla shell del container *guybrush_php8* digitiamo:
+
+  
+====
+  mysql -u root -p
+  ====
+
+  -p (senza parametri) è il flag che dice a MySQL di richiedere interattivamente
+  la password. Digitiamo la password e premiamo invio.
+
+
+ 2. Creazione di un database (mysitedb)
+
+  Dalla console (mysql>) digitiamo:
+
+  [source,sql]
+====
+  create database mysitedb;
+  ====
+  La risposta sarà qualcosa di simile:
+
+  ====
+  Query OK, 1 row affected (0.01 sec)
+  ====
+
+ 3. Creazione di un utente con privilegi solo sul database `mysitedb`
+
+  Con i comandi seguenti creeremo l'utente `mysiteuser`, imposteremo la sua
+  password e gli daremo privilegi elevati sul db.
+
+  Dalla console (mysql>) digita:
+
+  [source,sql]
+====
+  create user mysiteuser@localhost;
+  set password for mysiteuser@localhost = PASSWORD('password');
+  grant all on mysite.* to mysiteuser@localhost;
+  ====
+
+  controlliamo i permessi dell’utente:
+
+  [source,sql]
+====
+  show grants for mysiteuser@localhost;
+  ====
+
+> TODO cosa deve comparire affinché sia tutto ok?

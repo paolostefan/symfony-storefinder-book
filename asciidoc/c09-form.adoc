@@ -1,0 +1,30 @@
+[#c09-form]
+= I form di Symfony
+
+****
+.icon:github[] Con il repository {sample_git_repo_web}
+
+Per tornare a questo punto del libro potete fare checkout del ramo *map_search*. (((Git, git checkout)))
+
+[source,bash]
+----
+cd /percorso/di/guybrush        # sostituite col percorso corretto
+git checkout map_search
+----
+****
+
+****
+Abbiamo visto che esistono comandi per _definire_ e _modificare_ la struttura delle Entity; in questo capitolo
+impareremo a usare il sistema di gestione dei form messo a disposizione da Symfony.
+****
+
+include::09-form/1.crud.adoc[]
+
+include::09-form/2.abbelliamo.adoc[]
+
+include::09-form/3.paginazione.adoc[]
+
+// Questa parte è una divagazione e coi campi latlng accorpati non funziona.
+// include::09-form/4.mappa.adoc[]
+
+include::09-form/99.navigazione.adoc[]

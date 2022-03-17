@@ -1,0 +1,20 @@
+== Roadmap
+
+Ora che abbiamo smanettato un po' e abbiamo un'idea di come funziona il nostro nuovo giocattolo, stendiamo un piano d'azione: ecco cosa faremo nelle prossime lezioni.
+
+#TODO: 'sta roba non è coerente, torna qui alla fine del libro#
+
+. Creazione del *template base*: prenderemo un template di un sito web e lo adatteremo per farlo funzionare con Symfony.
+
+. *Database*: definizione delle Entity _Poi_ (Point of Interest) e _PoiCategory_
+. Form base: gestione delle categorie dei punti di interesse
+. Form base (2): gestione dei `Poi`
+. Creazione di un console command per l'importazione massiva di `Poi`
+. Visualizzazione e ricerca dei `Poi` su una mappa stile Google Maps
+. Area riservata: i firewall di Symfony; creazione di utenti statici
+. Creazione di utenti dinamici e adattamento della pagina login
+. Form dinamico con plugin mappe: punto di interesse
+. Deploy
+. Bonus level (?)
+
+<<<

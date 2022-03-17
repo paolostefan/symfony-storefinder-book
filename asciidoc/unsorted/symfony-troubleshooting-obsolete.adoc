@@ -1,0 +1,55 @@
+
+
+### Qualcosa non è andato per il verso giusto...
+
+L'installazione nella *Vagrant box* che usiamo dovrebbe andare a buon fine. Se però stai riproducendo questi passi su una macchina diversa ...
+
+  1. Il comando `sudo apt-get -y install php-xml` fallisce con l'errore `E: Unable to locate package php-xml`
+
+     Questo può succedere se hai PHP 5.x sul tuo server e stai usando Symfony 2 o 3.
+     Dal container *guybrush_php8* lancia questo comando per installare la libreria PHP richiesta:
+
+     
+====
+     sudo apt-get -y install php-xml-parser
+     ====
+
+  2. Il progetto viene creato ma produce alcuni messaggi di allarme:
+
+    ====
+    ✕  Symfony 4.0.x was successfully installed but your system doesn't meet its
+       technical requirements! Fix the following issues before executing
+       your Symfony application:
+    ====
+    seguito da...
+
+    ====
+    * date.timezone setting must be set
+      > Set the "date.timezone" setting in php.ini* (like Europe/Paris).
+    ====
+
+    In questo caso la voce corrispondente va specificata in php.ini, ossia in due file:
+
+    * `/etc/php5/cli/php.ini`
+    * `/etc/php5/apache2/php.ini`
+
+    Troviamo la riga:
+
+    [source,ini]
+====
+    ;date.timezone =
+    ====
+
+    e sostituiamola con:
+
+    [source,ini]
+====
+    date.timezone = Europe/Rome
+    ====
+
+    Per far sì che questa configurazione venga "sentita", fai rileggere la configurazione ad Apache con il comando:
+
+    
+====
+    sudo service apache2 reload
+    ====

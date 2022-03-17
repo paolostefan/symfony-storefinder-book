@@ -1,0 +1,12 @@
+version: "3.2"
+services:
+    adoc:
+      # Queste due equivalgono all'opzione "-it"
+      stdin_open: true
+      tty: true
+      entrypoint: "/bin/bash"
+      image: asciidoctor/docker-asciidoctor:latest
+      container_name: asciidoctor
+      volumes:
+        - ./asciidoc:/documents
+        - ./build:/build

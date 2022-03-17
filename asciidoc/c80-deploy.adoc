@@ -1,0 +1,116 @@
+[#c80-deploy]
+= Deploy
+
+****
+A meno che non sviluppiamo sulla stessa macchina da cui viene servito, avremo bisogno _trasportare_ i sorgenti dalla _macchina di sviluppo_ al _server_ a cui accedono gli utenti. Questo processo di trasporto si chiama *deploy* e può essere effettuato in diversi modi.
+****
+
+@todo finora abbiamo lavorato sul container *guybrush_php8* che era
+ il nostro server "remoto".
+@todo introduzione su cosa va fatto ad ogni deploy con Symfony
+
+== Via (S)FTP
+
+Questo metodo di deploy è il più semplice: consiste nel copiare i file che ci servono sul server remoto via FTP o SFTP.
+
+@todo esempio banalissimo
+
+=== Vantaggi
+
+. Immediatezza: non occorre scrivere script di deploy.
+. Velocissimo per deploy di pochi file.
+
+=== Svantaggi
+
+. Spreco di tempo: quando si fanno modifiche corpose, bisogna tenere a mente i singoli file modificati.
+. Se non teniamo a mente i file modificati, occorre fare l'upload di directory intere, sovrascrivendo quelle esistenti, caricando un sacco di file uguali (anche questo è uno spreco di tempo).
+
+== Via git
+
+Con questo metodo, il server su cui vogliamo fare il deploy accede al repository git *remoto* del nostro sito, e ne effettua un *pull*, cioè scarica l'intera codebase nel suo filesystem.
+
+=== Vantaggi
+
+. Scriptabile: è possibile inserire il comando git pull in uno script di deploy che effettua anche altre operazioni.
+
+=== Svantaggi
+
+. Con questo sistema siamo vincolati a fare il deploy di *tutti e soli* i file presenti nella codebase: non è possibile ignorare directory e file specifici all'infuori di quelli presenti nel file *.gitignore*.
+
+. Se usiamo un sistema di build (webpack, yui o simili), che comprime e/o aggrega i file CSS e Javascript, tenere i sorgenti sul server è superfluo.
+
+. Il repository remoto deve essere accessibile dal server, quindi generalmente la nostra codebase si troverà in un server git visibile da Internet (come ad es. GitLab, BitBucket o GitHub), e questo potrebbe essere un problema di sicurezza.
+
+== Via rsync
+
+Con questo metodo, i sorgenti vengono copiati sul server remoto mediante rsync. Utilizzando un file di configurazione per rsync, è possibile decidere quali file non devono essere caricati.
+
+@todo cos'è rsync
+
+=== Vantaggi
+
+. Alta configurabilità
+. Carica su server lo stretto necessario
+. Scriptabile
+
+[source,bash]
+.Boilerplate per il deploy tramite rsync
+----
+!/bin/bash
+#
+# <Symfony Project Name>
+# =================================
+# Deploy to remote server via rsync
+# =================================
+#
+# Save this file in the root of your Symfony project
+# and make it executable e.g. with:
+# chmod u+x deploy.sh
+#
+# Create an exclusion file named app/config/rsync_exclude.txt *before* running this script.
+#
+# *All paths are just examples!*
+# *No* trailing slashes in the paths please! ;-)
+#
+LOCAL_DIR='/Users/[you]/Sites/[your_project_path]'
+REMOTE_DIR='/var/www/[your_project_path]'
+PHP_EXE='php'
+
+# Passwordless connection alias (~/.ssh/config), server name, or server IP
+REMOTE=remote_alias
+# User and group under which the webserver is running (on remote)
+# Usually both user and group are 'www-data'; on CentOS/RedHat running Apache, it may be 'apache:apache'
+
+REMOTE_USER=user[:group]
+
+cd $LOCAL_DIR
+
+echo ". Deploying files ..."
+rsync -rlptvz ./ $REMOTE:$REMOTE_DIR --exclude-from=./config/rsync_exclude.txt
+echo ". Done deploy."
+
+echo ". Post deploy remote operations ..."
+
+# Update remote Symfony configuration file
+# If you prefer not to handle remote config from the development machine, just add
+# app/config/parameters.yml
+# to the rsync_exclude.txt file
+ssh $REMOTE "cp $REMOTE_DIR/config/parameters.remote.yml $REMOTE_DIR/app/config/parameters.yml"
+
+# Migrate database if needed
+echo ". Updating db schema..."
+ssh $REMOTE "$PHP_EXE $REMOTE_DIR/bin/console doctrine:migrations:diff"
+ssh $REMOTE "$PHP_EXE $REMOTE_DIR/bin/console doctrine:migrations:migrate"
+
+# Clear remote Symfony cache in both environments
+ssh $REMOTE "$PHP_EXE $REMOTE_DIR/bin/console cache:clear --no-warmup"
+ssh $REMOTE "$PHP_EXE $REMOTE_DIR/bin/console cache:clear --no-warmup --env=prod"
+
+echo ". Dumping assets..."
+ssh $REMOTE "$PHP_EXE $REMOTE_DIR/bin/console assetic:dump"
+ssh $REMOTE "$PHP_EXE $REMOTE_DIR/bin/console assetic:dump --env=prod"
+
+echo ". Making directories writable by web server..."
+ssh $REMOTE "chown -R $REMOTE_USER $REMOTE_DIR/var/cache/ $REMOTE_DIR/var/logs/ $REMOTE_DIR/src $REMOTE_DIR/public"
+echo ". Deploy completed."
+----

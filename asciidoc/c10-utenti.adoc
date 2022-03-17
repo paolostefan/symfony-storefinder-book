@@ -1,0 +1,24 @@
+[#c70-utenti]
+= Symfony e gli utenti
+
+****
+.icon:github[] Con il repository {sample_git_repo_web}
+
+Per tornare a questo punto del libro potete fare checkout del ramo *form*. (((Git, git checkout)))
+
+[source,bash]
+----
+cd /percorso/di/guybrush        # sostituite col percorso corretto
+git checkout form
+----
+****
+
+include::10-utenti/00.intro.adoc[]
+
+include::10-utenti/10.utenti-statici.adoc[]
+
+include::10-utenti/20.utenti-dinamici.adoc[]
+
+include::10-utenti/21.registrazione.adoc[]
+
+include::10-utenti/22.registrazione-addon.adoc[]

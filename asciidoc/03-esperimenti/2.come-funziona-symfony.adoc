@@ -1,0 +1,54 @@
+== Come funziona Symfony
+
+****
+Dopo aver fatto un po' di prove, è ora di fare una digressione teorica per non perderci.
+****
+
+Symfony è un _framework_ che serve per creare siti e applicazioni web; fornisce cioè un'impalcatura che permette di non *reinventare la ruota*, con le seguenti caratteristiche:
+
+ * fornisce un sistema <<MVC>>;
+ * utilizza i _friendly URLs_;
+ * permette di mantenere tutti i parametri in file di configurazione facilmente accessibili che possono essere esclusi dal repository tramite .gitignore;
+ * permette di definire ambienti di esecuzione differenti: quelli predefiniti sono *dev*, *prod* e *test*;
+ * mantiene la _document root_ separata dai sorgenti, che non possono essere "serviti" agevolmente: fornisce un livello di sicurezza maggiore rispetto ad es. a WordPress;
+ * utilizza autenticazione e gestione delle sessioni;
+ * permette la creazione di comandi da console;
+ * integrazione con PHPUnit per i test.
+
+
+=== MVC
+
+Il paradigma Model-View-Controller nasce dall'esigenza di *separare i ruoli* fra strutture dati, logica di programma e _presentation layer_; nel caso di Symfony questo modello è tradotto come segue:
+
+ 1. **Model**: tutto ciò che definisce le _strutture dati_;
+ 2. **View** o **Template**: tutto ciò che serve a _presentare_ le pagine;
+ 3. **Controller**: la _business logic_ che trasforma una richiesta HTTP in una risposta.
+
+
+=== Controller e pagine
+
+Possiamo pensare ad un ((Controller)) come a un "contenitore" di pagine: ciascuna di esse è identificata da una rotta o _route_ (cioè il suo URL relativo), ed è associata a un metodo del Controller.
+In Symfony è una classe PHP derivata da *Symfony\Bundle\FrameworkBundle\Controller\Controller*, e non ci sono limiti preimpostati al numero di controller definibili, né al numero di pagine che ciascun Controller può contenere.
+
+
+=== Dalla richiesta alla risposta
+
+Un sito basato su Symfony funziona così:
+
+. il webserver riceve una richiesta HTTP composta da un metodo e un URL, ad es.:
++
+----
+GET /homepage
+----
+
+. se l'URL corrisponde a un file nella directory */public* del progetto Symfony, questo viene servito direttamente. Altrimenti ...
+
+. ... l'URL viene interpretato come una _((route))_ e passato al kernel di Symfony;
+
+. il _kernel_ di Symfony verifica nella sua mappa se la _((route))_ e il metodo corrispondono ad un'*azione*, cioè ad un metodo di uno dei controller definiti; in caso contrario, restituisce un errore di tipo 404 (not found). Altrimenti ...
+
+. ... Symfony esegue l'_azione_ corrispondente alla route, ed invia al browser la risposta restituita dall'azione, in termini di header HTTP e contenuto.
+
+#@todo# parecchio
+
+<<<

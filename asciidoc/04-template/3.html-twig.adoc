@@ -1,0 +1,273 @@
+== Da HTML a Twig
+
+****
+In questo capitolo vedremo come rendere dinamico un file HTML.
+****
+
+Quando parliamo di template _di siti web_, pur usando la stessa parola, intendiamo qualcosa di diverso dai _template Twig_: il template _di un sito web_, come quelli in vendita in siti specializzati, può essere una single-page app, un minisito statico, o un insieme di pagine pronte all'uso: è quindi composto non solo da pagine HTML, ma anche da *fogli di stile* CSS, *immagini* e *file Javascript* (le librerie jQuery, Angular e plugin per entrambe); a volte insieme alle pagine vengono forniti anche *file di Photoshop* con cui è possibile personalizzare ulteriormente l'aspetto delle pagine.
+
+=== Il template di sito web che useremo
+
+(((Material design)))
+Il template che useremo si chiama {template_git_repo_web}[(({template_name}))]: è basato su ((Bootstrap)) 3, ha molte funzionalità utilizzabili con un semplice copia/incolla, è colorato ed è *gratuito*. Inoltre, è incluso nel repository {sample_git_repo} (è contenuto nella directory */html_template*) ed è servito da un container Docker, quindi se abbiamo dato il comando `docker-compose up`, ci basterà visitare la pagina <http://localhost:8081/> per poter esplorare il template. 
+Prendiamoci qualche minuto per esplorare le pagine presenti in questo template.
+
+Se volete scaricare questo template separatamente potete:
+
+* clonare il repository con ((Git)), ad es. da shell:
++
+[source,bash]
+----
+cd /ovunque/fuori/da/sample_symfony/
+git clone {template_git_repo_web}.git
+----
+
+* installarlo mediante *((npm))* (se abbiamo dimestichezza con il frontend):
++
+[source,bash]
+----
+cd /ovunque/fuori/da/sample_symfony/
+npm install adminbsb-materialdesign
+----
++
+In queso caso il template verrà scaricato in *./node_modules/adminbsb-materialdesign* .
+
+* visitare l'{template_git_repo_web}[homepage del template] e cliccare su *Clone or download* > *Download ZIP* (in alto a destra).
+
+
+<<<
+
+[#cambiamo-il-template-base]
+=== Modifichiamo base.html.twig
+
+****
+Ora che abbiamo dato un'occhiata al template, faremo in modo che la nostra
+pagina di benvenuto cominci a somigliare a una pagina web: lo faremo cambiando
+il *template base* che usa Symfony.
+****
+
+Iniziamo copiando dentro *public/* le seguenti subdirectory del template _{template_name}_ presenti nella directory */html_template*: 
+
+* *css*
+* *images*
+* *js*
+* *plugins*
+
+Rinominiamo poi il file *templates/base.html.twig* in *templates/base_old.html.twig*. Il suo contenuto dovrebbe essere simile a questo.
+
+[source,html]
+.templates/base_old.html.twig
+----
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        {% block stylesheets %}{% endblock %}
+    </head>
+    <body>
+        {% block body %}{% endblock %}
+        {% block javascripts %}{% endblock %}
+    </body>
+</html>
+----
+
+Il file *html_template/pages/examples/blank.html* del template _{template_name}_ diventerà la nuova pagina base: copiamolo in *templates/* col nome di *base.html.twig* .
+
+=== Blocchi
+
+Apriamo il file appena copiato (e rinominato), troviamo queste righe (verso la fine del file):
+
+[source,html]
+----
+<section class="content">
+    <div class="container-fluid">
+        <div class="block-header">
+            <h2>BLANK PAGE</h2>
+        </div>
+    </div>
+</section>
+----
+
+Sostituiamo il div *.block-header* con un blocco Twig di nome *body*:
+
+[source,diff]
+----
+<section class="content">
+    <div class="container-fluid">
+-        <div class="block-header">
+-            <h2>BLANK PAGE</h2>
+-        </div>
++        {% block body %}{% endblock %}
+    </div>
+</section>
+----
+
+In questo modo, il contenuto del blocco Twig di nome *body* verrà inserito come contenuto principale della pagina. +
+Facciamo lo stesso con il _titolo_ della pagina: troviamo nel template il tag *<title>* e sostituiamone il contenuto con il blocco Twig omonimo, come segue.
+
+[source,diff,html]
+----
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+-   <title>Blank Page | Bootstrap Based Admin Template - Material Design</title>
++   <title>{% block title %}Welcome!{% endblock %}</title> <1>
+----
+
+<1> Rispetto al blocco *body*, il blocco *title* ha anche un contenuto di default: se i template derivati non definiscono il blocco *title*, in questa posizione comparirà la stringa `Welcome!`.
+
+==== stylesheets e javascripts
+
+Ora definiremo i blocchi:
+
+- *stylesheets* per eventuali fogli di stile aggiuntivi;
+- *javascripts* per le librerie JS da includere nella pagina.
+
+Aggiungiamo il blocco *stylesheets* prima della chiusura del tag *<head>*:
+
+[source,twig]
+----
+{% block stylesheets %}{% endblock %}
+</head>
+----
+
+Quindi aggiungiamo il blocco *javascripts* prima dello script `../../js/admin.js`:
+
+[source,twig]
+----
+{% block javascripts %}{% endblock %}
+<script src="../../js/admin.js"></script>
+----
+
+In questo modo avremo riprodotto tutti i blocchi presenti nel _vecchio_ template *base.html.twig*.
+
+[NOTE]
+.Non c'è un limite al numero di blocchi
+====
+Abbiamo inserito i quattro blocchi *body*, *title*, *stylesheets* e *javascripts* perché erano quelli presenti nel vecchio *base.html.twig*: in questo modo il template nuovo può sostituire quello vecchio _senza modifiche_ ad eventuali template derivati. +
+Non siamo però limitati a questi blocchi: possiamo definire _tutti i blocchi che vogliamo_.
+====
+
+
+=== Percorsi di fogli di stile e script
+
+****
+.TL; DR
+Rimpiazziamo tutte le occorrenze di `href="../../`
+con `href="/` e tutte le occorrenze di `src="../../` con `src="/`.
+
+NOTE: Le virgolette vanno scritte _una volta sola_, dopo `href=` e `src=`.
+
+Salviamo e ricarichiamo la http://localhost:8080/[pagina home]. Se non abbiamo fatto sbagli, dovrebbe somigliare a questa:
+
+image::base.png[pdfwidth=90%]
+
+****
+
+==== Spiegazione
+
+Affinché la pagina cerchi script (JS) e fogli di stile (CSS) nel posto giusto, dobbiamo correggerne *tutti* i percorsi. +
+Nel template gli script, le immagini e i fogli di stile sono "su di due directory" (*../../*) rispetto alla pagina *pages/examples/blank.html*, cioè non si trovano in *pages/* ma in altre directory. +
+Nel nostro sito, non vogliamo che i percorsi di JS e CSS dipendano dall'URL della pagina, altrimenti dovremmo generare i percorsi dinamicamemte, oppure tutti gli URL dovrebbero trovarsi allo stesso *livello di profondità*.
+
+Per esempio, se lo stesso tag `<script src="../../js/jquery.js">` fosse presente nelle due pagine con URL:
+
+ * /home
+ * /poi/tagged/restaurants/edit
+
+allora, nella prima (*/home*) punterebbe a un indirizzo non corretto - andrebbe più indietro della document root- ma verrebbe risolto comunque in */js/jquery.js*; nella seconda pagina, punterebbe al file */poi/js/jquery.js*, inesistente.
+
+Vogliamo che, nei nostri template Twig, i percorsi di script ecc. siano sempre risolti in modo corretto, in modo da poter riutilizzare il nostro template base senza preoccuparci di correggere i percorsi: possiamo ottenere questo usando percorsi assoluti (cioè che iniziano per "*/*", tipo */js/jquery.js*) anziché relativi (quelli presenti nel template HTML, ad es. *../../js/jquery.js*).
+
+=== Scomponiamo la pagina base
+
+Per essere il template _base_, non si può dire che sia snello: conta più di 800 righe... Facciamo in modo di ridurlo separando il contenuto principale dalle sezioni:
+
+* top bar
+* sidebar sinistra (menu principale)
+* sidebar destra
+
+Creiamo a questo scopo la directory *templates/partials* e dentro di essa 3 file vuoti:
+
+* templates/partials/*top-bar.html.twig*
+* templates/partials/*left-sidebar.html.twig*
+* templates/partials/*right-sidebar.html.twig*
+
+Nel file *templates/base.html.twig* cerchiamo i due commenti:
+
+[source,html]
+----
+    <!-- Top Bar -->
+    ...
+    <!-- #Top Bar -->
+----
+
+Tagliamo tutto il codice compreso fra i due commenti 
+(inclusi i commenti), e incolliamolo nel file
+*templates/partials/top-bar.html.twig*. Salviamo questo file e torniamo a *templates/base.html.twig*. Qui, al posto del codice tagliato scriviamo:
+
+[source,twig]
+----
+  {% include 'partials/top-bar.html.twig' %}
+----
+
+Salviamo anche questo file e controlliamo che la http://localhost:8080/[pagina home] sia uguale a prima.
+Se è così, possiamo procedere tagliando e incollando anche queste due parti:
+
+[source,html]
+----
+    <!-- Left Sidebar -->
+    ...
+    <!-- #Left Sidebar-->
+----
+
+[source,html]
+----
+    <!-- Right Sidebar -->
+    ...
+    <!-- #Right Sidebar-->
+----
+
+rispettivamente in *templates/partials/left-sidebar.html.twig* e *templates/partials/right-sidebar.html.twig*. Al loro posto in *templates/base.html.twig* scriviamo:
+
+[source,twig]
+----
+  {% include 'partials/left-sidebar.html.twig' %}
+----
+
+[source,twig]
+----
+  {% include 'partials/right-sidebar.html.twig' %}
+----
+
+Verso la fine del file viene incluso questo script:
+
+[source,html]
+----
+  <!-- Demo Js -->
+  <script src="/js/demo.js"></script>
+----
+
+Questo script, cioè *public/js/demo.js*, contiene il codice di tracciamento di Google Analytics e le funzioni per cambiare skin (il colore della _top bar_): nessuna delle due funzionalità ci serve, quindi possiamo tranquillamente cancellare queste due righe.
+
+.Opzionale: riduciamo ulteriormente il peso del template
+
+Se vi va, potete togliere tutti i commenti HTML ancora presenti in *base.html.twig*, ottenendo un template base di circa *70 righe*.
+
+
+// === Facciamo un commit
+
+// È il momento di salvare nel repository git le modifiche fatte finora.
+// Per ragioni di performance, lanceremo i comandi seguenti dal nostro computer e *non dal container *guybrush_php8**; infatti, per stabilire cosa è cambiato, *git* esegue numerose letture nel suo database e nella directory dei sorgenti, e a tale scopo  container *guybrush_php8* è molto più lenta del nostro computer (la lettura deve infatti passare attraverso il kernel del container *guybrush_php8* e il file system NFS, perché il nostro computer rispetto al container *guybrush_php8* è un host di rete). +
+// Quindi dalla shell *del nostro computer*, posizioniamoci nella directory del progetto, aggiungiamo la directory corrente al _((working tree))_, e diamo il comando *git commit*, come segue.
+
+// [source,bash]
+// ----
+// cd percorso/di/guybrush
+// git add .
+// git commit -m "Template base aggiornato"
+// ----
+
+
+<<<

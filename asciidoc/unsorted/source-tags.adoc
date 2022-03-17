@@ -1,0 +1,6 @@
+
+ * **start** : Symfony + Vagrant init, senza nessuna modifica
+ * **mockup** : template statici delle pagine mappa, login, area riservata - elenco punti, area riservata - modifica punto di interesse
+ * **entities** : entity definite  
+ * **commands** : comandi creati
+ * **beta**: pagine mockup implementate

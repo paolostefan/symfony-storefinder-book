@@ -1,0 +1,92 @@
+# Mettere tutto insieme
+
+Facciamo in modo di poter ricercare i nostri punti di interesse, auto-dimensionare la mappa e altre operazioni simpatiche.
+
+
+## La nostra finestra sul mondo
+
+Creiamo un controller che restituisca le coordinate del "confine", cioè i valori minimi e massimi di latitudine e longitudine.
+
+Nel file `sample_symfony/guybrush/src/AppBundle/Controller/DefaultController.php`
+
+aggiungi
+
+    use Symfony\Component\HttpFoundation\JsonResponse;
+
+alle direttive di tipo `use`, cioè a inizio file prima di
+
+    class DefaultController ...
+
+Poi dentro la classe creiamo l'azione seguente:
+
+[source,php]
+====
+  /**
+   * @Route("/api/window", name="apiWindow")
+   */
+  public function apiWindowAction(Request $request) {
+
+    return new JsonResponse([]);
+  }
+====
+
+Per adesso restituisce una risposta (JSON) vuota.
+
+*@TODO*: parlare del Repository e del Query Builder
+
+
+## Frontend
+
+Il file `sample_symfony/guybrush/web/guybrush/js/map.js` è ancora intonso, così come l'abbiamo trovato in ... *@TODO*
+
+Nel file del plugin c'è il link all'homepage del plugin: http://hpneo.github.io/gmaps/
+
+Avvolgiamo tutte le istruzioni contenute dentro `$(function(){})` in una ulteriore funzione (ad es. `init()`), in modo che non vengano eseguite immediatamente. Poi, leggiamo via ajax la pagina api/window e, una volta ottenuti i dati, facciamo in modo di eseguire la funzione `init()`.
+
+Quindi se prima il file si presentava così:
+
+[source,javascript]
+====
+$(function(){
+    // questo è il contenuto...
+});
+====
+
+modifichiamolo così:
+
+[source,javascript]
+====
+$(function () {
+
+  var init = function(data){
+    // questo è il contenuto...
+  };
+
+  // Aggiungiamo questa chiamata
+  $.ajax({
+    url: 'api/window',
+    success: function(data){
+      init(data);
+    },
+    error: function(){
+      alert("Cannot get window!");
+    }
+  });  
+});
+====
+
+Adesso la pagina farà le stesse cose di prima, ossia creare la Google Map e inserire due marker, ma solo **dopo** aver ricevuto i risultati da `api/window`.
+
+*markers* è un nome fuorviante, rinomina in gmap
+
+### Raggruppiamo i marker
+https://developers.google.com/maps/documentation/javascript/marker-clustering#adding-a-marker-clusterer
+
+!pix/italia.png[L'italia è un Paese ricco di musei XD]
+
+* Clona il repo dei plugin
+  `git clone https://github.com/googlemaps/v3-utility-library.git`
+
+* Copia la dir markerclusterer in /web/plugins/
+* Aggiungi `<script src="/plugins/markerclusterer/src/markerclusterer.js"></script>` al tpl `/app/Resources/views/default/map.html.twig`
+*

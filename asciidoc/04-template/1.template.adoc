@@ -1,0 +1,444 @@
+
+== Template engine
+
+Nel lessico di Symfony, un _template_ è *un file di testo* da utilizzare come _modello_ per generare un output: nella maggior parte dei casi, si tratta di file usati dalle _azioni_ dei Controller per generare pagine HTML. +
+Un _((template engine))_ ("motore di template") è una libreria di funzioni in grado di _compilare_ un file template, inserendovi contenuti variabili in corrispondenza di specifici delimitatori. +
+Symfony utilizza un _template engine_ di nome *Twig*, che può servire per realizzare template sia in HTML che in altri linguaggi, come ad esempio:
+
+* XML
+* Javascript
+* YAML
+* PHP (cioè è possibile usare Twig per generare file _sorgenti_ PHP).
+
+In questo corso comunque useremo Twig **solo** per creare template HTML: tutti i file template che utilizzeremo avranno estensione `.html.twig`. _Twig_ indica sia il _template engine_ che il *linguaggio* interpretato dall'engine: sarà chiaro dal contesto a cosa ci stiamo riferendo.
+
+== Come si fa ad usare un template?
+
+È possibile usare un template per generare contenuti, chiamando
+*$this->render()* dal metodo di un ((Controller)). +
+*render()* richiede due argomenti, il primo obbligatorio (*$templateName*, una stringa che indica il nome del file da usare come template), e il secondo opzionale (*$params*, un array associativo di parametri da passare al template); il suo valore di ritorno è una stringa che rappresenta il template _renderizzato_, cioè con i delimitatori sostituiti dai relativi contenuti.
+
+[source,php]
+----
+$this->render($templateName[,$params]);
+----
+
+La stringa *$templateName* verrà interpretata come nome di un file da cercare dentro la directory */templates/*.
+
+=== Differenza fra Response e render()
+
+Quando istanziamo un oggetto di tipo _Response_, abbiamo il controllo completo sul *tipo* di contenuto (header `Content-type`), il *codice di stato HTTP* da restituire, e il *contenuto* vero e proprio della risposta; questa maggiore flessibilità si traduce generalmente in più righe di codice. +
+Il metodo `render()`, oltre ad usare un file template, genera una risposta con `Content-type` *text/html*, cioè una pagina HTML, e stato HTTP 200 (OK).
+
+=== Proviamo
+
+Nel paragrafo <<prima-pagina>> abbiamo visto come da un'azione in un ((Controller)) si possa restituire una risposta HTTP in testo semplice; facciamo ora in modo che anziché una risposta in testo semplice, venga restituita una pagina *html*. +
+Dentro *HomeController.php* sostituiamo l'istruzione `return` del metodo *index()* come segue:
+
+src/Controller/HomeController.php
+[source,diff]
+----
+-return new Response('Benvenuto nuovamente da Guybrush!');
++return $this->render('home.html.twig');
+----
+
+WARNING: Se visitiamo la pagina <http://localhost:8080> adesso, Symfony si incazza -cioè, otterremo un errore HTTP 500- perché gli stiamo dicendo di _renderizzare_ un file template che ancora non esiste.
+
+Creiamo quindi il file *templates/home.html.twig* e scriviamoci dentro:
+
+[source,twig]
+----
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<style>
+    body { font-family: sans-serif; background: #ece9e2; }
+</style>
+  <h1>Benvenuto da Guybrush!</h1>
+{% endblock %}
+----
+
+=== Percorso di default dei template
+
+Poche righe fa abbiamo creato un file nella directory *templates/*: non si tratta di un percorso magico, ma del valore configurato alla voce `twig/default_path`, solitamente presente nel file *config/packages/twig.yaml*.
+
+@todo: altri modi?!?
+
+(((Twig, Delimitatori)))
+
+<<<
+  
+== Cenni di Twig
+
+Il linguaggio Twig riconosce tre tipi di _delimitatori_: *commenti*, *espressioni* e *tag*. (((Twig, Commenti)))
+
+=== Commenti
+
+`{# questo è un commento in Twig #}`
+
+Il testo racchiuso fra `{\#` e `#}` viene considerato un commento, e _non comparirà nell'output_. (((Twig, Espressioni)))
+
+=== Espressioni
+
+`{{ questa è un'espresione }}` 
+
+Il testo racchiuso fra doppie graffe `{{` e `}}` viene considerato un'_espressione_: Twig cercherà di sostituirlo con il *valore* dell'espressione, ad es.:
+
+|===
+|Template |Output
+
+a|
+[source,twig]
+----
+Cinque per dodici fa {{ 5*12 }}
+----
+
+a|
+----
+Cinque per dodici fa 60
+----
+
+|===
+
+Un'espressione può contenere:
+
+. valori _letterali_ come nell'esempio qui sopra;
+. nomi di _variabili scalari_, ad es. `{{ pippo }}`, oppure membri di _variabili composte_ (array ed oggetti), ad es. `{{ pluto.colore }}` o `{{ pluto.3 }}`;
+. funzioni PHP.
+
+Tutti e tre inoltre possono essere concatenati da operatori matematici.
+
+Quando Twig trova il nome di una variabile in un'espressione,  cercherà fra le variabili _predefinite_ e quelle _ricevute_ nell'array dei parametri: se la variabile è definita, Twig userà il suo _valore_ per calcolare il risultato dell'espressione; altrimenti, genererà un errore.
+
+.Esempi di espressioni
+[cols="3,2,2"]
+|===
+|Template | Dati | Output
+
+a|
+[source,twig]
+----
+Ciao, {{ nome }} {{ cognome }}!
+----
+
+a|
+[source,php]
+----
+$dati = [
+'nome' => 'Mario',
+'cognome' => 'Rossi',
+];
+----
+
+a|
+----
+Ciao, Mario Rossi!
+----
+
+|===
+
+(((Twig, Tag)))
+
+=== Tag
+
+``{% questo è un tag %}`` 
+
+Il testo racchiuso fra `{%` e `%}` viene considerato un _tag_, cioè un costrutto che può modificare il flusso o la modalità di elaborazione dello stesso template. I costrutti *{% if %}* e *{% for %}* sono due tag utilizzati molto spesso. (((Twig, Tag, if))) 
+
+=== Il costrutto *if*
+
+Questo costrutto serve a generare una parte di contenuto _solo se_ si verifica una particolare condizione. Il costrutto deve aprirsi con un tag `if` e chiudersi con un tag `endif`. +
+Ad esempio, per mostrare un messaggio di errore _solo se_ la variabile `error` è valorizzata, possiamo scrivere:
+
+[source,html]
+----
+{% if error %}
+  <div class="alert alert-danger">
+    Ehi! Qualcosa è andato storto.
+  </div>
+{% endif %}
+----
+
+Per produrre un contenuto ulteriore se la condizione del tag 
+`if` *non* si verifica, si può usare il tag opzionale `else` come 
+nell'esempio che segue.
+
+[source,twig]
+.Costrutto Twig if/else
+----
+{% if error %}
+  {# Stampato solo se 'error' è true #}
+  <div class="alert alert-danger">
+    <strong>Ehi!</strong> Qualcosa è andato storto.
+  </div>
+{% else %}
+  {# Stampato solo se 'error' è false #}
+  <div class="alert alert-success">
+    <strong>Tutto ok!</strong> Operazione completata correttamente.
+  </div>
+{% endif %}
+----
+
+(((Twig, Tag, for))) 
+
+=== Il tag *for*
+
+Questo tag serve a stampare un elenco di elementi, ad es. i membri 
+di un array o di un altro _iterable_.
+
+.Esempio di `for` con un array semplice
+[cols="4,5,4"]
+|===
+| Dati | Template | Output
+
+a|
+[source,php]
+----
+$dati = [
+  'list' => [
+    'Pippo',
+    12
+    'Pluto',
+    'Paperino',
+    45
+  ]
+];
+----
+
+a|
+[source,html]
+----
+<ul>
+  {% for item in list %}
+  <li>{{ item }}</li>
+  {% endfor %}
+</ul>
+----
+
+a|
+[source,html]
+----
+<ul>
+  <li>Pippo</li>
+  <li>12</li>
+  <li>Pluto</li>
+  <li>Paperino</li>
+  <li>45</li>
+</ul>
+----
+
+|===
+
+.Esempio di `for` con un array associativo
+[cols="6,7,5"]
+|===
+| Dati | Template | Output
+
+a|
+[source,php]
+----
+$dati = [
+  'list' => [
+    'Primo' => 'Pippo',
+    'Altro' => 12,
+    31 => 'Paperino',
+  ]
+];
+----
+
+a|
+[source,html]
+----
+<ul>
+  {% for key,item in list %}
+    <li>
+      <b>{{ key }}</b>:
+      {{ item }}
+    </li>
+  {% endfor %}
+</ul>
+----
+
+a|
+[source,html]
+----
+<ul>
+  <li>
+    <b>Primo</b>:
+    Pippo
+  </li>
+  <li>
+    <b>Altro</b>:
+    12
+  </li>
+  <li>
+    <b>31</b>:
+    Paperino
+  </li>
+</ul>
+----
+
+|===
+
+(((Twig, Filtri)))
+
+=== Filtri 
+
+Il contenuto di espressioni e tag può essere modificato usando uno o più _filtri_, con la sintassi:
+
+[source,twig]
+----
+{{ valore | filtro }}
+{% if valore | filtro < 10 %}
+...
+{% endif %}
+----
+
+I _filtri_ sono funzioni predefinite di Twig che trasformano un dato, ad es.:
+
+- il filtro https://twig.symfony.com/doc/3.x/filters/length.html[*length*] restituisce il *numero* di elementi di un array;
+
+- il filtro https://twig.symfony.com/doc/3.x/filters/capitalize.html[*capitalize*] restituisce una stringa uguale a quella che ha ricevuto in input, con la *prima lettera maiuscola*;
+
+TIP: L'elenco completo dei tag e dei filtri è disponibile nel https://twig.symfony.com/doc/3.x/[sito ufficiale].
+
+(((Twig, Blocchi)))
+
+=== Blocchi
+
+Una delle caratteristiche più potenti di Twig è l'*ereditarietà* dei template. Dietro a questa parola cacofonica c'è un concetto fondamentale: *evitare le ripetizioni*. +
+Nella programmazione a oggetti (ad es. Java o PHP), una classe può *ereditare* campi e metodi da un'altra classe; allo stesso modo in Twig, un template può ereditare _variabili_ predefinite, _contenuto_ e _blocchi_ da un altro template. 
+
+I *blocchi* di un template Twig sono porzioni di testo racchiuse fra i tag *{% block %}* ed *{% endblock %}* .
+
+// Le analogie con la programmazione non si fermano qui:
+
+// - non c'è un limite prestabilito al numero di "generazioni": un template *A* può essere figlio di un template *B*, che a sua volta può essere figlio del template *C*, e così via;
+// - un template *figlio* può fare l'_override_ di uno o più blocchi dei suoi template *antenati* (così come una classe derivata può fare l'override di un metodo o sovrascrivere un campo della classe *antenata*).
+
+// L'aspetto importante è che qualunque modifica al template _antenato_ verrà riportata **automaticamente** a tutti i suoi discendenti.
+
+==== Esempio
+
+// [ditaa,images/esempio-blocchi,png]
+// ....
+//  /-----------------------------------------------\           /---------------------\
+//  |                                base.html.twig |  extends  | news_list.html.twig |
+//  |                                               |<----------|                     |
+//  |                                               |           | cFFD                |
+//  | +--------+  +-------+  +------+  +--------+   |           \---------------------/
+//  | : titolo |  : corpo |  : menu |  : footer |   |
+//  | +--------+  +-------+  +------+  +--------+   |  extends  /---------------------\
+//  |                                               |<----------|      news.html.twig |
+//  |                                               |           |                     |
+//  |                                               |           | cFFD                |
+//  |                                               |           \---------------------/
+//  |                                               |
+//  |                                               |  extends  /---------------------\
+//  |                                               |<----------|     about.html.twig |
+//  |                                               |           |                     |
+//  |                                               |           | cFFD                |
+//  |                                               |           \---------------------/
+//  | cFFD                                          |
+//  \-----------------------------------------------/
+// ....
+image::esempio-blocchi.png[]
+
+Un template (*base.html.twig*) contiene i seguenti blocchi:
+
+- titolo
+- corpo (contenuto della pagina)
+- menu laterale
+- footer
+
+Il template *base.html.twig* ha tre template _figli_:
+
+. la pagina di tipo _Elenco News_ (*news_list.html.twig*), in cui vengono elencate le notizie recenti;
+. la pagina di tipo _Contenuto News_ (*news.html.twig*), in cui viene mostrata in dettaglio una notizia;
+. la pagina _Chi siamo_ (*about.html.twig*), in cui sono presenti le informazioni sul sito e sugli autori.
+
+Se vogliamo cambiare la nota di copyright nel footer di _tutte_ le pagine, 
+basterà farlo nel template *base.html.twig* e non servirà toccare gli altri. +
+In questo caso modifichiamo un solo file e la modifica serve per almeno *tre* 
+pagine: 1 a 3 non è un risparmio clamoroso... ma nella pratica non è raro 
+avere *decine o centinaia di pagine* che discendono dallo stesso template: 
+potrebbe essere il caso dell'esempio, se ci fossero un centinaio di news a database. +
+Oltre ad essere comoda, questa caratteristica di Twig garantisce di non avere
+discrepanze di stile e/o contenuto tra le diverse pagine.
+
+<<<
+
+(((Twig, Tag, extends)))
+
+=== Come ereditare: il tag *extends*
+
+Il tag *extends* comunica a Twig che un template _eredita_ blocchi ed eventuali variabili da un _altro_ template.
+
+==== Esempio
+
+Supponiamo di partire dal seguente template:
+
+[source,twig]
+.base.html.twig
+----
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        {% block stylesheets %}{% endblock %}
+    </head>
+    <body>
+        {% block body %}{% endblock %}
+        {% block javascripts %}{% endblock %}
+    </body>
+</html>
+----
+
+Possiamo specificare che un altro template eredita blocchi e variabili da *base.html.twig* come segue.
+
+[source,twig]
+----
+{% extends 'base.html.twig' %}
+
+{% block body %}
+  Ciao, {{ nome }} {{ cognome }}!
+{% endblock %}
+----
+
+
+[cols="5,6"]
+|===
+| Dati (array PHP) | Output
+
+a|
+[source,php]
+----
+$dati = [
+  'nome' => 'Mario',
+  'cognome' => 'Rossi',
+];
+----
+
+
+a|
+[source,html]
+----
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <title>Welcome!</title>
+</head>
+<body>
+  Ciao, Mario Rossi!
+</body>
+</html>
+----
+
+|===
+
+=== Documentazione aggiuntiva su Twig
+
+Questo capitolo non vuol sostituire la documentazione ufficiale: per approfondimenti potete consultare il <<twig_reference,sito ufficiale di Twig>> e la <<symfony_template_docs,sezione>> del sito di Symfony dedicata ai template; Symfony definisce anche diverse funzioni Twig, documentate <<symfony_twig,qui>>.
+
+<<<

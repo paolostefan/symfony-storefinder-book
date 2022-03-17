@@ -1,0 +1,101 @@
+[appendix]
+[[server_virtuale]]
+= Server virtuale: cos'è?
+
+== Definizioni
+
+Un *server* è un *computer* che effettua compiti specifici. Un _server_ non è tale in virtù del suo hardware: che sia un portatile, un mainframe, un PC, un Raspberry Pi o uno smartphone, chiameremo un computer *server* quando:
+
+. esegue uno o più _servizi_, ad es.:
+
+** web server
+** database
+** generazione di certificati
+** firewall
+** mail server
+** FTP
++
+e chi più ne ha più ne metta.
+
+. è connesso alla rete (sia essa una LAN, una rete intranet o Internet), in modo che altri computer/dispositivi- detti _client_- possano usufruire dei suoi servizi.
+
+Un server reale è una macchina come il computer, tablet o smartphone su cui stai leggendo queste righe; un server *virtuale* è un'_applicazione_
+che emula il funzionamento di un server, cioè un programma che *finge di essere* un server reale, in esecuzione su un PC reale.
+
+Agli occhi di un _client_, cioè di un dispositivo che si connette ad un server, un server reale e un server virtuale sono indistinguibili.
+
+== Vantaggi dei server virtuali
+
+Se non ci sono differenze per il "pubblico", cioè per chi usufruisce dei servizi, perché usare l'uno piuttosto che l'altro?
+
+=== 1: tempo e denaro
+
+Nel mondo fisico, modificare la configurazione hardware impegna tempo e denaro.
+
+Ad es.: prima di rimpiazzare un disco con un altro più capiente, bisogna comprarne un altro -*denaro*- e copiare il contenuto sul disco nuovo -*tempo*.
+
+Poi, bisognerà spegnere la macchina -*tempo e denaro per business perso*-, cambiare il disco e riaccenderla.
+
+Nel mondo virtuale, queste modifiche sono solo numeri gestiti dal software di virtualizzazione: per esempio, la RAM della macchina virtuale è una parte della RAM fisica della macchina host.
+
+Per aggiungere RAM (entro i limiti della RAM della macchina host) basta dire al software di virtualizzazione di usarne di più.
+
+Niente da svitare.
+
+In alcuni casi è possibile aggiungere risorse alle VM addirittura senza spegnerle: si parla in tal caso di _aggiunte a caldo_ di memoria o spazio disco.
+
+=== 2: vantaggi per noi - testare un sito con più versioni dei software server
+
+Se decidessi di far girare il sito sul tuo PC/Mac, in genere dovresti installare una sola versione di Apache, PHP e MySQL.
+Se però volessi verificare come funziona il tuo sito con PHP 5.6 _e anche con PHP 7_, dovresti far coesistere le due versioni di PHP nella tua macchina, a volte con sotterfugi.
+
+Quando i software da far coesistere aumentano di numero (ad es. 3 versioni di PHP, due di MySQL, due di Apache), gestire i vari "interruttori" per attivare la combinazione giusta di versioni da testare può diventare proibitivo; c'è poi il rischio di intasare la tua macchina di sviluppo.
+
+Più in generale, installare software server sulla macchina di sviluppo:
+
+. appesantisce la macchina, perché obbliga ad avere diversi software aggiuntivi su disco, e alcuni di questi in esecuzione (rallentando quindi la macchina);
+. rischia di rivelarsi inutile perché *non garantisce* il funzionamento sulla macchina di produzione.
+
+Con un software di virtualizzazione (VirtualBox, VMWare, ecc.), puoi creare due, tre o più server virtuali con le configurazioni che servono, e lanciare l'una o l'altra a seconda di quale versione vuoi testare. Questa soluzione non fa risparmiare spazio su disco, ma è di sicuro più _portabile_ e garantisce con un buon grado di certezza il funzionamento in produzione.
+
+=== 3: alta fedeltà  e pulizia
+
+Le macchine virtuali possono ricalcare l'ambiente di produzione molto più fedelmente del tuo PC/Mac: se il sito di produzione verrà ospitato, ad es., da un server Debian 8.0 con Apache 2.4, PHP 7.1 ecc., puoi creare una macchina virtuale con quella specifica distribuzione e versione di Linux, Apache, PHP, MySQL e quant'altro. Tutto ciò senza dover installare nessun software server sul tuo PC/Mac: ti basteranno un software di virtualizzazione e Vagrant.
+
+== La rete e i server virtuali
+
+[[visitare-un-sito-web-su-un-server-remoto]]
+=== Sito web remoto
+
+Quando visiti un sito web con un browser, dietro le quinte succede questo...
+
+NOTE: In realtà ci sono molti altri eventi e variabili in gioco, ma ai fini del raffronto reale/virtuale può bastare questo.
+
+. Se usi il _nome_ del dominio, ad es. `www.linux.com` (questo avviene nel 99.9% dei casi), il tuo computer ottiene l'indirizzo IP del server a partire dal suo nome, tramite un servizio che si chiama _DNS_ footnote:dns[DNS è l'acronimo di Domain Name System; v. <https://it.wikipedia.org/wiki/Domain_Name_System> .].
+ Ad es.: `www.linux.com` viene tradotto nell'IP `151.101.17.5`;
+ Se invece usi direttamente l'*indirizzo IP* del server, la traduzione non è necessaria.
+
+. l'applicazione crea una connessione TCP con l'IP ottenuto, tipicamente sulla porta 80 (http) oppure 443 (https);
+. l'applicazione invia la richiesta HTTP (o HTTPS) usando la connessione che ha stabilito;
+. il server restituisce del codice (tipicamente un testo in formato HTML) che corrisponde alla richiesta;
+. il browser interpreta il codice e lo renderizza.
+
+=== Sito web locale
+
+Se il sito web che vuoi visitare si trova *sul tuo stesso computer*, i passi sono tutti identici tranne il primo:
+
+. il tuo computer risolve il nome `localhost` (o quello che hai configurato nel tuo file hosts-__citation needed__) nell'IP speciale `127.0.0.1`, oppure utilizzi direttamente l'IP `127.0.0.1`.
+
+L'IP `127.0.0.1` indica _la stessa macchina_ da cui la richiesta è partita. La connessione TCP verrà stabilita con il tuo stesso computer, e nulla viaggerà sulla rete esterna al tuo computer (cavo ethernet o WiFi): i pacchetti inviati dal browser verranno ricevuti dall'applicazione server in esecuzione sulla stessa macchina.
+
+Cioè, _viaggeranno_ solo nella memoria RAM del tuo computer.
+
+*Figura*
+
+=== Sito web di un server virtuale nel tuo PC
+
+Un server virtuale ha un indirizzo IP, generalmente definito dalla sua configurazione. Supponendo che il suo IP sia
+`11.22.33.44`, e che abbia un server web configurato e in esecuzione, quando dal tuo PC visiti con un browser la pagina
+http://11.22.33.44, il browser esegue gli stessi passi di quando
+<<visitare-un-sito-web-su-un-server-remoto,visiti un sito web>>; il software di virtualizzazione si occupa di "far
+credere" al browser che la richiesta stia viaggiando in rete, ma tutto sta avvenendo nella RAM del tuo computer.

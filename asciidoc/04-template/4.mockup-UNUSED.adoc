@@ -1,0 +1,135 @@
+== Pagine mockup
+
+In questa lezione costruiremo insieme alcune pagine _mockup_, cioè pagine pronte dal punto di vista grafico, ma prive di una _business logic_ che le fa funzionare.
+
+Al momento opportuno, le modificheremo rendendole pienamente operative.
+
+[#mockup_login]
+=== Login area riservata
+
+Creiamo un'azione per la pagina: in *src/Controller/SuperController.php* aggiungiamo la funzione seguente prima della *}* finale:
+
+[source,php]
+----
+/**
+  * @Route("/login", name="login")
+  */
+public function login()
+{
+  return $this->render('login.html.twig');
+}
+----
+
+La pagina di _{template_name}_ che useremo come base di partenza è *pages/examples/sign-in.html*: apriamola nel nostro IDE e confrontiamola con il template *base.html.twig*. +
+Notiamo che *sign-in.html*, rispetto a *base.html.twig*:
+
+. include un CSS in meno (*/css/themes/theme-brown.min.css*);
+. il tag *<body>* ha una classe CSS diversa;
+. include un JS in meno (*.../bootstrap-select.js*) e uno in più (*.../jquery.validate.js*);
+. *soprattutto*, il corpo della pagina ha una struttura diversa.
+
+Per evitare di complicarci la vita, è preferibile creare per questa pagina un template indipendente da *base.html.twig*, seguendo gli stessi passi della <<cambiamo-il-template-base,lezione precedente>>. +
+Anzitutto salviamo la pagina del template nel nostro progetto Symfony, col nome *templates/login.html.twig*; poi troviamo questa parte nel template:
+
+[source,html]
+.templates/login.html.twig
+----
+<head>
+   <meta charset="UTF-8">
+   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+   <title>Sign In | Bootstrap Based Admin Template - Material Design</title> <1>
+----
+
+<1> Sostituiamo il contenuto del tag `<title>` come segue:
+
+[source,html]
+----
+<head>
+   <meta charset="UTF-8">
+   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+   <title>{% block title %}Sign in{% endblock %}</title>
+----
+
+Poi, come abbiamo fatto per il template *base.html.twig*, rimpiazziamo tutte le occorrenze di:
+
+    href="../../
+
+con
+
+    href="/
+
+(*attenzione*: le virgolette vanno scritte solo dopo `href=`)
+
+e tutte le occorrenze di
+
+    src="../../
+
+con
+
+    src="/
+
+Se ora proviamo a caricare la pagina http://localhost:8080/mockup/login, all'apparenza dovrebbe essere identica all'originale.
+//
+// @todo: Siamo sicuri di non voler includere nel corso la registrazione e il forgot password?!?
+//
+// Nel nostro sito però non prevediamo di far registrare gli utenti, nè la funzione "Forgot password": troviamo quindi queste righe:
+//
+// [source,html]
+// ----
+//   <div class="row m-t-15 m-b--20">
+//     <div class="col-xs-6">
+//       <a href="sign-up.html">Register Now!</a>
+//     </div>
+//     <div class="col-xs-6 align-right">
+//       <a href="forgot-password.html">Forgot Password?</a>
+//     </div>
+//   </div>
+// ----
+//
+// e cancelliamole facendo attenzione a non "spezzare" i tag `<div>`. +
+
+Resta solo da cambiare il logo, quindi troviamo questa parte:
+
+[source,html]
+----
+  <div class="logo">
+    <a href="javascript:void(0);">Admin<b>BSB</b>
+    </a>
+    <small>Admin BootStrap Based - Material Design</small>
+  </div>
+----
+
+e sostituiamo il contenuto dei tag `<a>` e `<small>` con qualcosa che caratterizzi il nostro sito, ad esempio:
+
+[source,html]
+----
+  <div class="logo">
+    <a href="/">Guybrush
+    </a>
+    <small>A nice store finder :)</small>
+  </div>
+----
+
+//
+// === Creazione POI (point of interest)
+//
+// @todo
+// ////
+// completare
+// ////
+//
+// === Modifica POI
+//
+// @todo
+// ////
+// completare
+// ////
+//
+// === Mappa con campi di ricerca
+//
+// @todo
+// ////
+// completare
+// ////
+
+<<<

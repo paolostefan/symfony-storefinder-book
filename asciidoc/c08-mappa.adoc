@@ -1,0 +1,32 @@
+[#c40-mappa]
+= Creiamo una mappa
+
+****
+.icon:github[] Con il repository {sample_git_repo_web}
+
+Per tornare a questo punto del libro potete fare checkout del ramo *service_container*. (((Git, git checkout)))
+
+[source,bash]
+----
+cd /percorso/di/guybrush        # sostituite col percorso corretto
+git checkout service_container
+----
+****
+
+include::08-mappa/1.vuota.adoc[]
+
+include::08-mappa/2.ricerca.adoc[]
+
+include::08-mappa/3.marker-js.adoc[]
+
+****
+.icon:github[] Con il repository {sample_git_repo_web}
+
+Per tornare a questo punto del libro potete fare checkout del ramo *map_search*. (((Git, git checkout)))
+
+[source,bash]
+----
+cd /percorso/di/guybrush        # sostituite col percorso corretto
+git checkout map_search
+----
+****

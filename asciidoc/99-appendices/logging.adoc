@@ -1,0 +1,8 @@
+[appendix]
+= Logging
+
+****
+In questo capitolo vedremo come sfruttare le funzioni di logging di Symfony per tenere traccia di quello che succede nella nostra applicazione.
+****
+
+@todo

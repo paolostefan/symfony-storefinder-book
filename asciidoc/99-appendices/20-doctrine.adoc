@@ -1,0 +1,368 @@
+[appendix]
+= Doctrine
+
+[#doctrine_aggiungere_campi]
+== Aggiungere campi a una Entity
+
+A partire da Symfony 4, il comando `make:Entity` può servire per:
+
+. generare nuove _Entity_;
+. *aggiungere* campi ad _Entity_ esistenti;
+. aggiungere ad una _Entity_ i metodi *setter* e *getter* mancanti;
+. ricreare *tutti* i metodi _setter_ e _getter_ di una _Entity_.
+
+Il mio consiglio è di usare il comando tutte le volte che possiamo, per evitare perdite di tempo. +
+La sintassi del comando è la seguente:
+
+|===
+|Sintassi |Descrizione
+
+| `bin/console make:Entity <NomeDellaEntity>`
+| Crea una nuova Entity, oppure aggiunge campi interattivamente.
+
+| `bin/console make:Entity <NomeDellaEntity> --regenerate`
+| Aggiunge i metodi _getter_ e _setter_ mancanti ad una Entity esistente.
+
+| `bin/console make:Entity <NomeDellaEntity> --regenerate --overwrite`
+| Ricrea tutti i _getter_ e i _setter_, sovrascrivendo quelli già presenti.
+|===
+
+(((Database, indici)))
+[#db_indexes]
+== Indici
+
+Una caratteristica importante delle tabelle, che il comando `make:Entity` non gestisce, sono gli *indici*: non è possibile specificare quali colonne delle tabelle debbano essere parte di indici normali o univoci. +
+((Doctrine)) permette di definire indici semplici e univoci, che possono comprendere una o più colonne: vediamo come.
+
+=== Colonne univoche
+
+Se vogliamo semplicemente che una colonna sia *univoca* (_unique_), cioè che non permetta valori duplicati, possiamo aggiungere l'argomento `unique=true` all'annotazione (((annotazione, @ORM\Column))) *@ORM\Column*, ad es. così:
+
+[source,php]
+----
+  /**
+   * @ORM\Column(type="string", length=254, unique=true)
+   */
+  private $email;
+----
+
+Casi tipici in cui serve una colonna univoca sono i _cataloghi di prodotti_, in cui non è permesso usare lo stesso nome per più di un prodotto, oppure _tassonomie_ in cui non possono esistere elementi omonimi (è il caso di ((PoiCategory))).
+
+=== Indici su più colonne
+
+Possiamo chiedere a Doctrine di creare uno o più indici, modificando l'annotazione (((annotazione, @ORM\Table))) *@ORM\Table* posta prima della dichiarazione della *Entity*.
+
+NOTE: Il comando `make:Entity` di default *non aggiunge* l'annotazione *@ORM\Table*; infatti, essa non è necessaria a meno che non vogliamo personalizzare il _nome_ della tabella e/o _gli indici_.
+
+Quando l'annotazione *@ORM\Table* non è presente, Doctrine genera automaticamente il nome della tabella associata alla Entity, convertendo il nome della Entity da _camel case_ a minuscolo con _underscore_: cioè ad es. la _Entity_ *VertebratiTerrestriPesanti* verrà associata alla tabella *vertebrati_terrestri_pesanti*.
+
+Per dare un nome diverso alla tabella, possiamo aggiungere l'annotazione *@ORM\Table(name="...")* e fra le virgolette scriviamo il nome desiderato. +
+Questa annotazione deve trovarsi *appena prima della dichiarazione della classe*, nello stesso commento in cui `make:Entity` ha inserito *@ORM\Entity*, ad es. per l'Entity *Poi*:
+
+[source,php]
+----
+/**
+ * @ORM\Table(name="poi_alternative_table")
+ * @ORM\Entity(repositoryClass="App\Repository\PoiRepository")
+ */
+class Poi
+{
+  // ...
+----
+
+(((annotazione, @ORM\Index)))
+
+=== Indici semplici: l'annotazione @ORM\Index
+
+Per creare un *indice semplice* si può usare l'annotazione *@ORM\Index*, che richiede due argomenti:
+
+[cols="16,57,27"]
+|===
+|Argomento |Descrizione |Esempio
+
+|`name`
+|Nome dell'indice, stringa tra doppi apici.
+|`"idx"`
+
+|`columns`
+|Insieme di colonne (stringhe) che compongono l'indice, racchiuse tra parentesi graffe.
+|`{"author","year"}`
+|===
+
+Tutti gli *@ORM\Index* che vogliamo definire devono essere specificati nell'argomento *indexes* di *@ORM\Table*, sotto
+forma di insieme racchiuso tra parentesi graffe, come segue:
+
+[source,php]
+----
+/**
+ * @ORM\Table(name="...",
+ *   indexes={
+ *     @ORM\Index(name="idx", columns={"author","year"}),
+ *     @ORM\Index(...),
+ *     ...
+ *   })
+ */
+----
+
+(((annotazione, @ORM\UniqueContraint)))
+
+=== Indici univoci: l'annotazione @ORM\UniqueContraint
+
+Per aggiungere un indice *univoco* la procedura è del tutto analoga: ciascun indice univoco dovrà corrispondere ad
+un'annotazione *@ORM\UniqueContraint*, che richiede gli stessi argomenti di *@ORM\Index*.
+
+[cols="16,57,27"]
+|===
+|Nome |Descrizione |Esempio
+
+|`name`
+|Nome dell'indice, stringa tra doppi apici.
+|`"un1_idx"`
+
+|`columns`
+|Insieme di colonne (stringhe) che compongono l'indice, racchiuse tra parentesi graffe.
+|`{"title","year","genre"}`
+|===
+
+Tutti gli _indici univoci_ che vogliamo definire vanno specificati nell'argomento *uniqueConstraints* di *@ORM\Table*, sotto forma di insieme racchiuso tra parentesi graffe, come segue:
+
+[source,php]
+----
+/**
+ * @ORM\Table(name="...",
+ *            uniqueConstraints={
+ *              @ORM\UniqueContraint(name="un1_idx", columns={"title","year","genre"}),
+ *              @ORM\UniqueContraint(...),
+ *              ...
+ *            })
+ */
+----
+
+.Sincronizziamo la struttura
+
+Per far sì che le modifiche al nostro codice vengano riportate da Doctrine nella tabella di Database, è necessario creare ed eseguire una _((migration))_. Possiamo farlo con i comandi:
+
+[source,bash]
+----
+php bin/console make:migration
+php bin/console doctrine:migrations:migrate
+----
+
+== Relazioni fra Entity
+
+Le _Entity_ possono essere legate da una relazione di parentela, ad esempio:
+
+- in un catalogo multi-marchio di prodotti, ciascun *prodotto* sarà legato al suo *marchio*;
+- in un social network, ciascun *utente* potrà appartenere a nessuno, uno o più *gruppi*;
+- in una catalogazione tassonomica di animali o piante, ciascuno di essi sarà legato al suo *genere* e alla sua *specie*.
+
+Questo tipo di relazioni può essere del tipo genitore/figlio, laddove una Entity può essere identificata come genitore e avere uno o più figli (mentre una Entity figlia non può avere più di un genitore), oppure può essere una relazione simile a quella di appartenenza a gruppi, dove cioè ciascuna Entity può essere collegata a molte altre Entity, senza che esista un rapporto gerarchico.
+
+@todo 2 figure, many2one e many2many
+
+=== Many to one
+
+La relazione del tipo figlio-genitore è chiamata *Many to one* (*molti* figli possono avere *uno* stesso genitore), e tipicamente avviene mediante una colonna che fa da _((foreign key))_. +
+Per indicare che una colonna è una _foreign key_ bisogna usare *due annotazioni*:
+
+(((annotazione, @ORM\ManyToOne)))
+
+.@ORM\ManyToOne
+
+Quest'annotazione serve per specificare quale Entity vogliamo collegare a questa, e richiede *due* argomenti:
+
+- *targetEntity* (obbligatorio): nome della Entity tra virgolette:
+- *inversedBy* (facoltativo): nome -tra virgolette- del campo a cui accedere nella Entity "madre" per ottenere tutti i figli. Se presente, la relazione che viene creata è _bidirezionale_: nella Entity figlia, il campo specificato come argomento di `inversedBy` dovrà avere l'annotazione `@ORM\OneToMany` (v. <<#One-to-many,più avanti>>).
+
+[NOTE]
+.Esempi
+====
+Monodirezionale: `@ORM\ManyToOne(targetEntity="Brand")`
+
+Bidirezionale: `@ORM\ManyToOne(targetEntity="Brand", inversedBy="products")`
+
+in questo secondo caso, la Entity Brand dovrà avere il campo `$products` e
+questo dovrà avere annotazione `@ORM\OneToMany`.
+====
+
+.@ORM\JoinColumn
+
+(((annotazione, @ORM\JoinColumn))) Quest'annotazione rimpiazza *@ORM\Column*, ad indicare che questa colonna
+non è un dato scalare (cioè di tipo string, integer), ma rimanda ad un'altra Entity. +
+*@ORM\JoinColumn* richiede *due* argomenti, entrambi _obbligatori_:
+
+- *name*: nome di questa colonna nella tabella, come per *@ORM\Column*
+- *referencedColumnName*: nome della colonna nella tabella collegata.
+
+Rispetto ad *@ORM\Column*, l'annotazione *@ORM\JoinColumn* non ha
+argomento *type*: questo non significa che Doctrine non sappia quale tipo
+di dato è contenuto in questa colonna: sarà dello stesso tipo di
+*referencedColumnName* (nel 99% dei casi è un integer, perché
+*referencedColumnName* è *"id"*).
+
+[#One-to-many]
+=== One to many
+
+(((annotazione, @ORM\OneToMany))) Se vogliamo che la relazione sia _bidirezionale_ o _simmetrica_, cioè se vogliamo che
+le Entity "madri" possano avere accesso istantaneo a tutti i loro figli, in esse bisogna aggiungere l'annotazione
+**@ORM\OneToMany** .
+
+Quest'annotazione richiede due argomenti obbligatori:
+
+-   `targetEntity`: si comporta come la sua omonima in `@ORM\ManyToOne`, questa
+    volta però deve contenere il nome della Entity *figlia*.
+-   `mappedBy`: nome del *campo* della Entity figlia che punta a questa Entity.
+
+=== Esempio _bidirezionale_
+
+Marchio e prodotto: molti prodotti (Product) sono associati ad un **solo** marchio (Brand).
+
+Nella Entity *Product* specifichiamo che il campo brand è una relazione molti-a-uno.
+
+[source,php]
+----
+class Product {
+
+  /**
+   * @var Brand
+   *
+   * @ORM\ManyToOne(targetEntity="Brand", inversedBy="products")
+   * @ORM\JoinColumn(name="brand_id", referencedColumnName="id")
+   */
+  private $brand;
+
+  // ...
+
+}
+----
+
+Nella Entity Brand aggiungiamo un campo privato di nome *$products* (attenzione: tutto minuscolo, come specificato nell'annotazione *ManyToOne*, alla voce *inversedBy*): questo campo sarà di tipo ArrayCollection e dovrà essere inizializzato nel *costruttore* della _Entity_.
+
+[source,php]
+----
+use Doctrine\Common\Collections\ArrayCollection;
+
+class Brand{
+
+  /**
+   * @var ArrayCollection
+   *
+   * @ORM\OneToMany(targetEntity="Product", mappedBy="brand")
+   */
+  private $products;
+
+  // ...
+}
+----
+
+:dbl_: __
+
+[NOTE]
+====
+Solo se nella Entity Brand *non è definito* il metodo `{dbl_}construct()`, il comando `doctrine:generate:entities` aggiungerà un
+costruttore che inizializza questo campo (e tutti gli altri eventualmente annotati con `@ORM\OneToMany`). +
+Se invece nella Entity Brand il metodo `{dbl_}construct()` è già definito, il comando `doctrine:generate:entities` non lo modificherà (per sicurezza): in questo caso, dovremo aggiungere manualmente questa istruzione a `{dbl_}construct()`:
+
+        $this->products = new ArrayCollection();
+====
+
+Alla fine, nella Entity *Brand* il campo *$product* sarà annotato e inizializzato come segue:
+
+[source,php]
+----
+<?php
+
+// ...
+
+use Doctrine\Common\Collections\ArrayCollection;
+
+class Brand{
+
+  /**
+   * @var ArrayCollection
+   *
+   * @ORM\OneToMany(targetEntity="Product", mappedBy="brand")
+   */
+  private $products;
+
+  // ...
+
+  public function __construct() {
+    $this->products = new ArrayCollection();
+  }
+}
+----
+
+
+==== Generiamo i setter e i getter
+
+Dopo aver apportato tutte le modifiche descritte, per generare correttamente i setter e i getter nelle due Entity, va eseguito il comando:
+
+[source,bash]
+----
+php bin/console doctrine:generate:entities AppBundle
+----
+
+=== ManyToMany
+
+////
+completare
+////
+
+    /**
+     * @var ArrayCollection
+     * @ORM\ManyToMany(targetEntity="Group", inversedBy="users")
+     * @ORM\JoinTable(name="user_groups",
+     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id")}
+     *      )
+     * @ORM\OrderBy({"groupTitle" = "ASC", "lastUpdate" = "DESC"})
+     */
+    protected $areas;
+
+
+TIP: Per approfondire l'argomento Doctrine, puoi consultare la documentazione ufficiale a partire dal <<doctrine_basic_mapping,mapping di base>> e dalle <<doctrine_associations,relazioni>>. Per avere una panoramica delle annotazioni disponibili v. invece <<doctrine_annotations_reference,l'elenco delle annotazioni>>.
+
+== Valori di default
+
+Se vogliamo che una colonna abbia un valore di default, abbiamo due alternative.
+
+[#doctrine_default_constructor]
+=== Alternativa 1: impostare il valore nel costruttore
+
+Questa alternativa funziona indipendentemente dal tipo di database che stiamo utilizzando, ed è quindi consigliabile in generale. +
+Possiamo specificare il valore di default della colonna nel costruttore della Entity, come segue (in questo esempio il valore di default è zero).
+
+[source, php]
+----
+class MyEntity{
+    public function __construct()
+    {
+        $this->myColumn = 0;
+    } 
+
+    // ...
+}
+----
+
+NOTE: Il comando `make:entity` per default non aggiunge un costruttore alle Entity: se non è presente il metodo `__construct()`, bisognerà aggiungerlo.
+
+
+=== Alternativa 2: nell'annotazione
+
+Questa alternativa funziona solo con i database che hanno la _keyword_ `DEFAULT`, come ad es. MySQL. + 
+Possiamo specificare il valore di default della colonna nel parametro `options` dell'_annotation_ @ORM\Column, come segue (in questo esempio il valore di default è zero).
+
+[source, php]
+----
+class MyEntity{
+    /**
+      * @var string
+      *
+      * @ORM\Column(type="integer", options={"default" : 0})
+      */
+    private $myColumn;
+
+    // ...
+}
+----

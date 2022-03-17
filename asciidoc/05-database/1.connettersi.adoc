@@ -1,0 +1,44 @@
+
+== Connettiamoci
+
+ifeval::["{virtual}" == "Docker"]
+Il container di nome postgres ha già un database configurato a cui Symfony può accedere con un utente non privilegiato.
+endif::[]
+
+Per capire se *Symfony si connette correttamente al DB*, possiamo usare un trucco: esiste un _((console command))_ per eseguire query SQL da linea comando. Anche se non abbiamo definito alcuna tabella (o non conosciamo la struttura del DB), possiamo comunque eseguire la query `SELECT 1`. Se questa viene eseguita senza messaggi di errore, significa che Symfony riesce a connettersi al nostro DB. Proviamo quindi a dare il comando seguente: (((bin/console, doctrine:query:sql)))
+
+[source, bash]
+----
+php bin/console doctrine:query:sql "SELECT 1;"
+----
+
+icon:rocket[] Se non riceviamo messaggi di errore, siamo pronti a usare il database da Symfony: saltiamo a <<entity_cos_e>>
+
+
+=== Driver non trovato?
+
+Se state usando una VM o un DB di tipo diverso (ad es. Vagrant, o un DB MySQL), può succedere che Symfony si lamenti con un errore del tipo:
+
+  [PDOException]
+  could not find driver
+
+In tal caso, va installato il driver PHP per MySQL o per il DB che state usando. Tranne nel caso di Oracle, il driver è una estensione PHP installabile facilmente con il _package manager_ del container *guybrush_php8* Linux che state usando (*apt*, *yum* o *dnf*).
+
+È importante installare la versione dell'estensione corrispondente alla versione dell'_interprete_ PHP: per conoscerla, *dalla shell del container *guybrush_php8** basta lanciare il comando `php -v`, che produrrà un output simile:
+
+----
+PHP 7.4.3 (cli) (built: May 26 2020 12:24:22) ( NTS )
+Copyright (c) The PHP Group
+Zend Engine v3.4.0, Copyright (c) Zend Technologies
+    with Zend OPcache v7.4.3, Copyright (c), by Zend Technologies
+----
+
+Prendete nota delle _major_ e _minor version_ (qui sopra, *7.4*) 
+e installate l'estensione PHP corrispondente con il package manager
+del container *guybrush_php8*, oppure aggiungete una riga simile al _((Dockerfile))_ ed eseguite nuovamente il build:
+
+[source, bash]
+----
+apt install php7.4-mysql
+----
+

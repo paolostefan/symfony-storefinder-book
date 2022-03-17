@@ -1,0 +1,124 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Ricerca sulla mappa{% endblock %}
+
+
+{% block stylesheets %}
+  <link rel="stylesheet" href="/plugins/leaflet/leaflet.css"/>
+  <link rel="stylesheet" href="/plugins/waitme/waitMe.css"/>
+{% endblock %}
+
+{% block body %}
+  <div class="row clearfix">
+    <div class="col-sm-12">
+      <div class="card">
+        <div class="header">
+          <h2>Ricerca sulla mappa</h2>
+        </div>
+        <div class="body">
+          <div id="leafletMap" style="height:60vh;z-index:0;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# >>>Messaggio di cortesia: nessun risultato #}
+  <div class="row hidden" id="emptyResultWarning">
+    <div class="col-sm-12">
+      <div class="alert alert-warning">
+        <strong>Nessun punto di interesse corrisponde.</strong>
+      </div>
+    </div>
+  </div>
+  {# <<<Messaggio di cortesia: nessun risultato #}
+
+{% endblock %}
+
+{% block javascripts %}
+  <script src="/plugins/leaflet/leaflet.js"></script>
+  <script src="/plugins/waitme/waitMe.js"></script>
+  <script>
+    (function () {
+      // Map
+      const eMap = L.map('leafletMap', {
+        center: [45, 11],
+        zoom: 7,
+        scrollWheelZoom: false
+      });
+      // Tile layer
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(eMap);
+
+      let mg = null;
+
+      function replaceMarkers(results) {
+        if (mg) {
+          mg.remove();
+          mg = null;
+        }
+
+        const markers = [];
+        results.forEach(function (result) {
+          const popupTxt = [result.title, result.address, result.city].join('<br>');
+          const mkr = L.marker([result.lat, result.lon]).bindPopup(popupTxt);
+          markers.push(mkr);
+        });
+
+        mg = L.layerGroup(markers);
+        mg.addTo(eMap);
+      }
+
+      let last_query = '';    // Stringa ricercata
+      let searching = false;  // AJAX in progress?
+
+      function search(e) {
+        e.preventDefault();
+        if (searching) {
+
+          return;
+        }
+        const search_query = $('#searchBox').val().trim();
+        if (!search_query || search_query.length < 3 || search_query === last_query) {
+
+          console.debug("Invalid/same search query: '%s'", search_query);
+          return;
+        }
+        console.debug("Search for: '%s'", search_query);
+        const $loading = $('#leafletMap').waitMe({
+          effect: 'ios',
+          text: 'Ricerca in corso...',
+          bg: 'rgba(255,255,255,0.90)',
+          color: '#555'
+        });
+        searching = true;
+        $('#searchBtn').attr('disabled', true);
+        $('#emptyResultWarning').addClass('hidden');
+
+        last_query = search_query;
+
+        $.ajax('/api/v1/poi/search', {
+          type: 'GET',
+          data: {q: search_query},
+          success: function (data) {
+            console.log("%o", data);
+            if (!data.results.length) {
+              $('#emptyResultWarning').removeClass('hidden');
+            } else {
+              replaceMarkers(data.results);
+            }
+            $loading.waitMe('hide');
+            $('#searchBtn').attr('disabled', false);
+            searching = false;
+          },
+          error: function () {
+            $loading.waitMe('hide');
+            alert('Search failed!');
+            $('#searchBtn').attr('disabled', false);
+            searching = false;
+          }
+        });
+      }
+
+      $('#searchForm').on('submit', search);
+    })();
+  </script>
+{% endblock %}

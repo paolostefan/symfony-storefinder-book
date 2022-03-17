@@ -1,0 +1,65 @@
+
+
+@todo questa parte serve veramente?
+
+#### Le pagine PHP "tuttofare"
+
+Quando non si usa un framework, è molto comune trovarsi a scrivere **pagine** Php che fanno un po' di tutto: output HTML, query a database e business logic.
+Lo si fa se non si ha molto tempo a disposizione, e con la convinzione di non complicare troppo un sito basilare.
+
+Prendiamo come esempio una pagina che riceve in GET un argomento-l'id di un utente- e lo "saluta":
+
+[source,php]
+====
+<!DOCTYPE html>
+<html>
+<head>...</head>
+<body>
+<?php
+
+  // Connetti al database
+  $db = db_connect($db_username, $db_password, $db_name);
+
+  $id = intval($_GET['user_id']);
+
+  $query = "select * from users where user_id = ? limit 1";
+
+  // Esegui la query
+  $res = query_result($query);
+
+  if($res){
+    // Business logic
+    ?>
+    <h1>Ciao, <?php echo $res["first_name"]; ?></h1>
+    <?php
+
+    if($res["unread_msg"]){
+      ?>
+      <div class="notice">Hai <?php echo $res["unread_msg"]; ?> nuovi messaggi.<div>
+      <?php
+    }
+
+  } else {
+    ?>
+    <div class="warning">Non trovo l&quot;utente!</div>
+    <?php
+  }
+</body>
+</html>
+====
+
+L' esempio qui sopra è semplice, ma possiamo già percepire la sua tendenza a complicarsi: nella realtà la pagina dovrebbe prima definire o caricare le credenziali di autenticazione al database, e in più è un attimo sbagliare la chiusura di un tag quando il codice PHP è intercalato ad HTML... credo in effetti che pochi si siano accorti che il tag `<div>` dopo `unread_msg` non è chiuso ma **_volutamente_** riaperto!
+
+Altri scenari in cui non è semplice gestire un sito composto da pagine di questo tipo:
+
+ * vogliamo cambiare il **layout dell'intero sito**: per uniformare l'aspetto delle pagine bisognerebbe modificarle una ad una;
+ * vogliamo modificare le logiche di business;
+ * vogliamo rendere traducibile il sito;
+ * stiamo lavorando in team (ad es. sviluppatori e designer).
+
+
+#### La stessa pagina in Symfony
+
+////
+completare
+////

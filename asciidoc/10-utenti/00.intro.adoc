@@ -1,0 +1,70 @@
+Symfony permette di definire regole per gestire gli accessi, cioè per stabilire *se* e *come* gli utenti devono autenticarsi, e *quali pagine* può visualizzare l'utente corrente. +
+Il file *config/packages/security.yaml* contiene queste regole; vediamolo nel dettaglio.
+
+// Evitare "include" per non avere contenuti inattesi
+// include::../../sample_symfony/guybrush/config/packages/security.yaml[]
+
+[source,yaml]
+.Il contenuto iniziale di config/packages/security.yaml
+----
+security:
+    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
+    providers:
+        users_in_memory: { memory: null }
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        main:
+            anonymous: true
+            lazy: true
+            provider: users_in_memory
+
+            # activate different ways to authenticate
+            # https://symfony.com/doc/current/security.html#firewalls-authentication
+
+            # https://symfony.com/doc/current/security/impersonating_user.html
+            # switch_user: true
+
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+        # - { path: ^/admin, roles: ROLE_ADMIN }
+        # - { path: ^/profile, roles: ROLE_USER }
+----
+
+Vediamo di seguito il significato delle sezioni "figlie" di `security`.
+
+(((security.yaml, providers)))
+
+.providers
+
+Quando un utente inserisce le proprie credenziali, Symfony deve caricare le informazioni su quell'utente (ad es. per verificare se la password è corretta): gli _user provider_ servono proprio a questo scopo, e sono definiti in questa sezione. +
+È possibile definirne più di uno, anche se normalmente un _provider_ è sufficiente.
+
+TIP: La sezione *providers* è opzionale a partire da *Symfony 4.1*.
+
+(((security.yaml, firewalls)))
+
+.firewalls
+
+Symfony utilizza questa sezione per stabilire _se_ e _come_ richiedere l'autenticazione degli utenti: mediante un classico *form* di login, una *challenge HTTP*, un *token* (tipicamente utilizzato dalle API), oppure usando altri metodi come ad es. LDAP, eccetera. 
+
+(((security.yaml, access_control)))
+
+.access_control
+
+Questa sezione serve per negare l'accesso a specifici URL del sito ad utenti non autorizzati; ciascun elemento di `access_control` è un hash contenente le chiavi *path* - il pattern degli URL da controllare - e *roles* - il ruolo o i ruoli a cui è consentito l'accesso.
+
+NOTE: Symfony interpreta il valore di *path* come un'((espressione regolare)) footnote:regex[Espressioni regolari: diversi siti le spiegano nel dettaglio, ad es. https://www.rexegg.com/; altri siti servono per verificarne il funzionamento interattivamente, ad es. https://regex101.com/ .], perciò se vogliamo specificare un valore esatto, questo va racchiuso fra `^` e `$`; se invece vogliamo includere solo gli URL che _iniziano_ per un determinato valore, basta anteporre `^`. Per logiche più complesse vedi footnote:regex[].
+
+Ad es. per fare in modo che solo gli utenti con ruolo *ROLE_SUPER_ADMIN* possano accedere al percorso esatto */root/config*, potremo scrivere:
+
+[source,yaml]
+.Esempio di regola di access_control
+----
+security:
+    # ...
+    access_control:
+      - { path: ^/root/config$, roles: ROLE_SUPER_ADMIN }
+----
