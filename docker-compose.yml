@@ -9,4 +9,4 @@ services:
       container_name: asciidoctor
       volumes:
         - ./asciidoc:/documents
-        - ./build:/build
+        - ./_build:/build

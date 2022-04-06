@@ -6,7 +6,10 @@
         {
             "label": "Build PDF",
             "type": "shell",
-            "command": "asciidoc/build.sh -hp",
+            "command": "./build.sh -hp",
+            "options": {
+                "cwd": "asciidoc/"
+            },
             "problemMatcher": [],
             "group": {
                 "kind": "build",
@@ -16,14 +19,9 @@
         {
             "label": "Build HTML",
             "type": "shell",
-            "command": "asciidoc/build.sh",
-            "problemMatcher": []
+            "command": "docker-compose run adoc ./build.sh -o /build",
+            "problemMatcher": [],
+
         },
-        {
-            "label": "Docker shell @PHP",
-            "type": "shell",
-            "command": "docker exec -it php_fpm bash",
-            "problemMatcher": []
-        }
     ]
 }
