@@ -2,7 +2,7 @@
 
 Ora che abbiamo smanettato un po' e abbiamo un'idea di come funziona il nostro nuovo giocattolo, stendiamo un piano d'azione: ecco cosa faremo nelle prossime lezioni.
 
-#TODO: 'sta roba non è coerente, torna qui alla fine del libro#
+#TODO: i contenuti non sono coerenti: torna qui alla fine del corso#
 
 . Creazione del *template base*: prenderemo un template di un sito web e lo adatteremo per farlo funzionare con Symfony.
 

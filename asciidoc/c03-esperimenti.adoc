@@ -4,7 +4,7 @@ In questo capitolo inizieremo a _sporcarci le mani_ con Symfony.
 
 .Convenzione sui percorsi dei file
 ****
-I percorsi dei file sono _relativi_ alla directory principale del progetto Symfony (che si chiama *guybrush*, se finora avete seguito le istruzioni alla lettera). Ad esempio: se troverete scritto "apriamo il file *config/route.yaml*", saprete che si tratta del file *route.yaml* nella sottodirectory *config* del progetto Symfony.
+In questo corso i percorsi dei file -salvo dove specificato diversamente- vanno sempre intesi come _relativi_ alla directory principale del progetto Symfony (che si chiama *guybrush*, se finora avete seguito le istruzioni alla lettera). Ad esempio: se troverete scritto "apriamo il file *config/route.yaml*", saprete che si tratta del file *route.yaml* nella sottodirectory *config* del progetto Symfony.
 ****
 
 include::03-esperimenti/0.install.adoc[]
@@ -43,7 +43,7 @@ include::03-esperimenti/1.prima-pagina.adoc[]
 // ****
 // .icon:github[] Con il repository {sample_git_repo_web}
 
-// Per tornare a questo punto del libro potete fare checkout del ramo *sample_controllers* del repository. (((Git, git checkout)))
+// Per tornare a questo punto del corso potete fare checkout del ramo *sample_controllers* del repository. (((Git, git checkout)))
 
 // [source,bash]
 // ----

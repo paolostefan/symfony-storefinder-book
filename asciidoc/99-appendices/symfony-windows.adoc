@@ -175,7 +175,7 @@ TIP: Il carattere *%* seguito dall'asterisco (`%\*`) nei file *.bat* significa "
 
 == MariaDB
 
-Se il nostro progetto Symfony utilizza un database (come nel caso di questo libro), abbiamo diverse scelte a disposizione: una fra le più rapide, gratuita, è usare <<mariadb,MariaDB>>, un fork gratuito e open source di ((MySQL)).
+Se il nostro progetto Symfony utilizza un database (come nel caso di questo corso), abbiamo diverse scelte a disposizione: una fra le più rapide, gratuita, è usare <<mariadb,MariaDB>>, un fork gratuito e open source di ((MySQL)).
 
 TIP: Per usare MariaDB con PHP *non è necessaria* alcuna estensione aggiuntiva: si possono usare le estensioni *mysqli* e *pdo_mysql*, incluse nell'installazione standard di PHP.
 

@@ -78,7 +78,9 @@ Se usi la shell di *Git for Windows* tieni presente che:
 * Per creare una soluzione scalabile e gestibile nel tempo.
 * Per abituarsi a progettare e programmare in maniera strutturata.
 
-== Icone utilizzate in questo libro
+== Icone
+
+Quando toverete un trafiletto con una delle icone seguenti... il significato è questo.
 
 [cols="1,9"]
 |===
@@ -89,5 +91,8 @@ Se usi la shell di *Git for Windows* tieni presente che:
 
 |icon:github[]
 |È possibile scaricare il codice di questa lezione dal repository Git.
+
+|icon:binoculars[]
+|Approfondimento o curiosità. Generalmente si può saltare se avete fretta di procedere con lo sviluppo.
 
 |===

@@ -4,7 +4,7 @@
 ****
 .icon:github[] Con il repository {sample_git_repo_web}
 
-Per tornare a questo punto del libro potete fare _checkout_ del tag #NON ESISTE ANCORA#. (((Git, git checkout)))
+Per tornare a questo punto del corso potete fare _checkout_ del tag #NON ESISTE ANCORA#. (((Git, git checkout)))
 
 [source,bash]
 ----

@@ -3,7 +3,7 @@
 ****
 .icon:github[] Con il repository {sample_git_repo_web}
 
-Per tornare a questo punto del libro potete fare checkout del tag *0.8.0-static_users*. (((Git, git checkout)))
+Per tornare a questo punto del corso potete fare checkout del tag *0.8.0-static_users*. (((Git, git checkout)))
 
 [source,bash]
 ----
@@ -14,7 +14,7 @@ git checkout -b work 0.8.0-static_users
 ****
 
 Per rendere scalabile la gestione degli utenti è consigliabile salvare gli account in una *tabella di database*; inoltre, solo così è possibile implementare caratteristiche aggiuntive, come ad es. permettere agli utenti di _creare il proprio account_ in autonomia, dar loro la possibilità di _cambiare password_, oppure semplicemente gestire un vero e proprio _profilo_ utente; con la soluzione vista nel capitolo precedente, infatti, ciascun _account_ non ha nulla più che un nome utente e una password. +
-Quando ho iniziato a scrivere questo libro, per gestire dinamicamente gli utenti in Symfony era consigliabile usare il pacchetto *((FOSUserBundle))*; tuttavia, il fatto che non sia più mantenuto, la sua incompatibilità con Symfony 5.2, e un post sull'argomento footnote:fos[https://jolicode.github.io/fosuserbundle-conf/ L'autore del post sostiene che al giorno d'oggi utilizzare FOSUserBundle crea più ostacoli che vantaggi... e mi trova d'accordo.], mi hanno convinto a prendere un'altra strada.
+Quando ho iniziato a scrivere questo corso, per gestire dinamicamente gli utenti in Symfony era consigliabile usare il pacchetto *((FOSUserBundle))*; tuttavia, il fatto che non sia più mantenuto, la sua incompatibilità con Symfony 5.2, e un post sull'argomento footnote:fos[https://jolicode.github.io/fosuserbundle-conf/ L'autore del post sostiene che al giorno d'oggi utilizzare FOSUserBundle crea più ostacoli che vantaggi... e mi trova d'accordo.], mi hanno convinto a prendere un'altra strada.
 
 NOTE: _FOSUserBundle_ è compatibile con le versioni di Symfony fino alla *5.1* inclusa: se state usando una versione di Symfony compatibile e volete provare a utilizzarlo, trovate le istruzioni per installarlo nell'appendice <<fosuserbundle>>.
 
@@ -67,7 +67,7 @@ image::images/20-utenti-dinamici-make-user.png[]
 //    - Create a way to authenticate! See https://symfony.com/doc/current/security.html
 // ----
 
-Quando il comando ha completato la sua esecuzione, possiamo personalizare la _Entity_ User aggiungendovi alcuni campi (di suo, infatti, parte con i soli *nome utente* e *password*); in questo caso il comando `make:entity User` farà al caso nostro. Nel prosieguo del libro useremo i campi seguenti, ma potete aggiungerne altri a piacere:
+Quando il comando ha completato la sua esecuzione, possiamo personalizare la _Entity_ User aggiungendovi alcuni campi (di suo, infatti, parte con i soli *nome utente* e *password*); in questo caso il comando `make:entity User` farà al caso nostro. Nel resto del corso useremo i campi seguenti, ma potete aggiungerne altri a piacere:
 
  - nome completo (`fullName`);
  - data di creazione (`createdAt`), popolata in automatico grazie all'estensione <<timestampable_field,_Timestampable_>>;

@@ -5,18 +5,22 @@ icon:rocket[] Se avete già installato Docker sul vostro computer, potete saltar
 [#docker]
 == Docker
 
-I vantaggi più evidenti di Docker sono la _portabilità_ della configurazione (la stessa funziona in qualsiasi contesto), e la _velocità_ con cui i container possono esere avviati e fermati. +
+Docker è un sistema di virtualizzazione basato sul concetto 
+di ((container)): un container è, a grandi linee, una macchina virtuale 
+particolarmente leggera e veloce, che per funzionare sfrutta alcune caratteristiche peculiari del sistema operativo Linux. +
+Tipicamente ogni servizio (ad es. web server, o database)
+viene eseguito da un un container a sè stante; i container possono comunicare fra loro tramite TCP/IP (ad es. per far connettere un appserver a un db), e utilizzare volumi condivisi per persistere i dati (ad es. per salvare i dati di un database). +
 Rispetto ad una VM, un container (((Docker,container))) ha alcune differenze e limitazioni:
 
 - è associato ad un _entrypoint_, ossia ad uno specifico *comando*: il container si accende all'inizio dell'esecuzione del comando, ed esce invariabilmente quando questo comando termina;
-- se si tratta di un container che esegue un kernel Linux, *non* ha il processo `init`;
-- non ha uno storage persistente, a meno che non venga opportunamente configurato: questo fa sì che alcune operazioni, come la consultazione dei log o la modifica di file di configurazione, avvengano in maniera diversa rispetto ad una VM.
+- *non* ha il processo `init`;
+- a meno di usare volumi condivisi, le modifiche al filesystem effettuate durante l'esecuzione non vengono mantenute al successivo riavvio.
+
+I vantaggi più evidenti di Docker sono la _portabilità_ (bastano pochi Kb di file di configurazione, non serve l'immagine di una VM da centinaia di mega), la _velocità_ con cui i container possono esere avviati e fermati e la _riproducibilità_ (un ambiente Docker è definito da una serie di passi deterministici eseguiti durante il processo di build).
 
 NOTE: Un container o un insieme di container possono non rappresentare fedelmente l'ambiente di produzione in cui verrà deployata la nostra applicazione; infatti, se il deploy viene effettuato su una VM, alcuni problemi -tipicamente legati a configurazione e/o permessi sul filesystem- potrebbero emergere solo a deploy effettuato. Questo corso ha lo scopo di far apprendere il *funzionamento di Symfony* e non come allestire un server, per cui non ci occuperemo di gestire questi potenziali problemi.
 
 === Installare Docker
-
-
 
 .icon:apple[] Su Mac 
 ****
@@ -59,7 +63,7 @@ L'infrastruttura Docker utilizzata in questo corso è composta da *quattro* cont
 I file di configurazione per Docker si trovano nella directory icon:far-folder[] `docker/` del repository {sample_git_repo_web}.
 ====
 
-.Come interagire con Docker?
+.Interagire con Docker
 
 Esistono diversi modi per interagire con Docker (per effettuare build, far partire e fermare i container, e connettersi ad essi); di seguito ne vedremo tre.
 
@@ -124,7 +128,7 @@ cd docker/
 docker-compose build
 ----
 
-NOTE: In questo libro il comando `docker-compose` viene lanciato sempre dalla directory in cui si trova il file *docker-compose.yml*: in questo modo evitiamo di specificare il percorso del file `docker-compose.yaml`. +
+NOTE: In questo corso il comando `docker-compose` viene lanciato sempre dalla directory in cui si trova il file *docker-compose.yml*: in questo modo evitiamo di specificare il percorso del file `docker-compose.yaml`. +
 La sintassi generica del comando è +
 `docker-compose -f [percorso del file yaml] [comando]` +
 cioè ad es. +

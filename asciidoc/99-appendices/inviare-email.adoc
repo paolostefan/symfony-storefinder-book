@@ -36,7 +36,7 @@ NOTE: L'elenco completo dei provider supportati è presentato nella pagina https
 
 === GMail
 
-Se avete un indirizzo email su GMail, potete utilizzare i server SMTP di Google per inviare email (fino ad un massimo di 2000 al giorno). Per facilitare il compito esiste un pacchetto dedicato, installabile con il comando footnote:ignoreplatformreqs[Il parametro `--ignore-platform-reqs` è necessario solo perché l'infrastruttura Docker usata nel libro utilizza PHP 8, che non è pienamente supportato da Doctrine 2.8.]:
+Se avete un indirizzo email su GMail, potete utilizzare i server SMTP di Google per inviare email (fino ad un massimo di 2000 al giorno). Per facilitare il compito esiste un pacchetto dedicato, installabile con il comando footnote:ignoreplatformreqs[Il parametro `--ignore-platform-reqs` è necessario solo perché l'infrastruttura Docker usata nel corso utilizza PHP 8, che non è pienamente supportato da Doctrine 2.8.]:
 
 [source, bash]
 ----

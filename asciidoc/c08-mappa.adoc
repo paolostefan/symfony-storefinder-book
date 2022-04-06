@@ -4,7 +4,7 @@
 ****
 .icon:github[] Con il repository {sample_git_repo_web}
 
-Per tornare a questo punto del libro potete fare checkout del ramo *service_container*. (((Git, git checkout)))
+Per tornare a questo punto del corso potete fare checkout del ramo *service_container*. (((Git, git checkout)))
 
 [source,bash]
 ----
@@ -22,7 +22,7 @@ include::08-mappa/3.marker-js.adoc[]
 ****
 .icon:github[] Con il repository {sample_git_repo_web}
 
-Per tornare a questo punto del libro potete fare checkout del ramo *map_search*. (((Git, git checkout)))
+Per tornare a questo punto del corso potete fare checkout del ramo *map_search*. (((Git, git checkout)))
 
 [source,bash]
 ----

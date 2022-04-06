@@ -6,7 +6,7 @@
 ****
 .icon:github[] Con il repository {sample_git_repo_web}
 
-Per tornare a questo punto del libro potete fare checkout del ramo *import_command*. (((Git, git checkout)))
+Per tornare a questo punto del corso potete fare checkout del ramo *import_command*. (((Git, git checkout)))
 
 [source,bash]
 ----

@@ -63,14 +63,14 @@ l'installazione proseguirà in automatico.
 
 === Installare Git su Windows icon:windows[]
 
-Le istruzioni per l'installazione sono presenti <<git_install,nel sito di Git-scm>>.
+Le istruzioni per l'installazione sono presenti nel <<git_install,sito di Git-scm>>.
 
 <<<
 
 [#repo]
 == Repository Git
 
-Il codice che scriveremo in questo libro è disponibile in un repository Git pubblico: +
+Il codice che scriveremo in questo corso è disponibile in un repository Git pubblico: +
 {sample_git_repo_web}
 
 Questo repo contiene i file di configurazione necessari per creare l'ambiente
@@ -88,7 +88,7 @@ potrete implementare a modo vostro il progetto senza perdere troppo tempo su
 questioni meno divertenti. (((Git, git clone)))
 
 ****
-icon:github[] Per _clonare_ il repository, potete digitare il comando:
+icon:github[] Per _clonare_ il repository da shell, potete digitare il comando:
 
 [source,bash,subs=attributes+]
 ----
@@ -96,6 +96,6 @@ git clone --recurse-submodules {sample_git_repo}
 ----
 
 Questo comando effettuerà il download del repo creando una subdirectory di nome
-*sample_symfony* nella directory corrente.
+*gsac* nella directory corrente.
 
 ****
