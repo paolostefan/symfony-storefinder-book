@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Defaults
-# Generate html version (0=no, <>0=yes)
-HTML=1
-# Generate epub version 
+# Build html (0=no, <>0=yes)
+HTML=0
+# Build epub 
 EPUB=0
-# Generate pdf version 
+# Build pdf 
 PDF=0
 # Build path (where /build is mounted in docker-compose.yml)
 BUILDDIR=./_build
@@ -14,11 +14,11 @@ if [[ $# -gt 0 && ("$1" == '--help' ) ]]; then
   echo "
 Usage: $0 -[ehp]
 
-Builds this ebook, by default only in HTML format.
+Builds this ebook using asciidoctor docker container.
 
-  -e: create ePub
-  -h: *skip* HTML creation
-  -p: create Pdf
+  -e: build ePub
+  -h: build HTML
+  -p: build Pdf
 
 "
   exit 1
@@ -33,7 +33,7 @@ while getopts "hep" opt; do
       PDF=1
       ;;
     h)
-      HTML=0
+      HTML=1
       ;;
     *)
       echo "Unknown option ${opt}"
@@ -58,7 +58,7 @@ fi
 set -euo pipefail
 
 # build HTML book
-docker-compose run adoc ./build.sh $@ -o /build 
+docker compose run adoc ./build.sh $@ -o /build 
 
 if [ "${OPEN}" != '' ]; then
   if [ $HTML -ne 0 ]; then

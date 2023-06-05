@@ -6,10 +6,10 @@
         {
             "label": "Build PDF",
             "type": "shell",
-            "command": "./build.sh -hp",
-            "options": {
-                "cwd": "asciidoc/"
-            },
+            "command": "./run-build.sh -p",
+            // "options": {
+            //     "cwd": "asciidoc/"
+            // },
             "problemMatcher": [],
             "group": {
                 "kind": "build",
@@ -19,7 +19,7 @@
         {
             "label": "Build HTML",
             "type": "shell",
-            "command": "docker-compose run adoc ./build.sh -o /build",
+            "command": "./run-build.sh -h",
             "problemMatcher": [],
 
         },

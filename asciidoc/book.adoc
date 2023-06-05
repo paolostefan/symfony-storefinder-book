@@ -1,5 +1,5 @@
 // Custom vars that need to be here
-:build: 5
+:build: 7
 :version: 1.0.0
 // Valori permessi: Docker, Vagrant
 :virtual: Docker 
