@@ -1,0 +1,6 @@
+# action.yml
+name: 'Build PDF'
+description: '...Just as it says'
+runs:
+  using: docker
+  image: 'Dockerfile'
