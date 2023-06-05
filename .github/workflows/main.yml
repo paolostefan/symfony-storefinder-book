@@ -6,4 +6,4 @@ jobs:
     steps:
       - name: Run dockerized build script
         id: bp
-        uses: actions/build-action@v2
+        uses: ./build-action/
