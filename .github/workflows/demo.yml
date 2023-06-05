@@ -7,7 +7,6 @@ jobs:
       image: asciidoctor/docker-asciidoctor:latest
       volumes:
         - ./asciidoc:/documents
-        - ./_build:/build
     steps:
       - name: Run build script
         run: ./asciidoc/build.sh -p
