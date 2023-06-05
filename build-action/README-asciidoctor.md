@@ -17,4 +17,4 @@ docker-compose run adoc ./build.sh -o /build -he # build EPUB
 docker-compose run adoc ./build.sh -o /build -ep # build HTML+EPUB+PDF
 ```
 
-<https://asciidoctor.org/docs/user-manual/>
+<https://asciidoctor.org/docs/user-manual/> 
