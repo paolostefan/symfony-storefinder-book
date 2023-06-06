@@ -1,7 +1,10 @@
 *.pyc
 *.code-workspace
 .idea/
-_build/
+*.local/
+build/**/
+build/.built
+build/*.html
+build/*.pdf
+build/*.epub
 .DS_Store
-**/.asciidoctor
-old/

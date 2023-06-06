@@ -3,7 +3,7 @@
 set -euo pipefail
 
 SRCDIR=$GITHUB_WORKSPACE/asciidoc
-BUILDDIR=/tmp
+BUILDDIR=$GITHUB_WORKSPACE/build
 MAIN="${SRCDIR}"/book.adoc
 
 echo "Building into ${BUILDDIR}"

@@ -8,5 +8,6 @@ services:
       image: asciidoctor/docker-asciidoctor:latest
       container_name: asciidoctor
       volumes:
-        - ../asciidoc:/documents
-        - ../_build:/build
+        - ./asciidoc:/asciidoc
+        - ./build:/build
+        - ./scripts:/scripts
