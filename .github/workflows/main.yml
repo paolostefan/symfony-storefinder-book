@@ -3,10 +3,16 @@ jobs:
   build_pdf:
     runs-on: ubuntu-latest
     name: 'Build that PDF book'
-    steps:
-      # Checkout is needed for local actions
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Run dockerized build script
-        id: bp
-        uses: ./build-action/
+    container:
+      image: asciidoctor/docker-asciidoctor:latest
+      options: "--entrypoint build-action/entrypoint.sh"
+      volumes:
+        - "asciidoc:/documents"
+    # steps:
+    #   # Checkout is needed for local actions
+    #   - name: Checkout
+    #     uses: actions/checkout@v3
+    #   - name: Run dockerized build script
+    #     id: bp
+    #     uses: ./build-action/
+        
