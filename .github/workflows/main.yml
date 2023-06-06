@@ -5,8 +5,8 @@ jobs:
     name: 'Build that PDF book'
     container:
       image: asciidoctor/docker-asciidoctor:latest
-      volumes:
-        - "$WORKSPACE/asciidoc:/documents"
+#       volumes:
+#         - "$WORKSPACE/asciidoc:/documents"
     steps:
       - name: Checkout
         uses: actions/checkout@v3
