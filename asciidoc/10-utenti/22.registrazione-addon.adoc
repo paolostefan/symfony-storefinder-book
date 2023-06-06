@@ -1,18 +1,18 @@
 
 == Arricchiamo il form di registrazione
 
-****
-.icon:github[] Con il repository {sample_git_repo_web}
+// ****
+// .icon:github[] Con il repository {sample_git_repo_web}
 
-Per tornare a questo punto del corso potete fare checkout del tag *0.10.0-reg-base*. (((Git, git checkout)))
+// Per tornare a questo punto del corso potete fare checkout del tag *0.10.0-reg-base*. (((Git, git checkout)))
 
-[source,bash]
-----
-cd /percorso/di/guybrush        # sostituite col percorso corretto
-git checkout -b work 0.10.0-reg-base
-----
+// [source,bash]
+// ----
+// cd /percorso/di/guybrush        # sostituite col percorso corretto
+// git checkout -b work 0.10.0-reg-base
+// ----
 
-****
+// ****
 
 A questo punto del corso, il form di registrazione è operativo e consente la verifica del proprio account inviando un messaggio email. Niente male! +
 Alcuni aspetti però meritano ancora la nostra attenzione:

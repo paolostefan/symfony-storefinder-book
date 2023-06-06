@@ -3,17 +3,17 @@
 [#reverse-geocoding]
 = Reverse geocoding
 
-****
-.icon:github[] Con il repository {sample_git_repo_web}
+// ****
+// .icon:github[] Con il repository {sample_git_repo_web}
 
-Per tornare a questo punto del corso potete fare checkout del ramo *import_command*. (((Git, git checkout)))
+// Per tornare a questo punto del corso potete fare checkout del ramo *import_command*. (((Git, git checkout)))
 
-[source,bash]
-----
-cd /percorso/di/guybrush        # sostituite col percorso corretto
-git checkout import_command
-----
-****
+// [source,bash]
+// ----
+// cd /percorso/di/guybrush        # sostituite col percorso corretto
+// git checkout import_command
+// ----
+// ****
 
 [TIP]
 ====

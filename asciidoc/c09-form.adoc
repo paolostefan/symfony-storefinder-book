@@ -1,22 +1,22 @@
 [#c09-form]
 = I form di Symfony
 
-****
-.icon:github[] Con il repository {sample_git_repo_web}
+// ****
+// .icon:github[] Con il repository {sample_git_repo_web}
 
-Per tornare a questo punto del corso potete fare checkout del ramo *map_search*. (((Git, git checkout)))
+// Per tornare a questo punto del corso potete fare checkout del ramo *map_search*. (((Git, git checkout)))
 
-[source,bash]
-----
-cd /percorso/di/guybrush        # sostituite col percorso corretto
-git checkout map_search
-----
-****
+// [source,bash]
+// ----
+// cd /percorso/di/guybrush        # sostituite col percorso corretto
+// git checkout map_search
+// ----
+// ****
 
-****
-Abbiamo visto che esistono comandi per _definire_ e _modificare_ la struttura delle Entity; in questo capitolo
-impareremo a usare il sistema di gestione dei form messo a disposizione da Symfony.
-****
+// ****
+// Abbiamo visto che esistono comandi per _definire_ e _modificare_ la struttura delle Entity; in questo capitolo
+// impareremo a usare il sistema di gestione dei form messo a disposizione da Symfony.
+// ****
 
 include::09-form/1.crud.adoc[]
 

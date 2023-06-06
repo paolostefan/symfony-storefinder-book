@@ -38,17 +38,17 @@ image::images/3.marker-fissi.png[Marker fissi, pdfwidth=80%]
 
 == Aggiungiamo un box di ricerca
 
-****
-.icon:github[] Con il repository {sample_git_repo_web}
+// ****
+// .icon:github[] Con il repository {sample_git_repo_web}
 
-Per tornare a questo punto del corso potete fare checkout del ramo *empty_map*. (((Git, git checkout)))
+// Per tornare a questo punto del corso potete fare checkout del ramo *empty_map*. (((Git, git checkout)))
 
-[source,bash]
-----
-cd /percorso/di/guybrush        # sostituite col percorso corretto
-git checkout empty_map
-----
-****
+// [source,bash]
+// ----
+// cd /percorso/di/guybrush        # sostituite col percorso corretto
+// git checkout empty_map
+// ----
+// ****
 
 Ora faremo in modo che l'utente possa ricercare i punti di interesse usando il
 box di ricerca presente nella _titlebar_: quando si preme kbd:[Invio] nel box di

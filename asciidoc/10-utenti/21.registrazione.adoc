@@ -1,18 +1,18 @@
 [#registrazione]
 == Creiamo un form di registrazione
 
-****
-.icon:github[] Con il repository {sample_git_repo_web}
+// ****
+// .icon:github[] Con il repository {sample_git_repo_web}
 
-Per tornare a questo punto del corso potete fare checkout del tag *0.9.0-dynamic-users*. (((Git, git checkout)))
+// Per tornare a questo punto del corso potete fare checkout del tag *0.9.0-dynamic-users*. (((Git, git checkout)))
 
-[source,bash]
-----
-cd /percorso/di/guybrush        # sostituite col percorso corretto
-git checkout -b work 0.10.0-reg-base
-----
+// [source,bash]
+// ----
+// cd /percorso/di/guybrush        # sostituite col percorso corretto
+// git checkout -b work 0.10.0-reg-base
+// ----
 
-****
+// ****
 
 Per creare un form che permetta ai visitatori di iscriversi al sito, Symfony mette a disposizione un comando molto potente: `make:registration-form`. Possiamo vedere quante operazioni permette di effettuare questo comando, lanciandolo come segue (sempre da una shell del container *guybrush_php8*):
 

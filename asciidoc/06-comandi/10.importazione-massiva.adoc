@@ -1,17 +1,17 @@
 [#importazione-massiva]
 = Importazione massiva di POI
 
-****
-.icon:github[] Con il repository {sample_git_repo_web}
+// ****
+// .icon:github[] Con il repository {sample_git_repo_web}
 
-Per tornare a questo punto del corso potete fare _checkout_ del tag #NON ESISTE ANCORA#. (((Git, git checkout)))
+// Per tornare a questo punto del corso potete fare _checkout_ del tag #NON ESISTE ANCORA#. (((Git, git checkout)))
 
-[source,bash]
-----
-cd /percorso/di/guybrush        # sostituite col percorso corretto
-git checkout ...
-----
-****
+// [source,bash]
+// ----
+// cd /percorso/di/guybrush        # sostituite col percorso corretto
+// git checkout ...
+// ----
+// ****
 
 A questo punto del corso, nel DB sono presenti due tabelle vuote che 
 rappresentano _Punti di interesse_ e _Categorie_: è il momento di popolarle

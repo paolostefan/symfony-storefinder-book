@@ -1,18 +1,18 @@
 [#c05-database]
 = Symfony e i database
 
-****
-.icon:github[] Con il repository {sample_git_repo_web}
+// ****
+// .icon:github[] Con il repository {sample_git_repo_web}
 
-Per tornare a questo punto del corso potete fare checkout del ramo *base_template*. (((Git, git checkout)))
+// Per tornare a questo punto del corso potete fare checkout del ramo *base_template*. (((Git, git checkout)))
 
-[source,bash]
-----
-cd /percorso/di/guybrush        # sostituite col percorso corretto
-git checkout base_template
-----
+// [source,bash]
+// ----
+// cd /percorso/di/guybrush        # sostituite col percorso corretto
+// git checkout base_template
+// ----
 
-****
+// ****
 
 ****
 A meno che un sito web non sia una landing page o un blog statico, avrà bisogno di un database: è anche il caso del nostro sito.

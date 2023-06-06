@@ -9,32 +9,32 @@ In questo corso i percorsi dei file -salvo dove specificato diversamente- vanno 
 
 include::03-esperimenti/0.install.adoc[]
 
-****
-.icon:github[] Con il repository {sample_git_repo_web}
+// ****
+// .icon:github[] Con il repository {sample_git_repo_web}
 
-Se volete ripartire dal *progetto Symfony vuoto*, potete procedere come segue. (((Git, git checkout)))
+// Se volete ripartire dal *progetto Symfony vuoto*, potete procedere come segue. (((Git, git checkout)))
 
-. Dal vostro PC fate il checkout del ramo *empty_project*.
-+
-[source,bash]
-----
-cd /percorso/di/guybrush   # sostituite col percorso corretto
-git checkout empty_project # passiamo al ramo empty_project
----- 
+// . Dal vostro PC fate il checkout del ramo *empty_project*.
+// +
+// [source,bash]
+// ----
+// cd /percorso/di/guybrush   # sostituite col percorso corretto
+// git checkout empty_project # passiamo al ramo empty_project
+// ---- 
 
-. Dal container cancellate la directory *vendor* e date nuovamente il comando  `composer install`. +
+// . Dal container cancellate la directory *vendor* e date nuovamente il comando  `composer install`. +
 
-[source,bash]
-----
-su developer
-rm -rf vendor/             # cancella i vendor se esistono
-composer install
-----
+// [source,bash]
+// ----
+// su developer
+// rm -rf vendor/             # cancella i vendor se esistono
+// composer install
+// ----
 
-NOTE: Il comando `composer install` installa i pacchetti PHP nella directory *vendor* del progetto, che è volutamente esclusa dal repository.
-Se avevate installato altri pacchetti in precedenza, prima di ridare il comando è opportuno cancellare la directory *vendor* per ripartire da una situazione pulita, di _tabula rasa_.
+// NOTE: Il comando `composer install` installa i pacchetti PHP nella directory *vendor* del progetto, che è volutamente esclusa dal repository.
+// Se avevate installato altri pacchetti in precedenza, prima di ridare il comando è opportuno cancellare la directory *vendor* per ripartire da una situazione pulita, di _tabula rasa_.
 
-****
+// ****
 
 
 include::03-esperimenti/1.prima-pagina.adoc[]
