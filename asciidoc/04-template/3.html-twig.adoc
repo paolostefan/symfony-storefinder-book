@@ -9,7 +9,7 @@ Quando parliamo di template _di siti web_, pur usando la stessa parola, intendia
 === Il template di sito web che useremo
 
 (((Material design)))
-Il template che useremo si chiama {template_git_repo_web}[(({template_name}))]: è basato su ((Bootstrap)) 3, ha molte funzionalità utilizzabili con un semplice copia/incolla, è colorato ed è *gratuito*. Inoltre, è incluso nel repository {sample_git_repo} (è contenuto nella directory */html_template*) ed è servito da un container Docker, quindi se abbiamo dato il comando `docker-compose up`, ci basterà visitare la pagina <http://localhost:8081/> per poter esplorare il template. 
+Il template che useremo si chiama {template_git_repo_web}[(({template_name}))]: è basato su ((Bootstrap)) 3, ha molte funzionalità utilizzabili con un semplice copia/incolla, è colorato ed è *gratuito*. Inoltre, è incluso nel repository {sample_git_repo} (è contenuto nella directory */html_template*) ed è servito da un container Docker, quindi se abbiamo dato il comando `docker compose up`, ci basterà visitare la pagina <http://localhost:8081/> per poter esplorare il template. 
 Prendiamoci qualche minuto per esplorare le pagine presenti in questo template.
 
 Se volete scaricare questo template separatamente potete:

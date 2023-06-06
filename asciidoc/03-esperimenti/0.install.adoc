@@ -4,7 +4,7 @@
 Nelle prossime righe creeremo un progetto Symfony dal _container_ *guybrush_php8*, e (come vedremo tra poco) in una directory del nostro computer compariranno i file dello scheletro della web application. 
 
 ****
-.icon:binoculars[] La magica directory condivisa
+.icon:fas-binoculars[] La magica directory condivisa
 
 Per sviluppare sul nostro computer e far leggere i sorgenti al container *guybrush_php8* in tempo reale, useremo una directory condivisa. Nel file *docker-compose.yml* ci sono le seguenti righe: (((docker-compose.yml, Direttiva `volumes`)))
 
@@ -23,10 +23,10 @@ La riga `../guybrush:/var/www/html/guybrush` dice quindi a ((docker-compose)) ch
 // ifeval::["{virtual}" == "Vagrant"]
 
 // La directory */vagrant* del container *guybrush_php8* è _condivisa_ fra 
-// macchina host (il vostro computer) e macchina guest (il container 
+// macchina host (il tuo computer) e macchina guest (il container 
 // *guybrush_php8*): è cioè visibile sia dal container che dalla vostra macchina
 // di sviluppo. +
-// Tecnicamente, questa directory del vostro PC/Mac è uno share <<nfs,((NFS))>>
+// Tecnicamente, questa directory del tuo PC/Mac è uno share <<nfs,((NFS))>>
 // montato nel container *guybrush_php8*.
 
 // endif::[]
@@ -74,7 +74,7 @@ Vedremo che il file contiene esattamente quello che vi abbiamo appena scritto.
 === Creiamo il progetto Symfony
 
 Ogni progetto Symfony ha bisogno di un nome: per questo corso ho scelto il nome *_Guybrush_* ispirandomi al protagonista di _Monkey Island_, un videogioco nato negli anni '90. +
-Per creare un progetto Symfony si usa la shell, quindi dovremo connetterci al container *guybrush_php8* (ora è finalmente chiaro il perché di questo nome icon:smile-o[]) e lanciare i seguenti comandi.
+Per creare un progetto Symfony si usa la shell, quindi dovremo connetterci al container *guybrush_php8* (ora è finalmente chiaro il perché di questo nome icon:far-smile[]) e lanciare i seguenti comandi.
 
 [source,bash]
 ----

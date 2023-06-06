@@ -52,7 +52,7 @@ composer require friendsofsymfony/user-bundle
 
 == 2. Abilitazione del Bundle
 
-In Symfony 4 non serve! icon:smile-o[]
+In Symfony 4 non serve! icon:far-smile[]
 
 [#par3]
 == 3. Creazione della Entity user
@@ -97,7 +97,7 @@ class User extends BaseUser
 Prima della definizione della classe, abbiamo scritto l'annotazione *@ORM\Table(name="fos_user")*: *fos_user* è il nome che verrà dato alla tabella nel db, ed è arbitrario - cioè, possiamo usare qualsiasi altro nome, ad es. *app_user*. +
 In assenza di questa annotazione, Doctrine userà per la tabella  il _nome_ della Entity reso minuscolo, cioè *user*; questa però è una parola riservata (*keyword*) di MySQL e potrebbe generare _malintesi_ fra Symfony e MySQL.
 
-*Quindi*: usiamo l'annotazione *@ORM\Table(name=...)*, cercando di evitare *name=user* . icon:smile-o[]
+*Quindi*: usiamo l'annotazione *@ORM\Table(name=...)*, cercando di evitare *name=user* . icon:far-smile[]
 ====
 
 == 4. Impostazione del firewall di Symfony

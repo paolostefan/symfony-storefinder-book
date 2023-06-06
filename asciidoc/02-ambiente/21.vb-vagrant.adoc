@@ -74,7 +74,7 @@ Il prompt diventerà `vagrant@vagrant:~$`, ad indicare che la Shell con cui stia
 
 === Come verificare se la VM è accesa?
 
-Se abbiamo aperto una shell sulla VM, sicuramente è accesa. icon:smile-o-wink[] Altrimenti, dalla shell del _nostro computer_, posizioniamoci nella directory del progetto e digitiamo `vagrant status`.(((Vagrant,vagrant status))) La VM *è accesa* se l'output del comando comincia con:
+Se abbiamo aperto una shell sulla VM, sicuramente è accesa. icon:far-smile-wink[] Altrimenti, dalla shell del _nostro computer_, posizioniamoci nella directory del progetto e digitiamo `vagrant status`.(((Vagrant,vagrant status))) La VM *è accesa* se l'output del comando comincia con:
 
 ----
 Current machine states:

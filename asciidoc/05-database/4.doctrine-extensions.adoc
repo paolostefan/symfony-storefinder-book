@@ -1,3 +1,5 @@
+
+
 == Doctrine Extensions
 
 Accedere al DB tramite Doctrine è un passo avanti rispetto a scrivere le query una ad una, però è possibile spingersi oltre e automatizzare altre operazioni, come:
@@ -13,7 +15,7 @@ Queste e molte altre operazioni possono essere agevolate o rese *trasparenti* gr
 [IMPORTANT]
 ====
 Nel momento in cui scrivo, il pacchetto ufficiale non è compatibile con Symfony 5.2, per cui dovremo usare un fix temporaneo footnote:doctrinexfix[Le istruzioni per il fix temporaneo delle Doctrine Extensions è descritto qui: <https://github.com/antishov/StofDoctrineExtensionsBundle/issues/23#issuecomment-685991439>] per poterlo installare. +
-Prima di procedere consiglio caldamente di *effettuare un commit* dei sorgenti con git: se usate la shell, dal *vostro computer* date i comandi:
+Prima di procedere consiglio caldamente di *effettuare un commit* dei sorgenti con git: se usate la shell, dal *tuo computer* date i comandi:
 
 [source,bash]
 ----
@@ -25,10 +27,10 @@ git commit -m "Work in progress"
 ====
 
 ****
-.icon:rocket[] Se state usando Symfony 5.0 o 4.x
+.icon:fas-rocket[] Se state usando Symfony 5.0 o 4.x
 [NOTE]
 ====
-Se non avete seguito il corso alla lettera, e/o state usando la versione 5.0 o 4.x di Symfony, potete dare semplicemente il comando (dal container *guybrush_php8*):
+Se non hai seguito il corso alla lettera, e/o state usando la versione 5.0 o 4.x di Symfony, potete dare semplicemente il comando (dal container *guybrush_php8*):
 
 [source,bash]
 ----
@@ -169,7 +171,7 @@ Rispondiamo come segue alle domande del _console command_:
  > 
 ----
 
-TIP: Avete notato niente di nuovo? +
+TIP: hai notato niente di nuovo? +
 Il comando `make:entity` è sufficientemente sveglio da capire che se il nome
 di un campo finisce per *At*, può trattarsi di un campo che ha a che fare
 col tempo, e propone di default il tipo _datetime_.
@@ -194,7 +196,7 @@ col tempo, e propone di default il tipo _datetime_.
 //   }
 // ----
 
-// La fantomatica variabile `${dbl_}EXTRA{dbl_}LINE` non ha alcuna utilità; rimane lì per colpa di un bug del comando (o una _feature_ non richiesta icon:smile-o[]). In ogni caso, tutte le righe che la contengono possono essere cancellate senza timore. +
+// La fantomatica variabile `${dbl_}EXTRA{dbl_}LINE` non ha alcuna utilità; rimane lì per colpa di un bug del comando (o una _feature_ non richiesta icon:far-smile[]). In ogni caso, tutte le righe che la contengono possono essere cancellate senza timore. +
 // Controlliamo se nel file `src/Entity/Poi.php` ci sono riferimenti di questo tipo e, se ce ne sono, cancelliamoli tutti prima di proseguire.
 // ====
 

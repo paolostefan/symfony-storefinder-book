@@ -91,7 +91,7 @@ Ricarichiamo la pagina e dovremmo ottenere qualcosa di simile.
 
 image::images/3.mappa-85ca9.png[Edit e mappa,759]
 
-Alcuni dettagli vanno sistemati, _in primis_ lo zoom e la centratura della mappa. Vogliamo centrare la mappa alle coordinate del *POI*, e mostrare  un'area circoscritta intorno ad esso, e non _tutto il continente_. icon:smile-o[] +
+Alcuni dettagli vanno sistemati, _in primis_ lo zoom e la centratura della mappa. Vogliamo centrare la mappa alle coordinate del *POI*, e mostrare  un'area circoscritta intorno ad esso, e non _tutto il continente_. icon:far-smile[] +
 
 ==== Coordinate del POI
 

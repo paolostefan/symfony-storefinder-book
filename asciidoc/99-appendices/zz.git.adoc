@@ -2,7 +2,7 @@
 [appendix]
 = Perché git
 
-Forse la domanda giusta è "perché no?" icon:smile-o[] A parte gli scherzi, esistono <<git,decine di articoli su questo argomento>>, e lascio a te approfondire i vantaggi di usare un VCS, o meglio, gli _svantaggi di non usarlo_. Di seguito puoi trovare un esempio di vita reale con e senza un VCS.
+Forse la domanda giusta è "perché no?" icon:far-smile[] A parte gli scherzi, esistono <<git,decine di articoli su questo argomento>>, e lascio a te approfondire i vantaggi di usare un VCS, o meglio, gli _svantaggi di non usarlo_. Di seguito puoi trovare un esempio di vita reale con e senza un VCS.
 
 == Esempio di vita reale con e senza VCS
 
@@ -19,7 +19,7 @@ A questo punto scopriamo che la v1.1 va in crash su iPhone N con iOS 43.2.1, cos
 
 | Non possiamo ripristinare la 1.0 neanche temporaneamente: la nostra app in produzione è *inservibile* su iPhone N.| Salviamo le modifiche fatte finora per la v1.1; ripristiniamo la v1.0 dal VCS come nuovo ramo di sviluppo; rilasciamo nuovamente la v1.0 come patch (ad es. 1.1.2), che non è il massimo ma riporta un minimo di serenità agli utenti.
 
-| Dobbiamo lavorare anche di notte per sistemare questo problema, o le recensioni negative sull'app store diventeranno eccessive. icon:frown-o[] | L'app in produzione è *salva* e possiamo pensare a correggere la versione 1.1. icon:smile-o[]
+| Dobbiamo lavorare anche di notte per sistemare questo problema, o le recensioni negative sull'app store diventeranno eccessive. icon:far-frown[] | L'app in produzione è *salva* e possiamo pensare a correggere la versione 1.1. icon:far-smile[]
 
 |===
 

@@ -39,7 +39,7 @@ image::images/3.marker-fissi.png[Marker fissi, pdfwidth=80%]
 == Aggiungiamo un box di ricerca
 
 // ****
-// .icon:github[] Con il repository {sample_git_repo_web}
+// .icon:fab-github[] Con il repository {sample_git_repo_web}
 
 // Per tornare a questo punto del corso potete fare checkout del ramo *empty_map*. (((Git, git checkout)))
 
@@ -97,7 +97,7 @@ class SuperController{
 }
 ----
 
-<1> : Inserite il percorso relativo del file template che avete copiato.
+<1> : Inserite il percorso relativo del file template che hai copiato.
 
 La gestione del campo di ricerca verrà effettuata da Javascript, e il posto più corretto in cui scrivere questo codice è nell'ultimo tag `<script>` della pagina, dopo il codice con cui abbiamo creato i marker fissi. Possiamo usare ((jQuery)) per "ascoltare" l'evento `submit` del form, ed usare `$.ajax()` nella funzione che chiameremo (detta anche _((handler))_). Per fornire all'utente un'esperienza soddisfacente bisogna evitargli attese inutili, quindi dovremo:
 

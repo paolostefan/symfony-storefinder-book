@@ -1,4 +1,5 @@
 
+
 == Connettiamoci
 
 ifeval::["{virtual}" == "Docker"]
@@ -12,7 +13,7 @@ Per capire se *Symfony si connette correttamente al DB*, possiamo usare un trucc
 php bin/console doctrine:query:sql "SELECT 1;"
 ----
 
-icon:rocket[] Se non riceviamo messaggi di errore, siamo pronti a usare il database da Symfony: saltiamo a <<entity_cos_e>>
+icon:fas-rocket[] Se non riceviamo messaggi di errore, siamo pronti a usare il database da Symfony: saltiamo a <<entity_cos_e>>
 
 
 === Driver non trovato?

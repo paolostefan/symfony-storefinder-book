@@ -1,13 +1,15 @@
+
+
 ****
-icon:rocket[] Se avete già un IDE e Git, potete saltare al capitolo <<repo>>.
+icon:fas-rocket[] Se hai già un IDE e Git, potete saltare al capitolo <<repo>>.
 ****
 
 == IDE (((IDE)))
 
 TIP: *IDE* è l'acronimo di **I**ntegrated **D**evelopment **E**nvironment, cioè "ambiente di sviluppo integrato": è un programma che include, oltre ad un editor di testo, una serie di altri strumenti che permettono di interagire ad es. con compilatori, interpreti, client FTP (per il deploy) e strumenti per il controllo delle versioni.
 
-Non esiste *_la_* scelta migliore in assoluto: va benissimo l'editor/IDE che (probabilmente) avete già installato. +
-Se dovete ancora decidere, quelli che preferisco sono https://www.jetbrains.com/phpstorm/[((PhpStorm)) ®] (a pagamento dopo 30 giorni di prova gratuita) e https://code.visualstudio.com/[((Visual Studio Code))]. Fra le tante alternative gratuite troviamo https://netbeans.org/downloads/[NetBeans] ed https://www.eclipse.org/downloads/[Eclipse], mentre https://atom.io/[Atom] e https://www.sublimetext.com/[Sublime Text] pur non essendo veri e propri IDE, sono prodotti molto validi ed estensibili grazie a una miriade di plugin.
+Non esiste *_la_* scelta migliore in assoluto: va benissimo l'editor/IDE che (probabilmente) hai già installato. +
+Se devi ancora decidere, quelli che preferisco sono https://www.jetbrains.com/phpstorm/[((PhpStorm)) ®] (a pagamento dopo 30 giorni di prova gratuita) e https://code.visualstudio.com/[((Visual Studio Code))]. Fra le tante alternative gratuite troviamo https://netbeans.org/downloads/[NetBeans] ed https://www.eclipse.org/downloads/[Eclipse], mentre https://atom.io/[Atom] e https://www.sublimetext.com/[Sublime Text] pur non essendo veri e propri IDE, sono prodotti molto validi ed estensibili grazie a una miriade di plugin.
 
 
 == Controllo delle versioni: Git
@@ -18,7 +20,8 @@ Grazie a Git, ad esempio, se durante lo sviluppo ci troviamo ad un punto morto i
 TIP: I programmi come Git sono detti *((VCS))* oppure *((SCM))*. *VCS* è l'acronimo di **V**ersion **C**ontrol **S**ystem, sistema di controllo delle versioni; *SCM* sta per **S**ource **C**ode **M**anager, gestore dei sorgenti.
 
 
-=== Installare Git su Linux icon:linux[]
+
+=== Installare Git su Linux icon:fab-linux[]
 
 Tipicamente va dato il comando `[package-manager] install git`.
 
@@ -47,7 +50,7 @@ yum install git
 
 Per altre distribuzioni, è possibile consultare le istruzioni nel <<git_linux,sito di Git-scm>>.
 
-=== Installare Git su MacOS icon:apple[]
+=== Installare Git su MacOS icon:fab-apple[]
 
 Su MacOS è possibile installare Git in diversi modi; il più semplice forse è installare gli _Xcode Command Line Tools_. +
 Da MacOS Mavericks (10.9) in poi, per installarli basta lanciare git da Terminale.
@@ -61,7 +64,7 @@ Se *Git* non è installato, MacOS chiederà se vogliamo installare gli _Xcode Co
 l'installazione proseguirà in automatico.
 
 
-=== Installare Git su Windows icon:windows[]
+=== Installare Git su Windows icon:fab-windows[]
 
 Le istruzioni per l'installazione sono presenti nel <<git_install,sito di Git-scm>>.
 
@@ -76,26 +79,26 @@ Il codice che scriveremo in questo corso è disponibile in un repository Git pub
 Questo repo contiene i file di configurazione necessari per creare l'ambiente
 di _runtime_ (v. capitolo successivo), e tutto il codice che scriveremo
 durante il corso. +
-Quando nel testo troverete questa icona icon:github[], ci saranno anche le
+Quando nel testo troverete questa icona icon:fab-github[], ci saranno anche le
 indicazioni su come scaricare la relativa porzione di codice dal repository. +
 Scrivere codice in autonomia è il modo migliore per imparare;
-vi suggerisco però di clonare il repo (cioè scaricarlo sul vostro computer)
+vi suggerisco però di clonare il repo (cioè scaricarlo sul tuo computer)
 per due motivi: potrete allestire il _runtime_ più rapidamente, e sarà più
 semplice ripartire nel caso vi capiti di _piantarvi_ (succede a
 chiunque scriva codice). Nulla vieta ad es. di tenere il repository clonato in
 *una directory*, e i sorgenti che state scrivendo in *un'altra*: in tal modo
-potrete implementare a modo vostro il progetto senza perdere troppo tempo su
+potrete implementare a modo tuo il progetto senza perdere troppo tempo su
 questioni meno divertenti. (((Git, git clone)))
 
 ****
-icon:github[] Per _clonare_ il repository da shell, potete digitare il comando:
+icon:fab-github[] Per _clonare_ il repository da shell, potete digitare il comando:
 
 [source,bash,subs=attributes+]
 ----
-git clone --recurse-submodules {sample_git_repo}
+git clone --recurse-submodules {sample_git_repo} gsac/
 ----
 
-Questo comando effettuerà il download del repo creando una subdirectory di nome
-*gsac* nella directory corrente.
+Questo comando effettuerà il download del repo creando una subdirectory di nome *gsac* (Give Symfony A Chance) nella directory corrente.
 
 ****
+

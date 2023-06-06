@@ -2,7 +2,7 @@
 = Importazione massiva di POI
 
 // ****
-// .icon:github[] Con il repository {sample_git_repo_web}
+// .icon:fab-github[] Con il repository {sample_git_repo_web}
 
 // Per tornare a questo punto del corso potete fare _checkout_ del tag #NON ESISTE ANCORA#. (((Git, git checkout)))
 
@@ -28,7 +28,7 @@ Symfony scritto da noi.
 
 == Come creare un comando
 
-Per creare un nuovo comando, si può usare il comando (non è un gioco di parole icon:smile-o[]) `make:command`.
+Per creare un nuovo comando, si può usare il comando (non è un gioco di parole icon:far-smile[]) `make:command`.
 È possibile specificare come argomento l'_alias_ che vogliamo associare al nuovo comando, 
 cioè una stringa di caratteri alfanumerici (preferibilmente, solo lettere minuscole) ed eventualmente il carattere `:`
 da usare come separatore per i ((namespace)). +
@@ -161,7 +161,7 @@ Il comando dovrebbe semplicemente dirci:
 
      ! [NOTE] File ok 
 
-Funziona? Ok, allora modifichiamolo! icon:smile-o[]
+Funziona? Ok, allora modifichiamolo! icon:far-smile[]
 
 == Cosa deve fare il comando
 
@@ -234,7 +234,7 @@ image::file-ok.png[]
 [TIP]
 .Shortcut per comandi solitari (((Shortcut, per comandi)))
 ====
-Forse avete notato che negli screenshot il comando non è `poi:import` ma `poi:`. + 
+Forse hai notato che negli screenshot il comando non è `poi:import` ma `poi:`. + 
 Quando un _namespace_ (nel nostro caso, `poi`) contiene 
 *un solo comando*, è possibile invocare il comando usando il solo nome del namespace seguito dai due punti.
 ====

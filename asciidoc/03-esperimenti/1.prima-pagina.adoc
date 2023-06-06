@@ -1,3 +1,5 @@
+
+
 [#prima-pagina]
 == La nostra prima pagina
 
@@ -183,7 +185,7 @@ In assenza dell'argomento **name="..."**, Symfony assegnerà alla rotta il nome 
 
 ====
 
-Ora che abbiamo definito il metodo *HomeController::index()*, all'URL <http://localhost:8080/> dovrebbe comparire la scritta "Benvenuto da Guybrush!", in font Times nero su fondo bianco (uno stile molto *_Web 1.0_* icon:smile-o[]).
+Ora che abbiamo definito il metodo *HomeController::index()*, all'URL <http://localhost:8080/> dovrebbe comparire la scritta "Benvenuto da Guybrush!", in font Times nero su fondo bianco (uno stile molto *_Web 1.0_* icon:far-smile[]).
 
 ****
 
@@ -203,7 +205,7 @@ Se avevamo già visitato questo URL, può darsi che Symfony e/o il browser stian
 php bin/console cache:clear
 ----
 
-icon:comment-o[] *Quindi… ogni volta che modifichiamo una virgola dobbiamo fare questo giro?*
+icon:far-comment[] *Quindi… ogni volta che modifichiamo una virgola dobbiamo fare questo giro?*
 
 No, non è necessario, a meno che Symfony non sia in modalità _produzione_ (vedremo come farlo alla fine del corso).
 

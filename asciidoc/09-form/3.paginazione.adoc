@@ -1,3 +1,5 @@
+
+
 == Paginazione
 
 :jqdt: jQuery DataTables
@@ -170,7 +172,7 @@ Per verificare se l'_endpoint_ funziona, proviamo a visitarlo con il browser agg
 
 TIP: I parametri `start` e `length` hanno valori di default (rispettivamente *0* e *10*), per cui possono essere omessi, ma per verificare che vengano utilizzati nel modo richiesto li dovremo comunque specificare.
 
-=== Cabliamo icon:plug[]
+=== Cabliamo icon:fas-plug[]
 
 Ora che il "backend" è pronto, possiamo dire a {jqdt} di usarlo. L'oggetto da passare alla funzione Javascript *$().DataTable()* dovrà contenere parametri diversi, nella fattispecie:
 

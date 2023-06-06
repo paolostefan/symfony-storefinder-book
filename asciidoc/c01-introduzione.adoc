@@ -46,7 +46,7 @@ Per seguire il corso è necessaria una conoscenza di base di:
 
 Per seguire questo corso serviranno:
 
-. Un *computer* icon:smile-o[] con cui scrivere il codice; _non basta uno smartphone o un tablet_. Puoi usare indifferentemente un Mac, o un PC con Windows o Linux.
+. Un *computer* icon:far-smile[] con cui scrivere il codice; _non basta uno smartphone o un tablet_. Puoi usare indifferentemente un Mac, o un PC con Windows o Linux.
 
 . Accesso a Internet per il download dei software: se stai usando un PC pubblico, o sei in una rete protetta da un firewall particolarmente restrittivo, il download potrebbe non essere consentito.
 
@@ -56,27 +56,25 @@ Per seguire questo corso serviranno:
 
 ****
 [NOTE]
-.Shell su Windows(TM) icon:windows[]
+.Shell su Windows icon:fab-windows[]
 ====
-Symfony può funzionare con Microsoft(R) _Windows_(TM) ed è possibile interagirvi con PowerShell; però, lo scopo di questo corso non è imparare a usare Symfony su Windows, bensì realizzare un progetto con Symfony.
+Symfony può funzionare con Microsoft _Windows_ usando sia il prompt dei comandi sia PowerShell; lo scopo di questo corso però è realizzare un progetto con Symfony, e non imparare a usare Symfony su Windows.
 
 Se segui questo corso usando Windows, sconsiglio di utilizzare il prompt dei comandi (*cmd.exe*) o PowerShell; piuttosto, consiglio di utilizzare WSL2 (puoi usare la distro che preferisci) oppure https://git-scm.com/downloads[Git per Windows], che  comprende una *shell* alternativa con la quale potrai seguire alla lettera le indicazioni del corso. +
-Se usi la shell di *Git for Windows* tieni presente che:
+Se usi la shell di *Git for Windows* -forse lo sai già- tieni presente che:
 
-. i percorsi dei file vanno scritti come su Linux/MacOS, cioè usando come separatore delle directory questo slash `/` anziché quello predefinito di Windows (`\`)
-. i percorsi dei dischi non sono *C:\*, *D:\*, ecc. ma */c/*, */d/*, ecc.: se ad esempio il percorso di una directory in _Esplora risorse_ è `C:\percorso\della\directory\`, nella shell di *Git for Windows* andrà scritto così:
-
-    `/c/percorso/della/directory/`
+. i percorsi dei file usano il separatore delle directory di Linux/MacOS, cioè questo slash `/` , e non quello di Windows (cosiddetto _backslash_: `\`);
+. i percorsi dei dischi non sono *C:\*, *D:\*, ecc. ma */c/*, */d/*, ecc.: ad esempio se il percorso di una directory in _Esplora risorse_ è `C:\percorso\della\directory\`, nella shell di *Git for Windows* andrà scritto come `/c/percorso/della/directory/` .
 ====
 ****
-<<<
-
 
 === Perché Symfony
 
 * Per evitare di _reinventare la ruota_: Symfony risolve una serie di annosi problemi in maniera efficace, _in primis_ la gestione dei template e le interazioni con il database.
 * Per creare una soluzione scalabile e gestibile nel tempo.
 * Per abituarsi a progettare e programmare in maniera strutturata.
+
+<<<
 
 == Icone
 
@@ -86,13 +84,16 @@ Quando toverete un trafiletto con una delle icone seguenti... il significato è 
 |===
 |Icona |Significato
 
-|icon:rocket[]
+
+|icon:fas-rocket[]
 |È possibile saltare ad un paragrafo o capitolo successivo.
 
-|icon:github[]
+
+|icon:fab-github[]
 |È possibile scaricare il codice di questa lezione dal repository Git.
 
-|icon:binoculars[]
-|Approfondimento o curiosità. Generalmente si può saltare se avete fretta di procedere con lo sviluppo.
+
+|icon:fas-binoculars[]
+|Approfondimento o curiosità. Generalmente si può saltare se hai fretta di procedere con lo sviluppo.
 
 |===

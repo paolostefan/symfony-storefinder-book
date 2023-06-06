@@ -2,7 +2,7 @@
 == Arricchiamo il form di registrazione
 
 // ****
-// .icon:github[] Con il repository {sample_git_repo_web}
+// .icon:fab-github[] Con il repository {sample_git_repo_web}
 
 // Per tornare a questo punto del corso potete fare checkout del tag *0.10.0-reg-base*. (((Git, git checkout)))
 

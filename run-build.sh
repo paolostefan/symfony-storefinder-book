@@ -40,7 +40,7 @@ while getopts "hep" opt; do
   esac
 done
 
-set -euxo pipefail
+set -euo pipefail
 
 # build HTML book
 docker compose run adoc /scripts/build.sh $@ -o /build 

@@ -4,7 +4,7 @@
 = Reverse geocoding
 
 // ****
-// .icon:github[] Con il repository {sample_git_repo_web}
+// .icon:fab-github[] Con il repository {sample_git_repo_web}
 
 // Per tornare a questo punto del corso potete fare checkout del ramo *import_command*. (((Git, git checkout)))
 
@@ -97,7 +97,7 @@ Per effettuare la geocodifica inversa utilizzeremo l'API di *<<mapquest,((MapQue
 Vista l'utilità del servizio di geocodifica (diretta e inversa) molte realtà si sono date da fare per fornirlo, tutte o quasi con formula _freemium_ cioè gratuita fino a un certo numero di richieste; spesse volte le restrizioni sono piuttosto pesanti: ad es. _((Google Maps))_ richiede un account di _fatturazione_ con una carta di credito *non prepagata*, mentre _((OpenStreetMap))_ fissa un limite di *una richiesta al secondo* e *mille richieste al mese* (decisamente poco per le nostre esigenze). +
 Ho scelto di usare MapQuest perché con un account gratuito consente di effettuare fino a *15.000* richieste al mese, è un progetto mantenuto attivamente e ha un'ottima <<mapquest_docs,documentazione>>.
 
-Se possedete già una chiave API di un altro provider, può essere un esercizio utile partire dal comando che stiamo scrivendo e modificare le chiamate al _webservice_ secondo le specifiche del vostro provider.
+Se possedete già una chiave API di un altro provider, può essere un esercizio utile partire dal comando che stiamo scrivendo e modificare le chiamate al _webservice_ secondo le specifiche del tuo provider.
 
 ////
 Esempio di URL di richiesta di geocodifica di openstreetmap
@@ -194,7 +194,7 @@ class Poi
 
 == Il comando completo
 
-Io l'ho scritto così, ma sono convinto che il vostro funziona altrettanto bene,
+Io l'ho scritto così, ma sono convinto che il tuo funziona altrettanto bene,
 se non meglio.
 
 [source,php,linenums]

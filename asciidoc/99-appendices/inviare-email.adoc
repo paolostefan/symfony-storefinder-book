@@ -36,7 +36,7 @@ NOTE: L'elenco completo dei provider supportati è presentato nella pagina https
 
 === GMail
 
-Se avete un indirizzo email su GMail, potete utilizzare i server SMTP di Google per inviare email (fino ad un massimo di 2000 al giorno). Per facilitare il compito esiste un pacchetto dedicato, installabile con il comando footnote:ignoreplatformreqs[Il parametro `--ignore-platform-reqs` è necessario solo perché l'infrastruttura Docker usata nel corso utilizza PHP 8, che non è pienamente supportato da Doctrine 2.8.]:
+Se hai un indirizzo email su GMail, potete utilizzare i server SMTP di Google per inviare email (fino ad un massimo di 2000 al giorno). Per facilitare il compito esiste un pacchetto dedicato, installabile con il comando footnote:ignoreplatformreqs[Il parametro `--ignore-platform-reqs` è necessario solo perché l'infrastruttura Docker usata nel corso utilizza PHP 8, che non è pienamente supportato da Doctrine 2.8.]:
 
 [source, bash]
 ----
@@ -52,7 +52,7 @@ Una volta installato il pacchetto, bisogna specificare le proprie credenziali ne
 MAILER_DSN=gmail://iltuoindirizzo@gmail.com:password@default
 ----
 
-IMPORTANT: La password da inserire qui non è necessariamente la quella del vostro account Google. Se state usando l'autenticazione a due fattori, è necessario creare una _App password_ all'URL https://myaccount.google.com/apppasswords e utilizzare quella.
+IMPORTANT: La password da inserire qui non è necessariamente la quella del tuo account Google. Se state usando l'autenticazione a due fattori, è necessario creare una _App password_ all'URL https://myaccount.google.com/apppasswords e utilizzare quella.
 
 
 Se siete arrivati a questa appendice dal capitolo <<registrazione>>, potete tornare al punto corretto usando <<registrazione_mail_config_ok,questo link>>.

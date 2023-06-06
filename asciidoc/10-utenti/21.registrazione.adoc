@@ -2,7 +2,7 @@
 == Creiamo un form di registrazione
 
 // ****
-// .icon:github[] Con il repository {sample_git_repo_web}
+// .icon:fab-github[] Con il repository {sample_git_repo_web}
 
 // Per tornare a questo punto del corso potete fare checkout del tag *0.9.0-dynamic-users*. (((Git, git checkout)))
 
@@ -197,6 +197,6 @@ Possiamo migliorare ulteriormente l'aspetto della pagina con alcune accortezze (
 
 . Animare gli alert usando il plugin *animate-css* footnote:animate-css[La pagina relativa al plugin *animate-css* è disponibile all'URL http://localhost:8081/pages/ui/animations.html .].
 
-IMPORTANT: Alla fine dell'esercizio, o se non avete voglia di farlo, ricordatevi di cancellare le istruzioni `$session->getFlashBag()->add()` dall'azione *login()*: le avevamo aggiunte solo per provare a visualizzare messaggi!
+IMPORTANT: Alla fine dell'esercizio, o se non hai voglia di farlo, ricordatevi di cancellare le istruzioni `$session->getFlashBag()->add()` dall'azione *login()*: le avevamo aggiunte solo per provare a visualizzare messaggi!
 
 <<<

@@ -177,7 +177,7 @@ Quindi, per togliere il campo *updatedAt* sarà sufficiente commentare o cancell
     ;
 ----
 
-C'è ancora una sbavatura icon:frown-o[] : il campo *Category* ha _due_ menu dropdown, uno sopra l'altro. Come mai? +
+C'è ancora una sbavatura icon:far-frown[] : il campo *Category* ha _due_ menu dropdown, uno sopra l'altro. Come mai? +
 Il template _{template_name}_ usa il plugin Javascript *bootstrap-select*, che sostituisce i tag *select* predefiniti del browser con un dropdown più carino (o meglio, crea un widget aggiuntivo nascondendo il _select_ originale). Nel nostro form però, qualcosa non va per il verso giusto, e siccome il dropdown di Bootstrap è già più bello di quello di default, ci viene più facile disattivare globalmente il plugin *bootstrap-select*. Nel file */templates/base.html.twig* troviamo la riga seguente e commentiamola (ricordiamo che in ((Twig)) i commenti sono racchiusi tra `{\#` e `#}`).
 
 [source,diff]
