@@ -11,7 +11,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: List working dir on container
-        run: "ls -la /__w"
+        run: "ls -la /__w/symfony-storefinder-book/"
       # - name: Run dockerized build script
       #   id: bp
       #   run: "bash ./scripts/github-build-pdf.sh"
