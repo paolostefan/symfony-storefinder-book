@@ -5,14 +5,12 @@ jobs:
     name: 'Build that PDF book'
     container:
       image: asciidoctor/docker-asciidoctor:latest
-      options: "--entrypoint build-action/entrypoint.sh"
       volumes:
         - "asciidoc:/documents"
-    # steps:
-    #   # Checkout is needed for local actions
-    #   - name: Checkout
-    #     uses: actions/checkout@v3
-    #   - name: Run dockerized build script
-    #     id: bp
-    #     uses: ./build-action/
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run dockerized build script
+        id: bp
+        run: ./build-action/entrypoint.sh
         
