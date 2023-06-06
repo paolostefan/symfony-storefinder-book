@@ -10,9 +10,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Zio
-        run: "ls -la /documents"
-      - name: Run dockerized build script
-        id: bp
-        run: "bash ./scripts/github-build-pdf.sh"
+      - name: List working dir on container
+        run: "ls -la /__w"
+      # - name: Run dockerized build script
+      #   id: bp
+      #   run: "bash ./scripts/github-build-pdf.sh"
         
