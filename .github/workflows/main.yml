@@ -14,8 +14,13 @@ jobs:
       - name: Build PDF
         id: bp
         run: "bash ./scripts/github-build-pdf.sh"
+      - name: Upload PDF
+        uses: actions/upload-artifact@v3
+        with:
+          name: pdf
+          path: ${{ steps.bp.outputs.PDF_PATH }}
       - name: Download PDF
         uses: actions/download-artifact@v3
         with:
-          name: ${{ steps.bp.outputs.PDF_PATH }}
+          name: pdf
         
