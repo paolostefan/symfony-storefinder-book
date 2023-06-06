@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-SRCDIR=/documents
+SRCDIR=$GITHUB_WORKSPACE/asciidoc
 BUILDDIR=/tmp
 MAIN="${SRCDIR}"/book.adoc
 

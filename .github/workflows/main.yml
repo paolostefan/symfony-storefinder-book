@@ -5,16 +5,12 @@ jobs:
     name: 'Build that PDF book'
     container:
       image: asciidoctor/docker-asciidoctor:latest
-#       volumes:
-#         - "$WORKSPACE/asciidoc:/documents"
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: List working dir on container
-        run: |
-          ls -la /documents
-          ls -la $GITHUB_WORKSPACE
-      # - name: Run dockerized build script
-      #   id: bp
-      #   run: "bash ./scripts/github-build-pdf.sh"
+        run: ls -la $GITHUB_WORKSPACE/asciidoc
+      - name: Run dockerized build script
+        id: bp
+        run: "bash ./scripts/github-build-pdf.sh"
         
