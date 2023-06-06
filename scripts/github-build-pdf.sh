@@ -8,7 +8,7 @@ MAIN="${SRCDIR}"/book.adoc
 
 echo "Building into ${BUILDDIR}"
 
-# Increment build number (variable in ${MAIN} asciidoc file)
+# Get current build number (variable in ${MAIN} asciidoc file)
 BUILDNO=$(cat ${MAIN} | grep :build: | cut -d ' ' -f 2)
 
 echo "Build n. ${BUILDNO}"
@@ -19,6 +19,9 @@ asciidoctor-pdf -v -a pdf-style="${SRCDIR}"/book-theme.yml \
     --trace -a pdf-fontsdir="${SRCDIR}"/font/ \
     -D "${BUILDDIR}" -o ${PDFFILE} ${MAIN}
 
-echo ":floppy_disk: Built PDF: ${PDFFILE}" >>$GITHUB_STEP_SUMMARY
+ls -la ${BUILDDIR}/${PDFFILE}
 
-echo "All done! :beers:" >>$GITHUB_STEP_SUMMARY
+# Set the artifact path for subsequent steps
+echo "PDF_PATH=${BUILDDIR}/${PDFFILE}" >> "$GITHUB_OUTPUT"
+
+echo ":floppy_disk: Built PDF at path ${BUILDDIR}/${PDFFILE}" >>$GITHUB_STEP_SUMMARY

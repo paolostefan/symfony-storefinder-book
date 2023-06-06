@@ -2,15 +2,20 @@ on: workflow_dispatch
 jobs:
   build_pdf:
     runs-on: ubuntu-latest
-    name: 'Build that PDF book'
+    name: 'Build that PDF book, dude'
     container:
       image: asciidoctor/docker-asciidoctor:latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: List working dir on container
-        run: ls -la $GITHUB_WORKSPACE/asciidoc
-      - name: Run dockerized build script
+      # Thanks a lot to https://stackoverflow.com/a/69691610/719247
+      # - name: List working dir on container
+      #   run: ls -la $GITHUB_WORKSPACE/asciidoc
+      - name: Build PDF
         id: bp
         run: "bash ./scripts/github-build-pdf.sh"
+      - name: Download PDF
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ steps.bp.outputs.PDF_PATH }}
         
